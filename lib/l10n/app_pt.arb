@@ -1,0 +1,340 @@
+{
+  "@@locale": "pt",
+  "appTitle": "Emplake",
+  "soundOn": "Som ligado",
+  "soundOff": "Som desligado",
+  "soundOffShort": "som desligado",
+  "navHome": "Início",
+  "navHistory": "Resolvidos",
+  "navGame": "Jogo",
+  "navHelp": "Ajuda",
+  "navSettings": "Configurações",
+  "notFound": "Página não encontrada.",
+  "back": "Voltar",
+  "cancel": "Cancelar",
+  "ok": "OK",
+  "retry": "Tentar de novo",
+  "coverSheet": "FL. 00 · CAPA",
+  "plateCountry": "BRASIL",
+  "coverTagline": "Use os quatro dígitos da placa, na ordem, para montar uma igualdade verdadeira.",
+  "coverTap": "TOQUE PARA COMEÇAR",
+  "coverProject": "PROJETO",
+  "coverScale": "ESCALA",
+  "coverYear": "ANO",
+  "loginSubtitle": "Entre para salvar seus números resolvidos.",
+  "loginTeam": "EQUIPE",
+  "loginMember": "INTEGRANTE {n}",
+  "@loginMember": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "loginCredit": "Jogo concebido por Prof. Walter A. Carnielli",
+  "language": "Idioma",
+  "greeting": "OLÁ, {name} · {points} PTS",
+  "@greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "stepOf": "PASSO {step} DE {total}",
+  "@stepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "modeQuestion": "Como você quer jogar?",
+  "modeEducational": "Educacional",
+  "modeEducationalDesc": "Exemplos resolvidos passo a passo para aprender os operadores.",
+  "modeRandom": "Aleatório",
+  "modeRandomDesc": "Os números são sorteados entre os que você ainda não resolveu.",
+  "modeSpecific": "Específico",
+  "modeSpecificDesc": "Você digita o número de 4 dígitos que quer resolver.",
+  "modeChallenges": "Desafios",
+  "modeChallengesDesc": "Conjunto de desafios com diferentes dificuldades.",
+  "modeAdventure": "Aventura",
+  "modeAdventureDesc": "Uma placa por cidade, numa viagem pelo Brasil.",
+  "comingSoon": "EM BREVE",
+  "continueLabel": "CONTINUAR",
+  "modeLabel": "MODO: {mode}",
+  "@modeLabel": {
+    "placeholders": {
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseLevel": "Escolha o nível",
+  "levelEasy": "Fácil",
+  "levelIntermediate": "Intermediário",
+  "levelAdvanced": "Avançado",
+  "levelHard": "Difícil",
+  "levelEasyShort": "Fácil",
+  "levelIntermediateShort": "Interm.",
+  "levelAdvancedShort": "Avanç.",
+  "levelHardShort": "Difícil",
+  "levelEasyNote": "Único nível que aceita divisão não inteira (5 ÷ 2).",
+  "levelIntermediateNote": "Divisões precisam dar resultado inteiro.",
+  "levelAdvancedNote": "Sem raiz cúbica e sem potência.",
+  "levelHardNote": "Só as quatro operações e módulo.",
+  "operatorCount": "{count, plural, =1{1 operador} other{{count} operadores}}",
+  "@operatorCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "secondsPerNumber": "{seconds}s por número",
+  "@secondsPerNumber": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "fourDigitNumber": "NÚMERO DE 4 DÍGITOS",
+  "typeFourDigits": "Digite os 4 dígitos.",
+  "start": "COMEÇAR",
+  "pointsShort": "{points} pts",
+  "@pointsShort": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "treeGrowsHint": "a árvore cresce para cima\nconforme você liga os números",
+  "hintStart": "Toque entre dois números e escolha um operador para ligá-los. O = entra do mesmo jeito, uma única vez.",
+  "paletteBetween": "ENTRE NÚMEROS",
+  "paletteOver": "SOBRE UM TRECHO",
+  "paletteTapGap": "toque num vão entre números",
+  "paletteTapNode": "toque num número ou ramo",
+  "paletteGapSelected": "vão selecionado",
+  "paletteNodeSelected": "nó selecionado: {node}",
+  "@paletteNodeSelected": {
+    "placeholders": {
+      "node": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLabel": "vão {n}",
+  "@gapLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "removeOperator": "Remover operador",
+  "toggleParens": "Parênteses",
+  "undo": "Desfazer",
+  "skip": "PULAR",
+  "verify": "VERIFICAR",
+  "linksLeft": "{count, plural, =1{FALTA 1 LIGAÇÃO} other{FALTAM {count} LIGAÇÕES}}",
+  "@linksLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fixError": "CORRIJA O ERRO",
+  "latex": "LATEX",
+  "copy": "Copiar",
+  "copied": "Copiado!",
+  "pause": "Pausar",
+  "pausedTitle": "PAUSADO",
+  "pausedBody": "A árvore fica escondida durante a pausa.",
+  "resume": "Continuar",
+  "timeUp": "tempo esgotado",
+  "leftSide": "esquerda {value}",
+  "@leftSide": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "rightSide": "direita {value}",
+  "@rightSide": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "equalityTrue": "igualdade verdadeira",
+  "equalityFalse": "igualdade falsa",
+  "loadingNumber": "SORTEANDO UM NÚMERO…",
+  "allSolved": "Você já resolveu todos os números deste nível!",
+  "alreadySolved": "Você já resolveu este número neste nível. Pode jogar de novo, mas sem pontos.",
+  "noGame": "Nenhuma partida em andamento.",
+  "newGame": "NOVA PARTIDA",
+  "treeTitleDesktop": "ÁRVORE DA EXPRESSÃO · clique num nó · Tab alterna",
+  "formula": "FÓRMULA",
+  "infoNumber": "NÚMERO",
+  "infoDigits": "DÍGITOS",
+  "infoMode": "MODO",
+  "infoLevel": "NÍVEL",
+  "wrongTitle": "IGUALDADE FALSA",
+  "wrongBody": "O lado esquerdo vale {left} e o direito vale {right}. Ajuste e tente de novo.",
+  "@wrongBody": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      },
+      "right": {
+        "type": "String"
+      }
+    }
+  },
+  "errDivisionByZero": "DIVISÃO POR ZERO",
+  "errDivisionByZeroBody": "Não dá para dividir por zero. Troque o nó destacado.",
+  "errNonIntegerDivision": "DIVISÃO NÃO INTEIRA: {a} ÷ {b} = {result}",
+  "@errNonIntegerDivision": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
+  "errNonIntegerDivisionBody": "No nível {level}, toda divisão precisa ter resultado inteiro. Troque o nó destacado ou mude a estrutura.",
+  "@errNonIntegerDivisionBody": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "errFactorialDomain": "FATORIAL INVÁLIDO",
+  "errFactorialDomainBody": "O fatorial só vale para números inteiros de 0 em diante.",
+  "errFactorialTooLarge": "FATORIAL GRANDE DEMAIS",
+  "errFactorialTooLargeBody": "Use o fatorial só até 20!.",
+  "errEvenRoot": "RAIZ DE NÚMERO NEGATIVO",
+  "errEvenRootBody": "A raiz quadrada de um número negativo não é um número real.",
+  "errZeroNegPower": "ZERO ELEVADO A NEGATIVO",
+  "errZeroNegPowerBody": "0 elevado a um expoente negativo não está definido.",
+  "errComplexPower": "POTÊNCIA NÃO REAL",
+  "errComplexPowerBody": "Base negativa com expoente não inteiro não dá um número real.",
+  "errTooLarge": "NÚMERO GRANDE DEMAIS",
+  "errTooLargeBody": "O resultado passou do limite. Tente outra estrutura.",
+  "errNotAllowed": "OPERADOR FORA DO NÍVEL",
+  "errNotAllowedBody": "Esse operador não está liberado neste nível.",
+  "resultTrue": "IGUALDADE VERDADEIRA",
+  "resultTrueDetail": "{value} = {value} · resolvido em {seconds}s",
+  "@resultTrueDetail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resultLate": "CERTO, MAS FORA DO TEMPO",
+  "resultLateDetail": "{value} = {value} · o tempo acabou antes de verificar",
+  "@resultLateDetail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "points": "PONTOS",
+  "total": "TOTAL",
+  "savedSolved": "{number} salvo nos seus resolvidos",
+  "@savedSolved": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "savedCounts": "{number} conta como resolvido",
+  "@savedCounts": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "savedReplay": "{number} já estava nos seus resolvidos",
+  "@savedReplay": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "saving": "Salvando…",
+  "saveError": "Não foi possível salvar. Verifique sua conexão.",
+  "menu": "MENU",
+  "nextNumber": "PRÓXIMO NÚMERO",
+  "historyEyebrow": "SEU HISTÓRICO",
+  "historyTitle": "Resolvidos",
+  "historyLoading": "TRAÇANDO SEU HISTÓRICO…",
+  "solvedCount": "RESOLVIDOS",
+  "skippedCount": "PULADOS",
+  "filterAll": "Todos",
+  "historyEmpty": "Nenhum número resolvido aqui ainda. Que tal começar?",
+  "historyError": "Não foi possível carregar seu histórico.",
+  "today": "HOJE",
+  "yesterday": "ONTEM",
+  "latexCopied": "LaTeX copiado",
+  "lateTag": "FORA DO TEMPO",
+  "settingsEyebrow": "PREFERÊNCIAS",
+  "settingsTitle": "Configurações",
+  "theme": "TEMA",
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Escuro",
+  "themeHint": "Segue o tema do aparelho até você escolher outro.",
+  "presets": "TEMAS PRONTOS",
+  "presetBlueprint": "Planta",
+  "presetGraphite": "Grafite",
+  "presetSepia": "Sépia",
+  "presetForest": "Floresta",
+  "seedColor": "COR SEMENTE",
+  "pickColor": "Escolher cor",
+  "fontSize": "TAMANHO DA FONTE",
+  "fontSample": "Use os quatro dígitos na ordem.",
+  "fontFamily": "TIPO DE FONTE",
+  "sound": "SOM",
+  "soundEffects": "Efeitos sonoros",
+  "music": "Música",
+  "languageSection": "IDIOMA",
+  "account": "CONTA",
+  "signOut": "Sair",
+  "providerGoogle": "Google",
+  "providerEmail": "E-mail",
+  "player": "Jogador",
+  "helpTitle": "COMO JOGAR",
+  "help1": "Use os quatro dígitos da placa na ordem em que aparecem.",
+  "help2": "O = entra entre dois números, uma única vez, e separa os dois lados.",
+  "help3": "Toque num vão para ligar dois blocos com + − × ÷ xʸ. Toque num nó para trocar o operador ou aplicar √, !, |x| e outros sobre aquele trecho; ( ) agrupa o trecho.",
+  "help4": "Logo abaixo da sua fórmula aparece a mesma fórmula em LaTeX. Verificar confere se os dois lados são iguais; Pular troca por outro número ainda não resolvido.",
+  "helpEasyOps": "todos, inclusive ⌊x⌋ ⌈x⌉",
+  "helpFraction": "Divisão com resultado não inteiro (como 5 ÷ 2) só vale no Fácil.",
+  "helpGotIt": "ENTENDI"
+}

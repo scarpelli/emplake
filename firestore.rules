@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// Each player reads and writes only their own documents:
+//   users/{uid}                      profile and counters
+//   users/{uid}/solved/{level_nnnn}  solved numbers
+//   users/{uid}/skipped/{level_nnnn} skipped numbers
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validLevel(level) {
+      return level in ['easy', 'intermediate', 'advanced', 'hard'];
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /solved/{entry} {
+        allow read: if isOwner(uid);
+        // Solved entries are created once and never edited.
+        allow create: if isOwner(uid)
+          && request.resource.data.number is string
+          && request.resource.data.number.size() == 4
+          && validLevel(request.resource.data.level)
+          && entry == request.resource.data.level + '_' + request.resource.data.number
+          && request.resource.data.points is int
+          && request.resource.data.points >= 0
+          && request.resource.data.points <= 100;
+        allow update, delete: if false;
+      }
+
+      match /skipped/{entry} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+  }
+}
