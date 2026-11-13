@@ -190,13 +190,21 @@
   "hintStart": "Toque entre dois números e escolha um operador, ou arraste o sinal até o vão. O = entra do mesmo jeito, uma única vez. Arraste um sinal para outro vão para movê-lo, ou para fora da árvore para tirá-lo.",
   "paletteBetween": "ENTRE NÚMEROS",
   "paletteOver": "SOBRE UM TRECHO",
-  "paletteTapGap": "toque num vão entre números",
+  "paletteTapGap": "toque num vão ou num sinal",
   "paletteTapNode": "toque num número ou ramo",
   "paletteGapSelected": "vão selecionado",
   "paletteNodeSelected": "nó selecionado: {node}",
   "@paletteNodeSelected": {
     "placeholders": {
       "node": {
+        "type": "String"
+      }
+    }
+  },
+  "paletteCarrying": "levando {sign}: toque num vão",
+  "@paletteCarrying": {
+    "placeholders": {
+      "sign": {
         "type": "String"
       }
     }
@@ -465,6 +473,7 @@
       }
     }
   },
+  "achievementBanner": "CONQUISTA DESBLOQUEADA",
   "savedSolved": "{number} salvo nos seus resolvidos",
   "@savedSolved": {
     "placeholders": {

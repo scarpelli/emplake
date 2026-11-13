@@ -31,8 +31,10 @@ class GapSelection extends Selection {
 }
 
 class NodeSelection extends Selection {
-  const NodeSelection(this.nodeId);
+  const NodeSelection(this.nodeId, {this.picked = false});
   final int nodeId;
+
+  final bool picked;
 
   @override
   bool operator ==(Object other) => other is NodeSelection && other.nodeId == nodeId;
@@ -71,6 +73,23 @@ class MoveBinaryDrag extends SignDrag {
 class MoveEqualsDrag extends SignDrag {
   const MoveEqualsDrag(this.fromGap);
   final int fromGap;
+}
+
+class CarrySelection extends Selection {
+  const CarrySelection(this.drag);
+  final SignDrag drag;
+
+  BinOp? get op => switch (drag) {
+    PaletteBinaryDrag(:final op) => op,
+    _ => null,
+  };
+
+  bool get isEquals => drag is PaletteEqualsDrag;
+
+  @override
+  bool operator ==(Object other) => other is CarrySelection && other.op == op && other.isEquals == isEquals;
+  @override
+  int get hashCode => Object.hash(op, isEquals);
 }
 
 class GameState {
@@ -334,15 +353,39 @@ class GameController extends Notifier<GameState?> {
 
   void clear() => state = null;
 
+  SignDrag? _inHand(GameState s) {
+    switch (s.selection) {
+      case CarrySelection(:final drag):
+        return drag;
+      case EqualsSelection() when s.board.eqDigitGap != null:
+        return MoveEqualsDrag(s.board.eqDigitGap!);
+      case NodeSelection(:final nodeId, picked: true):
+        final node = s.board.find(nodeId);
+        return node is Binary ? MoveBinaryDrag(nodeId, node.digitGap) : null;
+      default:
+        return null;
+    }
+  }
+
+  bool _dropHere(GameState s, SignDrag drag, int gap) {
+    final next = _dropped(s.board, drag, gap);
+    if (identical(next, s.board)) return false;
+    _commit(s, next);
+    return true;
+  }
+
   void selectGap(int gap) {
     final s = _editable;
     if (s == null) return;
+    final hand = _inHand(s);
+    if (hand != null && _dropHere(s, hand, s.board.digitGapOf(gap))) return;
     state = s.copyWith(selection: GapSelection(gap));
   }
 
   void selectEquals() {
     final s = _editable;
     if (s == null || s.board.eqGap == null) return;
+    if (s.selection case CarrySelection(:final drag) when _dropHere(s, drag, s.board.eqDigitGap!)) return;
     final already = s.selection is EqualsSelection;
     state = already ? s.copyWith(clearSelection: true) : s.copyWith(selection: const EqualsSelection());
   }
@@ -350,8 +393,17 @@ class GameController extends Notifier<GameState?> {
   void selectNode(int nodeId) {
     final s = _editable;
     if (s == null) return;
+    final node = s.board.find(nodeId);
+    if (s.selection case CarrySelection(:final drag) when node is Binary) {
+      if (_dropHere(s, drag, node.digitGap)) return;
+    }
     final already = s.selection == NodeSelection(nodeId);
-    state = already ? s.copyWith(clearSelection: true) : s.copyWith(selection: NodeSelection(nodeId));
+    state = already ? s.copyWith(clearSelection: true) : s.copyWith(selection: NodeSelection(nodeId, picked: true));
+  }
+
+  void _carry(GameState s, SignDrag drag) {
+    final carry = CarrySelection(drag);
+    state = s.selection == carry ? s.copyWith(clearSelection: true) : s.copyWith(selection: carry);
   }
 
   void cycleSelection({bool backwards = false}) {
@@ -397,17 +449,25 @@ class GameController extends Notifier<GameState?> {
         final node = s.board.find(nodeId)! as Binary;
         if (node.op == op) return;
         _commit(s, s.board.changeBinary(nodeId, op), select: NodeSelection(nodeId));
+      case EqualsSelection() when s.board.eqDigitGap != null:
+        _dropHere(s, PaletteBinaryDrag(op), s.board.eqDigitGap!);
       default:
-        return;
+        _carry(s, PaletteBinaryDrag(op));
     }
   }
 
   void placeEquals() {
     final s = _editable;
     if (s == null) return;
-    final sel = s.selection;
-    if (sel is GapSelection && s.board.canPlaceEquals(sel.gap)) {
-      _commit(s, s.board.placeEquals(sel.gap));
+    switch (s.selection) {
+      case GapSelection(:final gap):
+        _dropHere(s, const PaletteEqualsDrag(), s.board.digitGapOf(gap));
+      case NodeSelection(:final nodeId) when s.board.find(nodeId) is Binary:
+        _dropHere(s, const PaletteEqualsDrag(), (s.board.find(nodeId)! as Binary).digitGap);
+      case EqualsSelection():
+        return;
+      default:
+        _carry(s, const PaletteEqualsDrag());
     }
   }
 

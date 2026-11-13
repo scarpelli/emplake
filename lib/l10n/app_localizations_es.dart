@@ -316,7 +316,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paletteOver => 'SOBRE UN TRAMO';
 
   @override
-  String get paletteTapGap => 'toca un hueco entre números';
+  String get paletteTapGap => 'toca un hueco o un signo';
 
   @override
   String get paletteTapNode => 'toca un número o rama';
@@ -327,6 +327,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String paletteNodeSelected(String node) {
     return 'nodo seleccionado: $node';
+  }
+
+  @override
+  String paletteCarrying(String sign) {
+    return 'llevando $sign: toca un hueco';
   }
 
   @override
@@ -664,6 +669,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String achievementUnlocked(String title) {
     return 'Logro: $title';
   }
+
+  @override
+  String get achievementBanner => 'LOGRO DESBLOQUEADO';
 
   @override
   String savedSolved(String number) {

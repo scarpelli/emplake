@@ -49,30 +49,11 @@ enum Level {
 
   static const pauseSeconds = 10;
 
-  int pointsFor({
-    required int secondsLeft,
-    required bool inTime,
-    int hints = 0,
-    bool blind = false,
-    int streak = 0,
-  }) =>
+  int pointsFor({required int secondsLeft, required bool inTime, int hints = 0, bool blind = false, int streak = 0}) =>
       score(secondsLeft: secondsLeft, inTime: inTime, hints: hints, blind: blind, streak: streak).total;
 
-  Score score({
-    required int secondsLeft,
-    required bool inTime,
-    int hints = 0,
-    bool blind = false,
-    int streak = 0,
-  }) =>
-      Score(
-        base: basePoints,
-        timeBonus: secondsLeft ~/ 5,
-        inTime: inTime,
-        hints: hints,
-        blind: blind,
-        streak: streak,
-      );
+  Score score({required int secondsLeft, required bool inTime, int hints = 0, bool blind = false, int streak = 0}) =>
+      Score(base: basePoints, timeBonus: secondsLeft ~/ 5, inTime: inTime, hints: hints, blind: blind, streak: streak);
 
   List<String> get operatorLabels => [
     for (final op in [BinOp.add, BinOp.sub, BinOp.mul, BinOp.div])

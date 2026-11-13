@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import '../../../core/theme/blueprint.dart';
 import '../../../core/widgets/bp_widgets.dart';
 import '../../../core/widgets/emplake_logo.dart';
 import '../../../data/firestore_repository.dart';
+import '../../achievements/achievement_toast.dart';
 import '../../achievements/achievements.dart';
 import '../../daily/daily.dart';
 import '../../help/help_dialog.dart';
@@ -164,21 +166,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       await repo.unlockAchievements(unlocked.map((a) => a.name));
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      final l = context.l10n;
-      for (final a in unlocked) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            duration: const Duration(seconds: 4),
-            content: Row(
-              children: [
-                Icon(a.icon, color: context.bp.onInk),
-                const SizedBox(width: 12),
-                Expanded(child: Text(l.achievementUnlocked(a.title(l)))),
-              ],
-            ),
-          ),
-        );
-      }
+      unawaited(showAchievementToasts(context, unlocked));
     } catch (_) {
     }
   }
@@ -305,17 +293,17 @@ class _GamePageState extends ConsumerState<GamePage> {
     context.go('/play');
   }
 
-  void _binary(BinOp op) {
-    final linking = ref.read(gameControllerProvider)?.selection is GapSelection;
-    _ctrl.applyBinary(op);
-    if (linking) _buzz();
-    _sound.play(linking ? Sfx.link : Sfx.tap);
+  void _act(VoidCallback action) {
+    final before = ref.read(gameControllerProvider)?.board;
+    action();
+    final changed = !identical(before, ref.read(gameControllerProvider)?.board);
+    _sound.play(changed ? Sfx.link : Sfx.tap);
+    if (changed) _buzz();
   }
 
-  void _equals() {
-    _ctrl.placeEquals();
-    _sound.play(Sfx.link);
-  }
+  void _binary(BinOp op) => _act(() => _ctrl.applyBinary(op));
+
+  void _equals() => _act(_ctrl.placeEquals);
 
   void _unary(UnOp op) {
     _ctrl.applyUnary(op);
@@ -519,18 +507,9 @@ class _GamePageState extends ConsumerState<GamePage> {
               emptyHint: null,
               showValues: settings.showLiveValues,
               hintGaps: _hintGaps(state),
-              onTapNode: (id) {
-                _ctrl.selectNode(id);
-                _sound.play(Sfx.tap);
-              },
-              onTapGap: (g) {
-                _ctrl.selectGap(g);
-                _sound.play(Sfx.tap);
-              },
-              onTapEquals: () {
-                _ctrl.selectEquals();
-                _sound.play(Sfx.tap);
-              },
+              onTapNode: (id) => _act(() => _ctrl.selectNode(id)),
+              onTapGap: (g) => _act(() => _ctrl.selectGap(g)),
+              onTapEquals: () => _act(_ctrl.selectEquals),
               onDrop: _drop,
               canDrop: _ctrl.canDrop,
               onDropOutside: _dropOutside,

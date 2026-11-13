@@ -114,7 +114,7 @@ class _ModePageState extends ConsumerState<ModePage> {
                 return SelectTile(
                   selected: selected,
                   enabled: m.isAvailable,
-                  onTap: () => setState(() => _mode = m),
+                  onTap: () => m == _mode ? _continue() : setState(() => _mode = m),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

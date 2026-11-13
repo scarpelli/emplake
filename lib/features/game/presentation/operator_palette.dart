@@ -51,9 +51,11 @@ class OperatorPalette extends StatelessWidget {
     final canEquals = playing && gap != null && board.canPlaceEquals(gap);
     final binaryNode = playing && node is Binary ? node : null;
     final nodeSelected = playing && node != null;
+    final carried = sel is CarrySelection ? sel : null;
 
     final betweenHint = switch (sel) {
       GapSelection() => l.paletteGapSelected,
+      CarrySelection(:final op) => l.paletteCarrying(op?.label ?? '='),
       EqualsSelection() => l.paletteNodeSelected('='),
       NodeSelection() when node != null => l.paletteNodeSelected(TreeLayout.of(board).nodes[node.id]?.label ?? ''),
       _ => l.paletteTapGap,
@@ -72,7 +74,7 @@ class OperatorPalette extends StatelessWidget {
       children: [
         Eyebrow(
           '${l.paletteBetween} · $betweenHint',
-          opacity: canLinkGap || canEquals || binaryNode != null ? 0.75 : 0.5,
+          opacity: canLinkGap || canEquals || binaryNode != null || carried != null ? 0.75 : 0.5,
         ),
         const SizedBox(height: 6),
         _Grid(
@@ -87,8 +89,8 @@ class OperatorPalette extends StatelessWidget {
                   key: keys.of(op),
                   label: op.label,
                   tooltip: '${op.name(l)} · ${op.example(context.decimalSeparator)}',
-                  enabled: canLinkGap || binaryNode != null,
-                  active: binaryNode?.op == op,
+                  enabled: playing,
+                  active: binaryNode?.op == op || carried?.op == op,
                   onTap: () => onBinary(op),
                 ),
               ),
@@ -100,8 +102,8 @@ class OperatorPalette extends StatelessWidget {
                 key: keys.of('='),
                 label: '=',
                 tooltip: '=',
-                enabled: canEquals,
-                active: false,
+                enabled: playing,
+                active: carried?.isEquals ?? false,
                 onTap: onEquals,
               ),
             ),

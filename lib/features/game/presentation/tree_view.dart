@@ -308,7 +308,7 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
                           GapSelection(:final gap) => n.kind == TreeNodeKind.gap && n.id == TreeLayout.gapId(gap),
                           NodeSelection(:final nodeId) => n.id == nodeId,
                           EqualsSelection() => n.kind == TreeNodeKind.equals,
-                          null => false,
+                          CarrySelection() || null => false,
                         },
                         error: n.id == errorId,
                       ),
@@ -346,11 +346,22 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
     };
   }
 
+  bool get _signInHand {
+    final sel = widget.state.selection;
+    return switch (sel) {
+      CarrySelection() || EqualsSelection() => true,
+      NodeSelection(:final nodeId, picked: true) => widget.state.board.find(nodeId) is Binary,
+      _ => false,
+    };
+  }
+
   Widget _interactiveNode(PlacedNode n, {required bool selected, required bool error}) {
     final hinted = n.digitGap != null && widget.hintGaps.contains(n.digitGap);
+    final destination = n.kind == TreeNodeKind.gap && _editable && _signInHand;
     Widget chip({bool hover = false}) => _NodeChip(
       node: n,
       hint: hinted,
+      destination: destination,
       selected: selected,
       hover: hover,
       error: error,
@@ -478,12 +489,15 @@ class _NodeChip extends StatelessWidget {
     required this.onTap,
     this.hover = false,
     this.hint = false,
+    this.destination = false,
   });
 
   final PlacedNode node;
   final bool selected;
 
   final bool hint;
+
+  final bool destination;
 
   final bool hover;
   final bool error;
@@ -558,12 +572,15 @@ class _NodeChip extends StatelessWidget {
         );
       case TreeNodeKind.gap:
         shape = CustomPaint(
-          painter: _DashedBoxPainter(lit ? bp.accent : bp.line, filled: lit ? bp.accent : null),
+          painter: _DashedBoxPainter(
+            lit || destination ? bp.accent : bp.line,
+            filled: lit ? bp.accent : (destination ? bp.accent.withValues(alpha: 0.18) : null),
+          ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 120),
             width: hover ? 30 : 22,
             height: hover ? 30 : 22,
-            child: Icon(Icons.add, size: 14, color: lit ? bp.onAccent : bp.muted),
+            child: Icon(Icons.add, size: 14, color: lit ? bp.onAccent : (destination ? bp.accent : bp.muted)),
           ),
         );
     }

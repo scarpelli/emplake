@@ -607,7 +607,7 @@ abstract class AppLocalizations {
   /// No description provided for @paletteTapGap.
   ///
   /// In pt, this message translates to:
-  /// **'toque num vão entre números'**
+  /// **'toque num vão ou num sinal'**
   String get paletteTapGap;
 
   /// No description provided for @paletteTapNode.
@@ -627,6 +627,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'nó selecionado: {node}'**
   String paletteNodeSelected(String node);
+
+  /// No description provided for @paletteCarrying.
+  ///
+  /// In pt, this message translates to:
+  /// **'levando {sign}: toque num vão'**
+  String paletteCarrying(String sign);
 
   /// No description provided for @gapLabel.
   ///
@@ -1173,6 +1179,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Conquista: {title}'**
   String achievementUnlocked(String title);
+
+  /// No description provided for @achievementBanner.
+  ///
+  /// In pt, this message translates to:
+  /// **'CONQUISTA DESBLOQUEADA'**
+  String get achievementBanner;
 
   /// No description provided for @savedSolved.
   ///

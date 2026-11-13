@@ -1,6 +1,8 @@
 import 'package:emplake/core/prefs.dart';
 import 'package:emplake/core/theme/blueprint.dart';
 import 'package:emplake/data/firestore_repository.dart';
+import 'package:emplake/features/achievements/achievement_toast.dart';
+import 'package:emplake/features/achievements/achievements.dart';
 import 'package:emplake/features/game/application/game_controller.dart';
 import 'package:emplake/features/game/domain/expr.dart';
 import 'package:emplake/features/game/domain/level.dart';
@@ -37,6 +39,35 @@ void main() {
     await tester.tap(find.text('OPERADORES'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Fatorial'), findsWidgets);
+  });
+
+  testWidgets('achievements show at the top of the screen and leave by themselves', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        Builder(
+          builder: (context) => Align(
+            alignment: Alignment.bottomCenter,
+            child: TextButton(
+              onPressed: () => showAchievementToasts(context, [Achievement.firstSolve, Achievement.blind]),
+              child: const Text('unlock'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('unlock'));
+    await tester.pump(const Duration(milliseconds: 900));
+    expect(find.text('CONQUISTA DESBLOQUEADA'), findsOneWidget);
+    expect(find.text('Primeira placa'), findsOneWidget);
+    final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
+    expect(tester.getTopLeft(find.text('Primeira placa')).dy, lessThan(screen.height / 3));
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(milliseconds: 900));
+    expect(find.text('Primeira placa'), findsNothing);
+    expect(find.text('Às cegas'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('CONQUISTA DESBLOQUEADA'), findsNothing);
   });
 
   group('game page', () {

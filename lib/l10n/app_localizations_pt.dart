@@ -315,7 +315,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get paletteOver => 'SOBRE UM TRECHO';
 
   @override
-  String get paletteTapGap => 'toque num vão entre números';
+  String get paletteTapGap => 'toque num vão ou num sinal';
 
   @override
   String get paletteTapNode => 'toque num número ou ramo';
@@ -326,6 +326,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String paletteNodeSelected(String node) {
     return 'nó selecionado: $node';
+  }
+
+  @override
+  String paletteCarrying(String sign) {
+    return 'levando $sign: toque num vão';
   }
 
   @override
@@ -662,6 +667,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String achievementUnlocked(String title) {
     return 'Conquista: $title';
   }
+
+  @override
+  String get achievementBanner => 'CONQUISTA DESBLOQUEADA';
 
   @override
   String savedSolved(String number) {

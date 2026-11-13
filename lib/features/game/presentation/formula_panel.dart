@@ -132,7 +132,6 @@ class _FormulaPanelState extends State<FormulaPanel> {
               ],
             ),
           ),
-          if (widget.compact) rendered(context),
           AnimatedSize(
             duration: const Duration(milliseconds: 200),
             alignment: Alignment.topCenter,
@@ -141,7 +140,7 @@ class _FormulaPanelState extends State<FormulaPanel> {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (!widget.compact) rendered(context),
+                      rendered(context),
                       Container(
                         decoration: BoxDecoration(
                           border: Border(top: BorderSide(color: bp.lineSoft)),

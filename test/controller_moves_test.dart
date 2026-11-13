@@ -96,4 +96,75 @@ void main() {
     expect(text(container), '1 × 2 × 3 = 6');
     expect(c.check(), CheckResult.notReady, reason: 'no checking after giving up');
   });
+
+  group('click and carry', () {
+    test('a palette sign picked first is dropped on the next tapped gap', () async {
+      final container = await makeContainer();
+      addTearDown(container.dispose);
+      final c = container.read(gameControllerProvider.notifier);
+      c.start(mode: GameMode.random, level: Level.easy, number: '1236');
+      c.applyBinary(BinOp.mul);
+      expect(container.read(gameControllerProvider)!.selection, const CarrySelection(PaletteBinaryDrag(BinOp.mul)));
+      c.selectGap(0);
+      expect(text(container), '1 × 2   3   6');
+      c.placeEquals();
+      c.selectGap(1);
+      expect(text(container), '1 × 2   3 = 6');
+    });
+
+    test('an operator just created is not carried: the next gap tap selects that gap', () async {
+      final container = await makeContainer();
+      addTearDown(container.dispose);
+      final c = container.read(gameControllerProvider.notifier);
+      c.start(mode: GameMode.random, level: Level.easy, number: '1236');
+      c.selectGap(0);
+      c.applyBinary(BinOp.mul);
+      c.selectGap(1);
+      expect(text(container), '1 × 2   3   6');
+      expect(container.read(gameControllerProvider)!.selection, const GapSelection(1));
+    });
+
+    test('tapping the same palette sign again puts it back', () async {
+      final container = await makeContainer();
+      addTearDown(container.dispose);
+      final c = container.read(gameControllerProvider.notifier);
+      c.start(mode: GameMode.random, level: Level.easy, number: '1236');
+      c.applyBinary(BinOp.add);
+      c.applyBinary(BinOp.add);
+      expect(container.read(gameControllerProvider)!.selection, isNull);
+    });
+
+    test('a selected operator or "=" moves to the next tapped gap', () async {
+      final container = await makeContainer();
+      addTearDown(container.dispose);
+      final c = container.read(gameControllerProvider.notifier);
+      c.start(mode: GameMode.random, level: Level.easy, number: '1236');
+      c.drop(const PaletteBinaryDrag(BinOp.add), 0);
+      final plus = container.read(gameControllerProvider)!.board.binaryAt(0)!.id;
+      c.selectNode(plus);
+      c.selectGap(1);
+      expect(text(container), '1   2   3 + 6');
+
+      c.drop(const PaletteEqualsDrag(), 0);
+      c.selectEquals();
+      c.selectGap(1);
+      expect(text(container), '1   2 = 3 + 6');
+    });
+
+    test('a carried sign dropped on an operator or on "=" replaces it', () async {
+      final container = await makeContainer();
+      addTearDown(container.dispose);
+      final c = container.read(gameControllerProvider.notifier);
+      c.start(mode: GameMode.random, level: Level.easy, number: '1236');
+      c.drop(const PaletteBinaryDrag(BinOp.add), 0);
+      c.drop(const PaletteEqualsDrag(), 2);
+      c.applyBinary(BinOp.mul);
+      final plus = container.read(gameControllerProvider)!.board.binaryAt(0)!.id;
+      c.selectNode(plus);
+      expect(text(container), '1 × 2   3 = 6');
+      c.placeEquals();
+      c.selectEquals();
+      expect(container.read(gameControllerProvider)!.selection, const EqualsSelection());
+    });
+  });
 }

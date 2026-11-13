@@ -112,10 +112,12 @@ class _LevelPageState extends ConsumerState<LevelPage> {
           for (final level in Level.values) ...[
             SelectTile(
               selected: level == _level,
-              onTap: () => setState(() {
-                _level = level;
-                _error = null;
-              }),
+              onTap: () => level == _level
+                  ? _start()
+                  : setState(() {
+                      _level = level;
+                      _error = null;
+                    }),
               child: Builder(
                 builder: (context) {
                   final on = level == _level;

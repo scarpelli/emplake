@@ -313,7 +313,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paletteOver => 'ON A SEGMENT';
 
   @override
-  String get paletteTapGap => 'tap a gap between numbers';
+  String get paletteTapGap => 'tap a gap or a sign';
 
   @override
   String get paletteTapNode => 'tap a number or branch';
@@ -324,6 +324,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String paletteNodeSelected(String node) {
     return 'selected node: $node';
+  }
+
+  @override
+  String paletteCarrying(String sign) {
+    return 'carrying $sign: tap a gap';
   }
 
   @override
@@ -660,6 +665,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String achievementUnlocked(String title) {
     return 'Achievement: $title';
   }
+
+  @override
+  String get achievementBanner => 'ACHIEVEMENT UNLOCKED';
 
   @override
   String savedSolved(String number) {

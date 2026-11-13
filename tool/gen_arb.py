@@ -148,10 +148,12 @@ s('hintStart', 'Toque entre dois números e escolha um operador, ou arraste o si
   'Toca entre dos números y elige un operador, o arrastra el signo al hueco. El = entra igual, una sola vez. Arrastra un signo a otro hueco para moverlo, o fuera del árbol para quitarlo.')
 s('paletteBetween', 'ENTRE NÚMEROS', 'BETWEEN NUMBERS', 'ENTRE NÚMEROS')
 s('paletteOver', 'SOBRE UM TRECHO', 'ON A SEGMENT', 'SOBRE UN TRAMO')
-s('paletteTapGap', 'toque num vão entre números', 'tap a gap between numbers', 'toca un hueco entre números')
+s('paletteTapGap', 'toque num vão ou num sinal', 'tap a gap or a sign', 'toca un hueco o un signo')
 s('paletteTapNode', 'toque num número ou ramo', 'tap a number or branch', 'toca un número o rama')
 s('paletteGapSelected', 'vão selecionado', 'gap selected', 'hueco seleccionado')
 s('paletteNodeSelected', 'nó selecionado: {node}', 'selected node: {node}', 'nodo seleccionado: {node}', {'node': STR})
+s('paletteCarrying', 'levando {sign}: toque num vão', 'carrying {sign}: tap a gap', 'llevando {sign}: toca un hueco',
+  {'sign': STR})
 s('gapLabel', 'vão {n}', 'gap {n}', 'hueco {n}', {'n': INT})
 s('removeOperator', 'Remover sinal', 'Remove sign', 'Quitar signo')
 s('hintTitle', 'DICA {n} DE 3', 'HINT {n} OF 3', 'PISTA {n} DE 3', {'n': INT})
@@ -293,6 +295,7 @@ s('scoreBlind', 'às cegas ×1,25', 'blind ×1.25', 'a ciegas ×1,25')
 s('scoreStreak', 'sequência {count}: +{percent}%', 'streak {count}: +{percent}%', 'racha {count}: +{percent}%',
   {'count': INT, 'percent': INT})
 s('achievementUnlocked', 'Conquista: {title}', 'Achievement: {title}', 'Logro: {title}', {'title': STR})
+s('achievementBanner', 'CONQUISTA DESBLOQUEADA', 'ACHIEVEMENT UNLOCKED', 'LOGRO DESBLOQUEADO')
 s('savedSolved', '{number} salvo nos seus resolvidos', '{number} saved to your solved numbers',
   '{number} guardado en tus resueltos', {'number': STR})
 s('savedCounts', '{number} conta como resolvido', '{number} counts as solved', '{number} cuenta como resuelto',
