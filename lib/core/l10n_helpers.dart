@@ -57,8 +57,6 @@ extension ModeL10n on GameMode {
   bool get isAvailable => switch (this) {
     _ => true,
   };
-
-  bool get listed => this != GameMode.daily;
 }
 
 (String, String) evalErrorText(EvalError e, Level level, AppLocalizations l, String sep) => switch (e.kind) {

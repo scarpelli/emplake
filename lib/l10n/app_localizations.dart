@@ -313,7 +313,7 @@ abstract class AppLocalizations {
   /// No description provided for @modeChallengesDesc.
   ///
   /// In pt, this message translates to:
-  /// **'Contra o relógio ou com uma regra extra em cada placa. Bata o seu recorde.'**
+  /// **'Jogue contra o relógio ou com uma regra extra em cada placa, e tente bater os seus recordes.'**
   String get modeChallengesDesc;
 
   /// No description provided for @modeAdventure.
@@ -325,7 +325,7 @@ abstract class AppLocalizations {
   /// No description provided for @modeAdventureDesc.
   ///
   /// In pt, this message translates to:
-  /// **'Todas as placas numa trilha por nível. Ganhe até 3 estrelas em cada fase.'**
+  /// **'Todas as placas do jogo numa trilha, do Fácil ao Difícil. Cada fase vale até 3 estrelas.'**
   String get modeAdventureDesc;
 
   /// No description provided for @modeDaily.
@@ -1123,7 +1123,7 @@ abstract class AppLocalizations {
   /// No description provided for @pointsReplayZero.
   ///
   /// In pt, this message translates to:
-  /// **'Número já resolvido neste nível: sem pontos.'**
+  /// **'Você já tinha resolvido este número neste nível, então ele não vale pontos de novo.'**
   String get pointsReplayZero;
 
   /// No description provided for @howScoringWorks.
@@ -1951,13 +1951,13 @@ abstract class AppLocalizations {
   /// No description provided for @adventureLockedStage.
   ///
   /// In pt, this message translates to:
-  /// **'Bloqueada: conclua as fases anteriores.'**
+  /// **'Esta fase abre quando você concluir as anteriores.'**
   String get adventureLockedStage;
 
   /// No description provided for @adventureStarsRule.
   ///
   /// In pt, this message translates to:
-  /// **'★ resolveu · ★★ no tempo e sem dica · ★★★ e com metade do tempo sobrando'**
+  /// **'★ quando você resolve, ★★ no tempo e sem dicas, ★★★ com pelo menos metade do tempo sobrando'**
   String get adventureStarsRule;
 
   /// No description provided for @adventureContinue.
@@ -1969,7 +1969,7 @@ abstract class AppLocalizations {
   /// No description provided for @adventureAllDone.
   ///
   /// In pt, this message translates to:
-  /// **'Trilha completa!'**
+  /// **'Você completou a trilha inteira!'**
   String get adventureAllDone;
 
   /// No description provided for @adventureStarsEarned.
@@ -2059,7 +2059,7 @@ abstract class AppLocalizations {
   /// No description provided for @challengeLadder.
   ///
   /// In pt, this message translates to:
-  /// **'Escada fixa: começa no Fácil e sobe de degrau a cada 3 acertos, até o Difícil. Sem dicas e sem pausa.'**
+  /// **'Os dois desafios começam no Fácil e sobem um degrau a cada 3 acertos, até chegar ao Difícil. Neles não há dicas nem pausa.'**
   String get challengeLadder;
 
   /// No description provided for @challengeRecord.
@@ -2125,19 +2125,19 @@ abstract class AppLocalizations {
   /// No description provided for @ruleForbid.
   ///
   /// In pt, this message translates to:
-  /// **'Sem {op}: este operador não pode ser usado.'**
+  /// **'Nesta placa, o {op} não pode ser usado.'**
   String ruleForbid(String op);
 
   /// No description provided for @ruleRequire.
   ///
   /// In pt, this message translates to:
-  /// **'Use {op}: a igualdade precisa ter este operador.'**
+  /// **'Nesta placa, a igualdade precisa usar o {op}.'**
   String ruleRequire(String op);
 
   /// No description provided for @ruleEqualsAt.
   ///
   /// In pt, this message translates to:
-  /// **'O = vai entre o {a} e o {b}.'**
+  /// **'Nesta placa, o = tem que ficar entre o {a} e o {b}.'**
   String ruleEqualsAt(int a, int b);
 
   /// No description provided for @ruleShortForbid.
@@ -2173,13 +2173,13 @@ abstract class AppLocalizations {
   /// No description provided for @runRightDetail.
   ///
   /// In pt, this message translates to:
-  /// **'Próxima placa em instantes…'**
+  /// **'A próxima placa aparece em instantes.'**
   String get runRightDetail;
 
   /// No description provided for @runStepUp.
   ///
   /// In pt, this message translates to:
-  /// **'Degrau {step}! +{seconds}s no relógio'**
+  /// **'Você subiu para o degrau {step} e ganhou {seconds}s no relógio.'**
   String runStepUp(int step, int seconds);
 
   /// No description provided for @runPlateLost.

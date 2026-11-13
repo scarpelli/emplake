@@ -127,14 +127,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get modeChallengesDesc =>
-      'Against the clock or with an extra rule on every plate. Beat your record.';
+      'Play against the clock or with an extra rule on each plate, and try to beat your records.';
 
   @override
   String get modeAdventure => 'Adventure';
 
   @override
   String get modeAdventureDesc =>
-      'Every plate on a trail, level by level. Earn up to 3 stars on each stage.';
+      'Every plate in the game on one trail, from Easy to Hard. Each stage is worth up to 3 stars.';
 
   @override
   String get modeDaily => 'Plate of the day';
@@ -631,7 +631,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pointsReplayZero =>
-      'Number already solved on this level: no points.';
+      'You had already solved this number on this level, so it gives no points again.';
 
   @override
   String get howScoringWorks => 'How does it work?';
@@ -1107,11 +1107,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get adventureLockedStage => 'Locked: finish the stages before it.';
+  String get adventureLockedStage =>
+      'This stage opens once you finish the ones before it.';
 
   @override
   String get adventureStarsRule =>
-      '★ solved · ★★ in time, no hints · ★★★ and with half the time left';
+      '★ when you solve it, ★★ in time and with no hints, ★★★ with at least half the time left';
 
   @override
   String adventureContinue(int number) {
@@ -1119,7 +1120,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get adventureAllDone => 'Trail complete!';
+  String get adventureAllDone => 'You finished the whole trail!';
 
   @override
   String adventureStarsEarned(int count) {
@@ -1178,7 +1179,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get challengeLadder =>
-      'Fixed ladder: starts on Easy and climbs a step every 3 right answers, up to Hard. No hints, no pause.';
+      'Both challenges start on Easy and climb a step every 3 right answers, all the way to Hard. There are no hints and no pause.';
 
   @override
   String get challengeRecord => 'RECORD';
@@ -1234,17 +1235,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String ruleForbid(String op) {
-    return 'No $op: you may not use this operator.';
+    return 'On this plate, you may not use $op.';
   }
 
   @override
   String ruleRequire(String op) {
-    return 'Use $op: the equation must include this operator.';
+    return 'On this plate, the equation has to use $op.';
   }
 
   @override
   String ruleEqualsAt(int a, int b) {
-    return 'The = goes between $a and $b.';
+    return 'On this plate, the = has to sit between $a and $b.';
   }
 
   @override
@@ -1269,11 +1270,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get runRight => 'RIGHT!';
 
   @override
-  String get runRightDetail => 'Next plate coming up…';
+  String get runRightDetail => 'The next plate shows up in a moment.';
 
   @override
   String runStepUp(int step, int seconds) {
-    return 'Step $step! +${seconds}s on the clock';
+    return 'You climbed to step $step and got ${seconds}s on the clock.';
   }
 
   @override

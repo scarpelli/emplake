@@ -19,7 +19,7 @@ class ModePage extends ConsumerStatefulWidget {
 }
 
 class _ModePageState extends ConsumerState<ModePage> {
-  GameMode _mode = GameMode.random;
+  GameMode _mode = GameMode.adventure;
   Future<UserProfile>? _profile;
 
   @override
@@ -37,9 +37,12 @@ class _ModePageState extends ConsumerState<ModePage> {
     GameMode.daily: Icons.today_outlined,
   };
 
-  static final _listed = [
-    for (final m in GameMode.values)
-      if (m.listed) m,
+  static const _listed = [
+    GameMode.adventure,
+    GameMode.random,
+    GameMode.challenges,
+    GameMode.educational,
+    GameMode.specific,
   ];
 
   void _continue() {

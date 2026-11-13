@@ -128,14 +128,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get modeChallengesDesc =>
-      'Contra el reloj o con una regla extra en cada placa. Supera tu récord.';
+      'Juega contra el reloj o con una regla extra en cada placa, e intenta superar tus récords.';
 
   @override
   String get modeAdventure => 'Aventura';
 
   @override
   String get modeAdventureDesc =>
-      'Todas las placas en una ruta por nivel. Gana hasta 3 estrellas en cada fase.';
+      'Todas las placas del juego en una ruta, de Fácil a Difícil. Cada fase vale hasta 3 estrellas.';
 
   @override
   String get modeDaily => 'Placa del día';
@@ -635,7 +635,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pointsReplayZero =>
-      'Número ya resuelto en este nivel: sin puntos.';
+      'Ya habías resuelto este número en este nivel, así que no da puntos otra vez.';
 
   @override
   String get howScoringWorks => '¿Cómo funciona?';
@@ -1115,11 +1115,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get adventureLockedStage =>
-      'Bloqueada: completa las fases anteriores.';
+      'Esta fase se abre cuando completes las anteriores.';
 
   @override
   String get adventureStarsRule =>
-      '★ resuelta · ★★ a tiempo y sin pistas · ★★★ y con la mitad del tiempo de sobra';
+      '★ cuando la resuelves, ★★ a tiempo y sin pistas, ★★★ con al menos la mitad del tiempo de sobra';
 
   @override
   String adventureContinue(int number) {
@@ -1127,7 +1127,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get adventureAllDone => '¡Ruta completa!';
+  String get adventureAllDone => '¡Completaste toda la ruta!';
 
   @override
   String adventureStarsEarned(int count) {
@@ -1186,7 +1186,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get challengeLadder =>
-      'Escalera fija: empieza en Fácil y sube un escalón cada 3 aciertos, hasta Difícil. Sin pistas ni pausa.';
+      'Los dos desafíos empiezan en Fácil y suben un escalón cada 3 aciertos, hasta llegar a Difícil. No hay pistas ni pausa.';
 
   @override
   String get challengeRecord => 'RÉCORD';
@@ -1242,17 +1242,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String ruleForbid(String op) {
-    return 'Sin $op: no puedes usar este operador.';
+    return 'En esta placa no se puede usar $op.';
   }
 
   @override
   String ruleRequire(String op) {
-    return 'Usa $op: la igualdad debe incluir este operador.';
+    return 'En esta placa, la igualdad tiene que usar $op.';
   }
 
   @override
   String ruleEqualsAt(int a, int b) {
-    return 'El = va entre $a y $b.';
+    return 'En esta placa, el = tiene que ir entre el $a y el $b.';
   }
 
   @override
@@ -1277,11 +1277,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get runRight => '¡BIEN!';
 
   @override
-  String get runRightDetail => 'Siguiente placa enseguida…';
+  String get runRightDetail => 'La siguiente placa aparece enseguida.';
 
   @override
   String runStepUp(int step, int seconds) {
-    return '¡Escalón $step! +${seconds}s en el reloj';
+    return 'Subiste al escalón $step y ganaste ${seconds}s en el reloj.';
   }
 
   @override

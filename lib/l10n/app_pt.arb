@@ -62,9 +62,9 @@
   "modeSpecific": "Específico",
   "modeSpecificDesc": "Você digita o número de 4 dígitos que quer resolver.",
   "modeChallenges": "Desafios",
-  "modeChallengesDesc": "Contra o relógio ou com uma regra extra em cada placa. Bata o seu recorde.",
+  "modeChallengesDesc": "Jogue contra o relógio ou com uma regra extra em cada placa, e tente bater os seus recordes.",
   "modeAdventure": "Aventura",
-  "modeAdventureDesc": "Todas as placas numa trilha por nível. Ganhe até 3 estrelas em cada fase.",
+  "modeAdventureDesc": "Todas as placas do jogo numa trilha, do Fácil ao Difícil. Cada fase vale até 3 estrelas.",
   "modeDaily": "Placa do dia",
   "modeDailyDesc": "O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.",
   "dailyAlreadyPlayed": "Você já jogou a placa de hoje. Volte amanhã para uma nova!",
@@ -436,7 +436,7 @@
     }
   },
   "pointsLateZero": "Fora do tempo não vale pontos.",
-  "pointsReplayZero": "Número já resolvido neste nível: sem pontos.",
+  "pointsReplayZero": "Você já tinha resolvido este número neste nível, então ele não vale pontos de novo.",
   "howScoringWorks": "Como funciona?",
   "scoreHints": "dicas ×{percent}%",
   "@scoreHints": {
@@ -726,8 +726,8 @@
       }
     }
   },
-  "adventureLockedStage": "Bloqueada: conclua as fases anteriores.",
-  "adventureStarsRule": "★ resolveu · ★★ no tempo e sem dica · ★★★ e com metade do tempo sobrando",
+  "adventureLockedStage": "Esta fase abre quando você concluir as anteriores.",
+  "adventureStarsRule": "★ quando você resolve, ★★ no tempo e sem dicas, ★★★ com pelo menos metade do tempo sobrando",
   "adventureContinue": "CONTINUAR FASE {number}",
   "@adventureContinue": {
     "placeholders": {
@@ -736,7 +736,7 @@
       }
     }
   },
-  "adventureAllDone": "Trilha completa!",
+  "adventureAllDone": "Você completou a trilha inteira!",
   "adventureStarsEarned": "{count, plural, =0{Nenhuma estrela} =1{1 estrela} other{{count} estrelas}}",
   "@adventureStarsEarned": {
     "placeholders": {
@@ -771,7 +771,7 @@
   "challengeRestrictedTitle": "Com restrição",
   "challengeRestrictedTag": "REGRA EXTRA",
   "challengeRestrictedDesc": "Cada placa vem com uma regra: sem +, = fixo, operador obrigatório… Você tem 3 vidas.",
-  "challengeLadder": "Escada fixa: começa no Fácil e sobe de degrau a cada 3 acertos, até o Difícil. Sem dicas e sem pausa.",
+  "challengeLadder": "Os dois desafios começam no Fácil e sobem um degrau a cada 3 acertos, até chegar ao Difícil. Neles não há dicas nem pausa.",
   "challengeRecord": "RECORDE",
   "challengeStreak": "SEQUÊNCIA",
   "challengePlays": "PARTIDAS",
@@ -810,7 +810,7 @@
   },
   "runSkipLife": "PULAR −♥",
   "ruleTitle": "REGRA DA PLACA",
-  "ruleForbid": "Sem {op}: este operador não pode ser usado.",
+  "ruleForbid": "Nesta placa, o {op} não pode ser usado.",
   "@ruleForbid": {
     "placeholders": {
       "op": {
@@ -818,7 +818,7 @@
       }
     }
   },
-  "ruleRequire": "Use {op}: a igualdade precisa ter este operador.",
+  "ruleRequire": "Nesta placa, a igualdade precisa usar o {op}.",
   "@ruleRequire": {
     "placeholders": {
       "op": {
@@ -826,7 +826,7 @@
       }
     }
   },
-  "ruleEqualsAt": "O = vai entre o {a} e o {b}.",
+  "ruleEqualsAt": "Nesta placa, o = tem que ficar entre o {a} e o {b}.",
   "@ruleEqualsAt": {
     "placeholders": {
       "a": {
@@ -866,8 +866,8 @@
   },
   "ruleBroken": "Verdadeira, mas fora da regra",
   "runRight": "CERTO!",
-  "runRightDetail": "Próxima placa em instantes…",
-  "runStepUp": "Degrau {step}! +{seconds}s no relógio",
+  "runRightDetail": "A próxima placa aparece em instantes.",
+  "runStepUp": "Você subiu para o degrau {step} e ganhou {seconds}s no relógio.",
   "@runStepUp": {
     "placeholders": {
       "step": {

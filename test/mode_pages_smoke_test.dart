@@ -92,7 +92,7 @@ void main() {
         );
     await tester.pump();
     expect(find.text('REGRA DA PLACA'), findsOneWidget);
-    expect(find.textContaining('Sem ×'), findsOneWidget);
+    expect(find.textContaining('o × não pode ser usado'), findsOneWidget);
     expect(find.text('PULAR −♥'), findsOneWidget);
   });
 }

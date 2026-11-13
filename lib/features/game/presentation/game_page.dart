@@ -145,7 +145,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       _ctrl.setSaveResult(SaveStatus.none);
       return;
     }
-    if (s.mode == GameMode.adventure) {
+    if (s.mode == GameMode.adventure && s.stage != null) {
       final stars = AdventureStars.of(
         inTime: s.solvedInTime,
         hints: s.hintsUsed,

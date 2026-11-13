@@ -46,7 +46,17 @@ class NewGamePage extends ConsumerStatefulWidget {
 }
 
 class _Prepared {
-  const _Prepared(this.number, this.alreadySolved, {this.level, this.dailyDone, this.run, this.plate});
+  const _Prepared(
+    this.number,
+    this.alreadySolved, {
+    this.level,
+    this.dailyDone,
+    this.run,
+    this.plate,
+    this.tutorial = false,
+  });
+
+  final bool tutorial;
   final String? number;
   final bool alreadySolved;
 
@@ -65,8 +75,9 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
     final repo = ref.read(repositoryProvider);
     if (widget.mode == GameMode.daily) return _prepareDaily(repo);
     if (widget.mode == GameMode.challenges) return _prepareChallenge();
-    if (widget.mode == GameMode.random && widget.number == null && ref.read(settingsProvider).hintsVisible) {
-      return const _Prepared(tutorialNumber, false, level: Level.easy);
+    final opensGame = (widget.mode == GameMode.random && widget.number == null) || widget.mode == GameMode.adventure;
+    if (opensGame && ref.read(settingsProvider).hintsVisible) {
+      return const _Prepared(tutorialNumber, false, level: Level.easy, tutorial: true);
     }
     final typed = widget.number;
     if (typed != null) {
@@ -137,7 +148,7 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
             alreadySolved: p.alreadySolved,
             liveValues: ref.read(settingsProvider).showLiveValues,
             practice: widget.practice,
-            stage: widget.stage,
+            stage: p.tutorial ? null : widget.stage,
           );
     }
     context.go('/game');

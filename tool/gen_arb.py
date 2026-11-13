@@ -67,13 +67,13 @@ s('modeSpecificDesc', 'Você digita o número de 4 dígitos que quer resolver.',
   'You type the 4-digit number you want to solve.',
   'Escribes el número de 4 dígitos que quieres resolver.')
 s('modeChallenges', 'Desafios', 'Challenges', 'Desafíos')
-s('modeChallengesDesc', 'Contra o relógio ou com uma regra extra em cada placa. Bata o seu recorde.',
-  'Against the clock or with an extra rule on every plate. Beat your record.',
-  'Contra el reloj o con una regla extra en cada placa. Supera tu récord.')
+s('modeChallengesDesc', 'Jogue contra o relógio ou com uma regra extra em cada placa, e tente bater os seus recordes.',
+  'Play against the clock or with an extra rule on each plate, and try to beat your records.',
+  'Juega contra el reloj o con una regla extra en cada placa, e intenta superar tus récords.')
 s('modeAdventure', 'Aventura', 'Adventure', 'Aventura')
-s('modeAdventureDesc', 'Todas as placas numa trilha por nível. Ganhe até 3 estrelas em cada fase.',
-  'Every plate on a trail, level by level. Earn up to 3 stars on each stage.',
-  'Todas las placas en una ruta por nivel. Gana hasta 3 estrellas en cada fase.')
+s('modeAdventureDesc', 'Todas as placas do jogo numa trilha, do Fácil ao Difícil. Cada fase vale até 3 estrelas.',
+  'Every plate in the game on one trail, from Easy to Hard. Each stage is worth up to 3 stars.',
+  'Todas las placas del juego en una ruta, de Fácil a Difícil. Cada fase vale hasta 3 estrellas.')
 s('modeDaily', 'Placa do dia', 'Plate of the day', 'Placa del día')
 s('modeDailyDesc', 'O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.',
   'The same number for everyone today. One attempt; share your result.',
@@ -283,8 +283,9 @@ s('total', 'TOTAL', 'TOTAL', 'TOTAL')
 s('pointsBreakdown', '{base} base + {bonus} pelo tempo', '{base} base + {bonus} for time', '{base} base + {bonus} por tiempo',
   {'base': INT, 'bonus': INT})
 s('pointsLateZero', 'Fora do tempo não vale pontos.', 'No points when out of time.', 'Fuera de tiempo no suma puntos.')
-s('pointsReplayZero', 'Número já resolvido neste nível: sem pontos.', 'Number already solved on this level: no points.',
-  'Número ya resuelto en este nivel: sin puntos.')
+s('pointsReplayZero', 'Você já tinha resolvido este número neste nível, então ele não vale pontos de novo.',
+  'You had already solved this number on this level, so it gives no points again.',
+  'Ya habías resuelto este número en este nivel, así que no da puntos otra vez.')
 s('howScoringWorks', 'Como funciona?', 'How does it work?', '¿Cómo funciona?')
 s('scoreHints', 'dicas ×{percent}%', 'hints ×{percent}%', 'pistas ×{percent}%', {'count': INT, 'percent': INT})
 s('scoreBlind', 'às cegas ×1,25', 'blind ×1.25', 'a ciegas ×1,25')
@@ -501,13 +502,16 @@ s('adventureStage', 'Fase {number}', 'Stage {number}', 'Fase {number}', {'number
 s('adventureLockedColumn', 'Abre com {count} fases concluídas no nível anterior.',
   'Opens after {count} stages done on the previous level.',
   'Se abre con {count} fases completadas en el nivel anterior.', {'count': INT})
-s('adventureLockedStage', 'Bloqueada: conclua as fases anteriores.', 'Locked: finish the stages before it.',
-  'Bloqueada: completa las fases anteriores.')
-s('adventureStarsRule', '★ resolveu · ★★ no tempo e sem dica · ★★★ e com metade do tempo sobrando',
-  '★ solved · ★★ in time, no hints · ★★★ and with half the time left',
-  '★ resuelta · ★★ a tiempo y sin pistas · ★★★ y con la mitad del tiempo de sobra')
+s('adventureLockedStage', 'Esta fase abre quando você concluir as anteriores.',
+  'This stage opens once you finish the ones before it.',
+  'Esta fase se abre cuando completes las anteriores.')
+s('adventureStarsRule', '★ quando você resolve, ★★ no tempo e sem dicas, ★★★ com pelo menos metade do tempo sobrando',
+  '★ when you solve it, ★★ in time and with no hints, ★★★ with at least half the time left',
+  '★ cuando la resuelves, ★★ a tiempo y sin pistas, ★★★ con al menos la mitad del tiempo de sobra')
 s('adventureContinue', 'CONTINUAR FASE {number}', 'CONTINUE STAGE {number}', 'CONTINUAR FASE {number}', {'number': INT})
-s('adventureAllDone', 'Trilha completa!', 'Trail complete!', '¡Ruta completa!')
+s('adventureAllDone', 'Você completou a trilha inteira!',
+  'You finished the whole trail!',
+  '¡Completaste toda la ruta!')
 s('adventureStarsEarned', '{count, plural, =0{Nenhuma estrela} =1{1 estrela} other{{count} estrelas}}',
   '{count, plural, =0{No stars} =1{1 star} other{{count} stars}}',
   '{count, plural, =0{Sin estrellas} =1{1 estrella} other{{count} estrellas}}', {'count': INT})
@@ -531,9 +535,9 @@ s('challengeRestrictedTag', 'REGRA EXTRA', 'EXTRA RULE', 'REGLA EXTRA')
 s('challengeRestrictedDesc', 'Cada placa vem com uma regra: sem +, = fixo, operador obrigatório… Você tem 3 vidas.',
   'Every plate comes with a rule: no +, fixed =, a required operator… You have 3 lives.',
   'Cada placa trae una regla: sin +, = fijo, operador obligatorio… Tienes 3 vidas.')
-s('challengeLadder', 'Escada fixa: começa no Fácil e sobe de degrau a cada 3 acertos, até o Difícil. Sem dicas e sem pausa.',
-  'Fixed ladder: starts on Easy and climbs a step every 3 right answers, up to Hard. No hints, no pause.',
-  'Escalera fija: empieza en Fácil y sube un escalón cada 3 aciertos, hasta Difícil. Sin pistas ni pausa.')
+s('challengeLadder', 'Os dois desafios começam no Fácil e sobem um degrau a cada 3 acertos, até chegar ao Difícil. Neles não há dicas nem pausa.',
+  'Both challenges start on Easy and climb a step every 3 right answers, all the way to Hard. There are no hints and no pause.',
+  'Los dos desafíos empiezan en Fácil y suben un escalón cada 3 aciertos, hasta llegar a Difícil. No hay pistas ni pausa.')
 s('challengeRecord', 'RECORDE', 'RECORD', 'RÉCORD')
 s('challengeStreak', 'SEQUÊNCIA', 'STREAK', 'RACHA')
 s('challengePlays', 'PARTIDAS', 'RUNS', 'PARTIDAS')
@@ -548,20 +552,26 @@ s('runLives', '{count, plural, =0{sem vidas} =1{1 vida} other{{count} vidas}}',
 s('runSkip', 'PULAR −{seconds}s', 'SKIP −{seconds}s', 'SALTAR −{seconds}s', {'seconds': INT})
 s('runSkipLife', 'PULAR −♥', 'SKIP −♥', 'SALTAR −♥')
 s('ruleTitle', 'REGRA DA PLACA', 'PLATE RULE', 'REGLA DE LA PLACA')
-s('ruleForbid', 'Sem {op}: este operador não pode ser usado.', 'No {op}: you may not use this operator.',
-  'Sin {op}: no puedes usar este operador.', {'op': STR})
-s('ruleRequire', 'Use {op}: a igualdade precisa ter este operador.', 'Use {op}: the equation must include this operator.',
-  'Usa {op}: la igualdad debe incluir este operador.', {'op': STR})
-s('ruleEqualsAt', 'O = vai entre o {a} e o {b}.', 'The = goes between {a} and {b}.', 'El = va entre {a} y {b}.',
-  {'a': INT, 'b': INT})
+s('ruleForbid', 'Nesta placa, o {op} não pode ser usado.',
+  'On this plate, you may not use {op}.',
+  'En esta placa no se puede usar {op}.', {'op': STR})
+s('ruleRequire', 'Nesta placa, a igualdade precisa usar o {op}.',
+  'On this plate, the equation has to use {op}.',
+  'En esta placa, la igualdad tiene que usar {op}.', {'op': STR})
+s('ruleEqualsAt', 'Nesta placa, o = tem que ficar entre o {a} e o {b}.',
+  'On this plate, the = has to sit between {a} and {b}.',
+  'En esta placa, el = tiene que ir entre el {a} y el {b}.', {'a': INT, 'b': INT})
 s('ruleShortForbid', 'sem {op}', 'no {op}', 'sin {op}', {'op': STR})
 s('ruleShortRequire', 'use {op}', 'use {op}', 'usa {op}', {'op': STR})
 s('ruleShortEquals', '= entre {a} e {b}', '= between {a} and {b}', '= entre {a} y {b}', {'a': INT, 'b': INT})
 s('ruleBroken', 'Verdadeira, mas fora da regra', 'True, but it breaks the rule', 'Verdadera, pero rompe la regla')
 s('runRight', 'CERTO!', 'RIGHT!', '¡BIEN!')
-s('runRightDetail', 'Próxima placa em instantes…', 'Next plate coming up…', 'Siguiente placa enseguida…')
-s('runStepUp', 'Degrau {step}! +{seconds}s no relógio', 'Step {step}! +{seconds}s on the clock',
-  '¡Escalón {step}! +{seconds}s en el reloj', {'step': INT, 'seconds': INT})
+s('runRightDetail', 'A próxima placa aparece em instantes.',
+  'The next plate shows up in a moment.',
+  'La siguiente placa aparece enseguida.')
+s('runStepUp', 'Você subiu para o degrau {step} e ganhou {seconds}s no relógio.',
+  'You climbed to step {step} and got {seconds}s on the clock.',
+  'Subiste al escalón {step} y ganaste {seconds}s en el reloj.', {'step': INT, 'seconds': INT})
 s('runPlateLost', 'PLACA PERDIDA', 'PLATE LOST', 'PLACA PERDIDA')
 s('runPlateLostDetail', 'Você perdeu uma vida. Esta é uma solução que segue a regra.',
   'You lost a life. Here is a solution that follows the rule.',
