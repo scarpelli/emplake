@@ -17,19 +17,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'REPLACE_ME',
-    appId: '1:000000000000:web:0000000000000000000000',
-    messagingSenderId: '000000000000',
-    projectId: 'emplake-placeholder',
-    authDomain: 'emplake-placeholder.firebaseapp.com',
-    storageBucket: 'emplake-placeholder.appspot.com',
+    apiKey: 'AIzaSyCVdRUfnufFLg2AJ9piZ6QEovPQgs0t7Cc',
+    appId: '1:502048843819:web:020847f957a461b001626e',
+    messagingSenderId: '502048843819',
+    projectId: 'emplake-20262',
+    authDomain: 'emplake-20262.firebaseapp.com',
+    storageBucket: 'emplake-20262.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'REPLACE_ME',
-    appId: '1:000000000000:android:0000000000000000000000',
-    messagingSenderId: '000000000000',
-    projectId: 'emplake-placeholder',
-    storageBucket: 'emplake-placeholder.appspot.com',
+    apiKey: 'AIzaSyC6_uiCUAi5vqwVzZnN61pj4nGgP1bJq7U',
+    appId: '1:502048843819:android:d1a9132d119f3afc01626e',
+    messagingSenderId: '502048843819',
+    projectId: 'emplake-20262',
+    storageBucket: 'emplake-20262.firebasestorage.app',
   );
 }

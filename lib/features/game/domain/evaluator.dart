@@ -74,6 +74,8 @@ class Evaluator {
     }
   }
 
+  bool isSolution(Board board) => board.verdict(level).isTrue;
+
   NumValue _eval(Node node, Map<int, NumValue> values) {
     final NumValue v;
     switch (node) {
@@ -242,10 +244,6 @@ extension BoardVerdict on Board {
   Verdict verdict(Level level) {
     final result = Evaluator(level).evaluateBoard(this);
     if (!isComplete) return Verdict(result: result);
-    return Verdict(
-      result: result,
-      left: result.values[blocks[0].id],
-      right: result.values[blocks[1].id],
-    );
+    return Verdict(result: result, left: result.values[blocks[0].id], right: result.values[blocks[1].id]);
   }
 }

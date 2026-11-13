@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/daily/daily.dart';
+import '../features/game/application/catalog_provider.dart';
+import '../features/game/domain/catalog.dart';
 import '../features/game/domain/level.dart';
 import 'models.dart';
 
@@ -39,27 +42,11 @@ class FirestoreRepository {
     return {for (final d in q.docs) d.data()['number'] as String};
   }
 
-  Future<bool> isSolved(Level level, String number) async =>
-      (await _solved.doc(docId(level, number)).get()).exists;
+  Future<bool> isSolved(Level level, String number) async => (await _solved.doc(docId(level, number)).get()).exists;
 
-  Future<String?> pickUnsolved(Level level, {String? exclude, Random? random}) async {
+  Future<CatalogEntry?> pickUnsolved(Catalog catalog, Level level, {String? exclude, Random? random}) async {
     final solved = await solvedNumbers(level);
-    return pickFrom(solved, exclude: exclude, random: random);
-  }
-
-  static String? pickFrom(Set<String> solved, {String? exclude, Random? random}) {
-    final r = random ?? Random();
-    for (var i = 0; i < 64; i++) {
-      final n = r.nextInt(10000).toString().padLeft(4, '0');
-      if (!solved.contains(n) && n != exclude) return n;
-    }
-    final free = [
-      for (var i = 0; i < 10000; i++)
-        if (!solved.contains(i.toString().padLeft(4, '0')) && i.toString().padLeft(4, '0') != exclude)
-          i.toString().padLeft(4, '0'),
-    ];
-    if (free.isEmpty) return null;
-    return free[r.nextInt(free.length)];
+    return DrawPolicy.pick(catalog, level, solved, exclude: exclude, random: random);
   }
 
   Future<SaveOutcome> saveSolved({
@@ -70,15 +57,22 @@ class FirestoreRepository {
     required int points,
     required int seconds,
     required bool inTime,
+    int hints = 0,
+    bool blind = false,
   }) {
     final ref = _solved.doc(docId(level, number));
     return _db.runTransaction((tx) async {
       final existing = await tx.get(ref);
       final profile = await tx.get(_userDoc);
-      final total = (profile.data()?['totalPoints'] as num?)?.toInt() ?? 0;
+      final data = profile.data() ?? const <String, dynamic>{};
+      final total = (data['totalPoints'] as num?)?.toInt() ?? 0;
+      final streak = (data['streak'] as num?)?.toInt() ?? 0;
       if (existing.exists) {
-        return SaveOutcome(isNew: false, pointsAwarded: 0, totalPoints: total);
+        return SaveOutcome(isNew: false, pointsAwarded: 0, totalPoints: total, streak: streak);
       }
+      final keeps = inTime && hints == 0;
+      final newStreak = keeps ? streak + 1 : 0;
+      final best = (data['bestStreak'] as num?)?.toInt() ?? 0;
       tx.set(ref, {
         'number': number,
         'level': level.name,
@@ -87,57 +81,108 @@ class FirestoreRepository {
         'points': points,
         'seconds': seconds,
         'inTime': inTime,
+        'hints': hints,
+        'blind': blind,
         'solvedAt': FieldValue.serverTimestamp(),
       });
-      tx.set(
-        _userDoc,
-        {
-          'displayName': user.displayName ?? '',
-          'email': user.email ?? '',
-          'totalPoints': FieldValue.increment(points),
-          'solvedCount': FieldValue.increment(1),
-        },
-        SetOptions(merge: true),
-      );
-      return SaveOutcome(isNew: true, pointsAwarded: points, totalPoints: total + points);
+      tx.set(_userDoc, {
+        'displayName': user.displayName ?? '',
+        'email': user.email ?? '',
+        'totalPoints': FieldValue.increment(points),
+        'solvedCount': FieldValue.increment(1),
+        'solvedByLevel': {level.name: FieldValue.increment(1)},
+        'streak': newStreak,
+        'bestStreak': newStreak > best ? newStreak : best,
+        if (inTime) 'inTimeSolves': FieldValue.increment(1),
+        if (inTime && blind) 'blindSolves': FieldValue.increment(1),
+      }, SetOptions(merge: true));
+      return SaveOutcome(isNew: true, pointsAwarded: points, totalPoints: total + points, streak: newStreak);
     });
   }
 
-  Future<void> recordSkip(Level level, String number) async {
+  Future<void> recordSkip(Level level, String number, {bool revealed = false}) async {
     final batch = _db.batch();
-    batch.set(
-      _skipped.doc(docId(level, number)),
-      {
-        'number': number,
-        'level': level.name,
-        'times': FieldValue.increment(1),
-        'lastAt': FieldValue.serverTimestamp(),
-      },
-      SetOptions(merge: true),
-    );
-    batch.set(_userDoc, {'skippedCount': FieldValue.increment(1)}, SetOptions(merge: true));
+    batch.set(_skipped.doc(docId(level, number)), {
+      'number': number,
+      'level': level.name,
+      'times': FieldValue.increment(1),
+      'lastAt': FieldValue.serverTimestamp(),
+      if (revealed) 'revealed': true,
+    }, SetOptions(merge: true));
+    batch.set(_userDoc, {'skippedCount': FieldValue.increment(1), 'streak': 0}, SetOptions(merge: true));
     await batch.commit();
+  }
+
+  DocumentReference<Map<String, dynamic>> _dailyDoc(String key) => _userDoc.collection('daily').doc(key);
+
+  Future<DailyResult?> dailyResult(String key) async {
+    final snap = await _dailyDoc(key).get();
+    return snap.exists ? DailyResult.fromMap(snap.data()!) : null;
+  }
+
+  Future<void> startDaily(String key, {required String number, required Level level}) =>
+      _dailyDoc(key).set({'number': number, 'level': level.name, 'status': 'started'}, SetOptions(merge: true));
+
+  Future<int> finishDaily(
+    String key, {
+    required bool solved,
+    required int seconds,
+    required int hints,
+    required bool blind,
+  }) {
+    return _db.runTransaction((tx) async {
+      final profile = await tx.get(_userDoc);
+      final data = profile.data() ?? const <String, dynamic>{};
+      final streak = Daily.nextStreak(
+        key: key,
+        solved: solved,
+        lastDaily: data['lastDaily'] as String?,
+        current: (data['dailyStreak'] as num?)?.toInt() ?? 0,
+      );
+      tx.set(_dailyDoc(key), {
+        'status': solved ? 'solved' : 'failed',
+        'seconds': seconds,
+        'hints': hints,
+        'blind': blind,
+        'finishedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      tx.set(_userDoc, {'dailyStreak': streak, if (solved) 'lastDaily': key}, SetOptions(merge: true));
+      return streak;
+    });
+  }
+
+  Future<void> unlockAchievements(Iterable<String> ids) async {
+    if (ids.isEmpty) return;
+    await _userDoc.set({
+      'achievements': {for (final id in ids) id: FieldValue.serverTimestamp()},
+    }, SetOptions(merge: true));
   }
 
   Future<HistorySnapshot> loadHistory() async {
     final results = await Future.wait([
       _solved.orderBy('solvedAt', descending: true).limit(500).get(),
       _userDoc.get(),
+      _skipped.orderBy('lastAt', descending: true).limit(200).get(),
     ]);
     final solved = results[0] as QuerySnapshot<Map<String, dynamic>>;
     final profile = results[1] as DocumentSnapshot<Map<String, dynamic>>;
+    final skipped = results[2] as QuerySnapshot<Map<String, dynamic>>;
+    final solvedIds = {for (final d in solved.docs) d.id};
     return HistorySnapshot(
       entries: [for (final d in solved.docs) SolvedEntry.fromMap(d.data())],
       skippedCount: (profile.data()?['skippedCount'] as num?)?.toInt() ?? 0,
+      solvedCount: (profile.data()?['solvedCount'] as num?)?.toInt(),
+      skipped: [
+        for (final d in skipped.docs)
+          if (!solvedIds.contains(d.id)) SkippedEntry.fromMap(d.data()),
+      ],
     );
   }
 }
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 
-final authStateProvider = StreamProvider<User?>(
-  (ref) => ref.watch(firebaseAuthProvider).userChanges(),
-);
+final authStateProvider = StreamProvider<User?>((ref) => ref.watch(firebaseAuthProvider).userChanges());
 
 final repositoryProvider = Provider<FirestoreRepository?>((ref) {
   final user = ref.watch(authStateProvider).value;

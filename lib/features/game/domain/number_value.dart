@@ -136,8 +136,7 @@ class NumValue {
     return s.replaceFirst('.', sep).replaceFirst('-', '−');
   }
 
-  static String _sci(double d, String sep) =>
-      d.toStringAsExponential(3).replaceFirst('.', sep).replaceFirst('-', '−');
+  static String _sci(double d, String sep) => d.toStringAsExponential(3).replaceFirst('.', sep).replaceFirst('-', '−');
 
   @override
   String toString() => display(decimalSeparator: '.');

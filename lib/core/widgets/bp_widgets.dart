@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import '../../features/help/help_dialog.dart';
 import '../../features/settings/settings_controller.dart';
 import '../l10n_helpers.dart';
 import '../theme/blueprint.dart';
@@ -16,12 +17,10 @@ class Eyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              letterSpacing: 1.5,
-              color: (color ?? context.bp.ink).withValues(alpha: opacity),
-            ),
-      );
+    text,
+    style: Theme.of(context).textTheme.labelSmall
+        ?.copyWith(letterSpacing: 1.5, color: (color ?? context.bp.ink).withValues(alpha: opacity)),
+  );
 }
 
 class PageTitle extends StatelessWidget {
@@ -100,6 +99,34 @@ class SoundToggle extends ConsumerWidget {
   }
 }
 
+class HelpButton extends StatelessWidget {
+  const HelpButton({super.key, this.scoring = false});
+
+  final bool scoring;
+
+  @override
+  Widget build(BuildContext context) => BoxIconButton(
+    icon: Icons.help_outline,
+    tooltip: context.l10n.navHelp,
+    onPressed: () => showHelpDialog(context, scoring: scoring),
+  );
+}
+
+class LiveValuesToggle extends ConsumerWidget {
+  const LiveValuesToggle({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final on = ref.watch(settingsProvider.select((s) => s.showLiveValues));
+    final l = context.l10n;
+    return BoxIconButton(
+      icon: on ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+      tooltip: on ? l.liveValuesHide : l.liveValuesShow,
+      onPressed: () => ref.read(settingsProvider.notifier).toggleLiveValues(),
+    );
+  }
+}
+
 class SelectTile extends StatelessWidget {
   const SelectTile({
     super.key,
@@ -132,7 +159,10 @@ class SelectTile extends StatelessWidget {
             decoration: BoxDecoration(border: Border.all(color: selected ? bp.ink : bp.line)),
             child: DefaultTextStyle.merge(
               style: TextStyle(color: fg),
-              child: IconTheme.merge(data: IconThemeData(color: fg), child: child),
+              child: IconTheme.merge(
+                data: IconThemeData(color: fg),
+                child: child,
+              ),
             ),
           ),
         ),
@@ -155,10 +185,7 @@ class BpLoader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           LoadingAnimationWidget.hexagonDots(color: bp.ink, size: size),
-          if (label != null) ...[
-            const SizedBox(height: 16),
-            Eyebrow(label!),
-          ],
+          if (label != null) ...[const SizedBox(height: 16), Eyebrow(label!)],
         ],
       ),
     );
@@ -173,22 +200,22 @@ class LanguageFlag extends StatelessWidget {
   final double height;
 
   static String countryFor(String lang) => switch (lang) {
-        'pt' => 'BR',
-        'es' => 'ES',
-        _ => 'US',
-      };
+    'pt' => 'BR',
+    'es' => 'ES',
+    _ => 'US',
+  };
 
   static String nativeName(String lang) => switch (lang) {
-        'pt' => 'Português',
-        'es' => 'Español',
-        _ => 'English',
-      };
+    'pt' => 'Português',
+    'es' => 'Español',
+    _ => 'English',
+  };
 
   @override
   Widget build(BuildContext context) => CountryFlag.fromCountryCode(
-        countryFor(languageCode),
-        theme: ImageTheme(width: width, height: height, shape: const Rectangle()),
-      );
+    countryFor(languageCode),
+    theme: ImageTheme(width: width, height: height, shape: const Rectangle()),
+  );
 }
 
 class LanguagePicker extends ConsumerWidget {
@@ -235,7 +262,10 @@ class ContentWidth extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: child),
-      );
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
 }

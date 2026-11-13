@@ -17,16 +17,16 @@ int _linearPrec(Node n) {
   return switch (n) {
     Leaf() => _atom,
     Unary(:final op) => switch (op) {
-        UnOp.abs || UnOp.floor || UnOp.ceil => _atom,
-        UnOp.fact => 9,
-        UnOp.sqrt || UnOp.cbrt => 8,
-        UnOp.neg => 6,
-      },
+      UnOp.abs || UnOp.floor || UnOp.ceil => _atom,
+      UnOp.fact => 9,
+      UnOp.sqrt || UnOp.cbrt => 8,
+      UnOp.neg => 6,
+    },
     Binary(:final op) => switch (op) {
-        BinOp.pow => 7,
-        BinOp.mul || BinOp.div => 5,
-        BinOp.add || BinOp.sub => 4,
-      },
+      BinOp.pow => 7,
+      BinOp.mul || BinOp.div => 5,
+      BinOp.add || BinOp.sub => 4,
+    },
   };
 }
 
@@ -134,14 +134,14 @@ String latexNode(Node n) {
     Leaf(:final digit) => '$digit',
     Binary(:final op, :final left, :final right) => _latexBinary(op, left, right),
     Unary(:final op, :final child) => switch (op) {
-        UnOp.neg => '-${_lwrap(_latexPrec(child) <= 7, child)}',
-        UnOp.sqrt => '\\sqrt{${latexNode(child)}}',
-        UnOp.cbrt => '\\sqrt[3]{${latexNode(child)}}',
-        UnOp.fact => '${_lwrap(_latexPrec(child) < _atom, child)}!',
-        UnOp.abs => '\\left|${latexNode(child)}\\right|',
-        UnOp.floor => '\\left\\lfloor ${latexNode(child)} \\right\\rfloor',
-        UnOp.ceil => '\\left\\lceil ${latexNode(child)} \\right\\rceil',
-      },
+      UnOp.neg => '-${_lwrap(_latexPrec(child) <= 7, child)}',
+      UnOp.sqrt => '\\sqrt{${latexNode(child)}}',
+      UnOp.cbrt => '\\sqrt[3]{${latexNode(child)}}',
+      UnOp.fact => '${_lwrap(_latexPrec(child) < _atom, child)}!',
+      UnOp.abs => '\\left|${latexNode(child)}\\right|',
+      UnOp.floor => '\\left\\lfloor ${latexNode(child)} \\right\\rfloor',
+      UnOp.ceil => '\\left\\lceil ${latexNode(child)} \\right\\rceil',
+    },
   };
   return n.parens ? '\\left($inner\\right)' : inner;
 }

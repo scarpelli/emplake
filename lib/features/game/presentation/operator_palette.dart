@@ -54,36 +54,56 @@ class OperatorPalette extends StatelessWidget {
 
     final betweenHint = switch (sel) {
       GapSelection() => l.paletteGapSelected,
+      EqualsSelection() => l.paletteNodeSelected('='),
       NodeSelection() when node != null => l.paletteNodeSelected(TreeLayout.of(board).nodes[node.id]?.label ?? ''),
       _ => l.paletteTapGap,
     };
-    final binaryOps = [for (final op in BinOp.values) if (state.level.binary.contains(op)) op];
-    final unaryOps = [for (final op in UnOp.values) if (state.level.unary.contains(op)) op];
+    final binaryOps = [
+      for (final op in BinOp.values)
+        if (state.level.binary.contains(op)) op,
+    ];
+    final unaryOps = [
+      for (final op in UnOp.values)
+        if (state.level.unary.contains(op)) op,
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Eyebrow('${l.paletteBetween} · $betweenHint', opacity: canLinkGap || canEquals || binaryNode != null ? 0.75 : 0.5),
+        Eyebrow(
+          '${l.paletteBetween} · $betweenHint',
+          opacity: canLinkGap || canEquals || binaryNode != null ? 0.75 : 0.5,
+        ),
         const SizedBox(height: 6),
         _Grid(
           columns: binaryOps.length + 1,
           children: [
             for (final op in binaryOps)
-              _OpButton(
-                key: keys.of(op),
-                label: op.label,
-                tooltip: op.label,
-                enabled: canLinkGap || binaryNode != null,
-                active: binaryNode?.op == op,
-                onTap: () => onBinary(op),
+              _dragWhenPlaying(
+                playing,
+                PaletteBinaryDrag(op),
+                op.label,
+                _OpButton(
+                  key: keys.of(op),
+                  label: op.label,
+                  tooltip: '${op.name(l)} · ${op.example(context.decimalSeparator)}',
+                  enabled: canLinkGap || binaryNode != null,
+                  active: binaryNode?.op == op,
+                  onTap: () => onBinary(op),
+                ),
               ),
-            _OpButton(
-              key: keys.of('='),
-              label: '=',
-              tooltip: '=',
-              enabled: canEquals,
-              active: false,
-              onTap: onEquals,
+            _dragWhenPlaying(
+              playing,
+              const PaletteEqualsDrag(),
+              '=',
+              _OpButton(
+                key: keys.of('='),
+                label: '=',
+                tooltip: '=',
+                enabled: canEquals,
+                active: false,
+                onTap: onEquals,
+              ),
             ),
           ],
         ),
@@ -98,7 +118,7 @@ class OperatorPalette extends StatelessWidget {
               _OpButton(
                 key: keys.of(op),
                 label: op.label,
-                tooltip: op.label,
+                tooltip: '${op.name(l)} · ${op.example(context.decimalSeparator)}',
                 enabled: nodeSelected,
                 active: false,
                 dashed: true,
@@ -115,7 +135,7 @@ class OperatorPalette extends StatelessWidget {
             _OpButton(
               icon: Icons.backspace_outlined,
               tooltip: l.removeOperator,
-              enabled: playing && node is Unary,
+              enabled: playing && (node is Unary || node is Binary || (sel is EqualsSelection && board.eqGap != null)),
               active: false,
               dashed: true,
               onTap: onRemove,
@@ -127,6 +147,35 @@ class OperatorPalette extends StatelessWidget {
   }
 }
 
+Widget _dragWhenPlaying(bool playing, SignDrag drag, String label, Widget button) {
+  if (!playing) return button;
+  return SignDraggable(data: drag, feedback: _DragBubble(label), child: button);
+}
+
+class _DragBubble extends StatelessWidget {
+  const _DragBubble(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final bp = context.bp;
+    return Container(
+      width: 44,
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: bp.accent,
+        shape: BoxShape.circle,
+        border: Border.all(color: bp.accent),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: bp.onAccent, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+}
+
 class _Grid extends StatelessWidget {
   const _Grid({required this.columns, required this.children, this.dashed = false});
   final int columns;
@@ -134,16 +183,18 @@ class _Grid extends StatelessWidget {
   final bool dashed;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (context, c) {
-        const gap = 6.0;
-        final cols = columns.clamp(1, 7);
-        final w = (c.maxWidth - gap * (cols - 1)) / cols;
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: [for (final child in children) SizedBox(width: w, height: dashed ? 40 : 44, child: child)],
-        );
-      });
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, c) {
+      const gap = 6.0;
+      final cols = columns.clamp(1, 7);
+      final w = (c.maxWidth - gap * (cols - 1)) / cols;
+      return Wrap(
+        spacing: gap,
+        runSpacing: gap,
+        children: [for (final child in children) SizedBox(width: w, height: dashed ? 40 : 44, child: child)],
+      );
+    },
+  );
 }
 
 class _OpButton extends StatelessWidget {
@@ -189,8 +240,11 @@ class _OpButton extends StatelessWidget {
                 decoration: BoxDecoration(border: Border.all(color: bp.ink.withValues(alpha: 0.7))),
                 child: icon != null
                     ? Icon(icon, size: 18, color: fg)
-                    : Text(label!,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600)),
+                    : Text(
+                        label!,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: fg, fontWeight: FontWeight.w600),
+                      ),
               ),
             ),
           ),

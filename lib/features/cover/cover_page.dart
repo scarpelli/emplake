@@ -40,17 +40,15 @@ class CoverPage extends ConsumerWidget {
                       Row(
                         children: [
                           Expanded(child: Eyebrow(l.coverSheet)),
+                          const HelpButton(),
+                          const SizedBox(width: 8),
                           const SoundToggle(),
                         ],
                       ),
                       const Spacer(),
                       const _DimensionedPlate(),
                       const SizedBox(height: 32),
-                      Text(
-                        l.coverTagline,
-                        textAlign: TextAlign.center,
-                        style: t.bodyLarge?.copyWith(height: 1.5),
-                      ),
+                      Text(l.coverTagline, textAlign: TextAlign.center, style: t.bodyLarge?.copyWith(height: 1.5)),
                       const SizedBox(height: 28),
                       const _TapHint(),
                       const Spacer(),
@@ -84,8 +82,7 @@ class _TapHint extends StatefulWidget {
 }
 
 class _TapHintState extends State<_TapHint> with SingleTickerProviderStateMixin {
-  late final _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))
-    ..repeat(reverse: true);
+  late final _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat(reverse: true);
 
   @override
   void dispose() {
@@ -102,8 +99,10 @@ class _TapHintState extends State<_TapHint> with SingleTickerProviderStateMixin 
         children: [
           const Icon(Icons.touch_app_outlined),
           const SizedBox(width: 8),
-          Text(context.l10n.coverTap,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(letterSpacing: 2, fontWeight: FontWeight.w600)),
+          Text(
+            context.l10n.coverTap,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(letterSpacing: 2, fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );
@@ -122,7 +121,9 @@ class _TitleCell extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(border: last ? null : Border(right: BorderSide(color: bp.line))),
+        decoration: BoxDecoration(
+          border: last ? null : Border(right: BorderSide(color: bp.line)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -142,64 +143,79 @@ class _DimensionedPlate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return LayoutBuilder(builder: (context, c) {
-      final w = (c.maxWidth - 40).clamp(200.0, 360.0);
-      final h = w * 130 / 400;
-      return Column(
-        children: [
-          _Dimension(width: w, label: '400 mm'),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: w,
-                height: h,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF7F7F2),
-                  border: Border.all(color: const Color(0xFF1B1B1B), width: 2),
-                  borderRadius: BorderRadius.circular(6),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 18, offset: const Offset(0, 8))],
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      height: h * 0.24,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF1F4BA5),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final w = (c.maxWidth - 40).clamp(200.0, 360.0);
+        final h = w * 130 / 400;
+        return Column(
+          children: [
+            _Dimension(width: w, label: '400 mm'),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: w,
+                  height: h,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7F7F2),
+                    border: Border.all(color: const Color(0xFF1B1B1B), width: 2),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        context.l10n.plateCountry,
-                        style: t.labelSmall?.copyWith(color: Colors.white, letterSpacing: 3, fontWeight: FontWeight.w600),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: h * 0.24,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF1F4BA5),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          context.l10n.plateCountry,
+                          style: t.labelSmall?.copyWith(
+                            color: Colors.white,
+                            letterSpacing: 3,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: FittedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            '3MPL4K3',
-                            style: t.displayMedium?.copyWith(
-                              color: const Color(0xFF1B1B1B),
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 4,
+                      Expanded(
+                        child: FittedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              '3MPL4K3',
+                              style: t.displayMedium?.copyWith(
+                                color: const Color(0xFF1B1B1B),
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 4,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              RotatedBox(quarterTurns: 1, child: _Dimension(width: h, label: '130')),
-            ],
-          ),
-        ],
-      );
-    });
+                const SizedBox(width: 8),
+                RotatedBox(
+                  quarterTurns: 1,
+                  child: _Dimension(width: h, label: '130'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

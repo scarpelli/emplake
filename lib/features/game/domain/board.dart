@@ -6,13 +6,11 @@ class Board {
   factory Board.start(String number) {
     assert(number.length == 4 && int.tryParse(number) != null);
     final digits = number.split('').map(int.parse).toList(growable: false);
-    return Board._(
-      digits,
-      [for (var i = 0; i < digits.length; i++) Leaf(i, digits[i], i)],
-      null,
-      digits.length,
-    );
+    return Board._(digits, [for (var i = 0; i < digits.length; i++) Leaf(i, digits[i], i)], null, digits.length);
   }
+
+  factory Board.fromSides(List<int> digits, Node left, Node right, {required int nextId}) =>
+      Board._(List.unmodifiable(digits), List.unmodifiable([left, right]), 0, nextId);
 
   static const totalLinks = 3;
 
@@ -51,6 +49,86 @@ class Board {
     return Board._(digits, blocks, gap, nextId);
   }
 
+  int digitGapOf(int blockGap) => blocks[blockGap].lastIndex;
+
+  int? blockGapAt(int gap) {
+    for (var i = 0; i < gapCount; i++) {
+      if (digitGapOf(i) == gap) return i;
+    }
+    return null;
+  }
+
+  int? get eqDigitGap => eqGap == null ? null : digitGapOf(eqGap!);
+
+  Binary? binaryAt(int gap) {
+    for (final b in blocks) {
+      for (final n in b.descendants) {
+        if (n is Binary && n.digitGap == gap) return n;
+      }
+    }
+    return null;
+  }
+
+  Board removeEquals() => eqGap == null ? this : Board._(digits, blocks, null, nextId);
+
+  Board unlink(int nodeId) {
+    final node = find(nodeId);
+    if (node is! Binary) throw StateError('node $nodeId is not binary');
+    final i = blockOf(nodeId);
+    final (a, b) = blocks[i].splitAt(node.digitGap);
+    final newBlocks = [...blocks]..replaceRange(i, i + 1, [a, b]);
+    final newEq = eqGap != null && eqGap! >= i ? eqGap! + 1 : eqGap;
+    return Board._(digits, List.unmodifiable(newBlocks), newEq, nextId);
+  }
+
+  Board clearGap(int gap) {
+    if (eqDigitGap == gap) return removeEquals();
+    final b = binaryAt(gap);
+    return b == null ? this : unlink(b.id);
+  }
+
+  Board dropBinary(BinOp op, int gap) {
+    final existing = binaryAt(gap);
+    if (existing != null) return existing.op == op ? this : changeBinary(existing.id, op);
+    final cleared = clearGap(gap);
+    return cleared.link(cleared.blockGapAt(gap)!, op);
+  }
+
+  Board dropEquals(int gap) {
+    if (eqDigitGap == gap) return this;
+    final cleared = removeEquals().clearGap(gap);
+    return cleared.placeEquals(cleared.blockGapAt(gap)!);
+  }
+
+  Board moveBinary(int nodeId, int gap) {
+    final node = find(nodeId);
+    if (node is! Binary) throw StateError('node $nodeId is not binary');
+    final from = node.digitGap;
+    if (from == gap) return this;
+    final other = binaryAt(gap);
+    if (other != null) {
+      return changeBinary(nodeId, other.op).changeBinary(other.id, node.op);
+    }
+    final hadEquals = eqDigitGap == gap;
+    var next = unlink(nodeId);
+    if (hadEquals) {
+      next = next.removeEquals();
+      next = next.placeEquals(next.blockGapAt(from)!);
+    }
+    return next.link(next.blockGapAt(gap)!, node.op);
+  }
+
+  Board moveEquals(int gap) {
+    final from = eqDigitGap;
+    if (from == null || from == gap) return this;
+    final other = binaryAt(gap);
+    var next = removeEquals();
+    if (other != null) next = next.unlink(other.id);
+    next = next.placeEquals(next.blockGapAt(gap)!);
+    if (other != null) next = next.link(next.blockGapAt(from)!, other.op);
+    return next;
+  }
+
   Node? find(int nodeId) {
     for (final b in blocks) {
       final n = b.find(nodeId);
@@ -69,8 +147,7 @@ class Board {
     return Board._(digits, List.unmodifiable(newBlocks), eqGap, nextId + idDelta);
   }
 
-  Board applyUnary(int nodeId, UnOp op) =>
-      _replace(nodeId, (n) => Unary(nextId, op, n), idDelta: 1);
+  Board applyUnary(int nodeId, UnOp op) => _replace(nodeId, (n) => Unary(nextId, op, n), idDelta: 1);
 
   Board unwrap(int nodeId) {
     final node = find(nodeId);
@@ -78,24 +155,21 @@ class Board {
     return _replace(nodeId, (n) => (n as Unary).child);
   }
 
-  Board changeBinary(int nodeId, BinOp op) =>
-      _replace(nodeId, (n) => (n as Binary).withOp(op));
+  Board changeBinary(int nodeId, BinOp op) => _replace(nodeId, (n) => (n as Binary).withOp(op));
 
   Board toggleParens(int nodeId) => _replace(nodeId, (n) => n.withParens(!n.parens));
 
   Map<String, dynamic> toJson() => {
-        'digits': digits,
-        'blocks': [for (final b in blocks) b.toJson()],
-        if (eqGap != null) 'eq': eqGap,
-        'next': nextId,
-      };
+    'digits': digits,
+    'blocks': [for (final b in blocks) b.toJson()],
+    if (eqGap != null) 'eq': eqGap,
+    'next': nextId,
+  };
 
   factory Board.fromJson(Map<String, dynamic> json) => Board._(
-        (json['digits'] as List).cast<int>(),
-        List.unmodifiable([
-          for (final b in json['blocks'] as List) Node.fromJson((b as Map).cast<String, dynamic>()),
-        ]),
-        json['eq'] as int?,
-        json['next'] as int,
-      );
+    (json['digits'] as List).cast<int>(),
+    List.unmodifiable([for (final b in json['blocks'] as List) Node.fromJson((b as Map).cast<String, dynamic>())]),
+    json['eq'] as int?,
+    json['next'] as int,
+  );
 }

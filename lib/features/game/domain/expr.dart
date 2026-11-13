@@ -81,6 +81,37 @@ sealed class Node {
     }
   }
 
+  int get firstIndex => switch (this) {
+    Leaf(:final index) => index,
+    Binary(:final left) => left.firstIndex,
+    Unary(:final child) => child.firstIndex,
+  };
+
+  int get lastIndex => switch (this) {
+    Leaf(:final index) => index,
+    Binary(:final right) => right.lastIndex,
+    Unary(:final child) => child.lastIndex,
+  };
+
+  (Node, Node) splitAt(int gap) {
+    assert(firstIndex <= gap && gap < lastIndex, 'gap $gap outside $firstIndex..$lastIndex');
+    switch (this) {
+      case Leaf():
+        throw StateError('a leaf has no gap to split');
+      case Unary(:final child):
+        return child.splitAt(gap);
+      case Binary(:final op, :final left, :final right):
+        final at = left.lastIndex;
+        if (gap == at) return (left, right);
+        if (gap < at) {
+          final (a, b) = left.splitAt(gap);
+          return (a, Binary(id, op, b, right, parens: parens));
+        }
+        final (a, b) = right.splitAt(gap);
+        return (Binary(id, op, left, a, parens: parens), b);
+    }
+  }
+
   Node? find(int nodeId) {
     for (final n in descendants) {
       if (n.id == nodeId) return n;
@@ -93,16 +124,16 @@ sealed class Node {
     return switch (this) {
       Leaf() => this,
       Binary(:final op, :final left, :final right) => _sameOrNew(
-          left.replace(nodeId, replace),
-          right.replace(nodeId, replace),
-          (l, r) => Binary(id, op, l, r, parens: parens),
-          left,
-          right,
-        ),
+        left.replace(nodeId, replace),
+        right.replace(nodeId, replace),
+        (l, r) => Binary(id, op, l, r, parens: parens),
+        left,
+        right,
+      ),
       Unary(:final op, :final child) => () {
-          final c = child.replace(nodeId, replace);
-          return identical(c, child) ? this : Unary(id, op, c, parens: parens);
-        }(),
+        final c = child.replace(nodeId, replace);
+        return identical(c, child) ? this : Unary(id, op, c, parens: parens);
+      }(),
     };
   }
 
@@ -136,15 +167,17 @@ class Binary extends Node {
 
   Binary withOp(BinOp value) => Binary(id, value, left, right, parens: parens);
 
+  int get digitGap => left.lastIndex;
+
   @override
   Map<String, dynamic> toJson() => {
-        't': 'b',
-        'id': id,
-        'op': op.name,
-        'l': left.toJson(),
-        'r': right.toJson(),
-        if (parens) 'p': true,
-      };
+    't': 'b',
+    'id': id,
+    'op': op.name,
+    'l': left.toJson(),
+    'r': right.toJson(),
+    if (parens) 'p': true,
+  };
 }
 
 class Unary extends Node {
@@ -157,11 +190,5 @@ class Unary extends Node {
   Unary withParens(bool value) => Unary(id, op, child, parens: value);
 
   @override
-  Map<String, dynamic> toJson() => {
-        't': 'u',
-        'id': id,
-        'op': op.name,
-        'c': child.toJson(),
-        if (parens) 'p': true,
-      };
+  Map<String, dynamic> toJson() => {'t': 'u', 'id': id, 'op': op.name, 'c': child.toJson(), if (parens) 'p': true};
 }

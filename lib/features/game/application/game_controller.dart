@@ -8,10 +8,11 @@ import '../domain/board.dart';
 import '../domain/evaluator.dart';
 import '../domain/expr.dart';
 import '../domain/level.dart';
+import '../domain/solution_codec.dart';
 
-enum GameMode { educational, random, specific, challenges, adventure }
+enum GameMode { educational, random, specific, challenges, adventure, daily }
 
-enum GamePhase { playing, solved }
+enum GamePhase { playing, solved, revealed }
 
 enum SaveStatus { none, saving, savedNew, savedReplay, failed }
 
@@ -39,6 +40,39 @@ class NodeSelection extends Selection {
   int get hashCode => nodeId.hashCode;
 }
 
+class EqualsSelection extends Selection {
+  const EqualsSelection();
+
+  @override
+  bool operator ==(Object other) => other is EqualsSelection;
+  @override
+  int get hashCode => 0;
+}
+
+sealed class SignDrag {
+  const SignDrag();
+}
+
+class PaletteBinaryDrag extends SignDrag {
+  const PaletteBinaryDrag(this.op);
+  final BinOp op;
+}
+
+class PaletteEqualsDrag extends SignDrag {
+  const PaletteEqualsDrag();
+}
+
+class MoveBinaryDrag extends SignDrag {
+  const MoveBinaryDrag(this.nodeId, this.fromGap);
+  final int nodeId;
+  final int fromGap;
+}
+
+class MoveEqualsDrag extends SignDrag {
+  const MoveEqualsDrag(this.fromGap);
+  final int fromGap;
+}
+
 class GameState {
   const GameState({
     required this.mode,
@@ -58,6 +92,11 @@ class GameState {
     this.pointsEarned = 0,
     this.totalPoints,
     this.saveStatus = SaveStatus.none,
+    this.solution,
+    this.hintsUsed = 0,
+    this.sawLiveValues = true,
+    this.streakUsed = 0,
+    this.practice = false,
   });
 
   final GameMode mode;
@@ -85,8 +124,28 @@ class GameState {
   final int? totalPoints;
   final SaveStatus saveStatus;
 
+  final String? solution;
+
+  final int hintsUsed;
+
+  final bool sawLiveValues;
+
+  final int streakUsed;
+
+  final bool practice;
+
+  bool get canHint => phase == GamePhase.playing && !paused && hintsUsed < 3;
+
+  Score get score => level.score(
+    secondsLeft: secondsLeft,
+    inTime: solvedInTime,
+    hints: hintsUsed,
+    blind: !sawLiveValues,
+    streak: streakUsed,
+  );
+
   String get number => board.number;
-  bool get timeUp => secondsLeft <= 0;
+  bool get timeUp => !practice && secondsLeft <= 0;
   bool get canUndo => history.isNotEmpty && phase == GamePhase.playing;
 
   Verdict get verdict => board.verdict(level);
@@ -108,42 +167,55 @@ class GameState {
     int? pointsEarned,
     int? totalPoints,
     SaveStatus? saveStatus,
-  }) =>
-      GameState(
-        mode: mode,
-        level: level,
-        board: board ?? this.board,
-        history: history ?? this.history,
-        selection: clearSelection ? null : (selection ?? this.selection),
-        secondsLeft: secondsLeft ?? this.secondsLeft,
-        elapsed: elapsed ?? this.elapsed,
-        pauseUsed: pauseUsed ?? this.pauseUsed,
-        paused: paused ?? this.paused,
-        pauseLeft: clearPauseLeft ? null : (pauseLeft ?? this.pauseLeft),
-        phase: phase ?? this.phase,
-        wrongAttempt: wrongAttempt ?? this.wrongAttempt,
-        alreadySolved: alreadySolved,
-        solvedInTime: solvedInTime ?? this.solvedInTime,
-        pointsEarned: pointsEarned ?? this.pointsEarned,
-        totalPoints: totalPoints ?? this.totalPoints,
-        saveStatus: saveStatus ?? this.saveStatus,
-      );
+    int? hintsUsed,
+    bool? sawLiveValues,
+    int? streakUsed,
+    String? solution,
+  }) => GameState(
+    mode: mode,
+    level: level,
+    board: board ?? this.board,
+    history: history ?? this.history,
+    selection: clearSelection ? null : (selection ?? this.selection),
+    secondsLeft: secondsLeft ?? this.secondsLeft,
+    elapsed: elapsed ?? this.elapsed,
+    pauseUsed: pauseUsed ?? this.pauseUsed,
+    paused: paused ?? this.paused,
+    pauseLeft: clearPauseLeft ? null : (pauseLeft ?? this.pauseLeft),
+    phase: phase ?? this.phase,
+    wrongAttempt: wrongAttempt ?? this.wrongAttempt,
+    alreadySolved: alreadySolved,
+    solvedInTime: solvedInTime ?? this.solvedInTime,
+    pointsEarned: pointsEarned ?? this.pointsEarned,
+    totalPoints: totalPoints ?? this.totalPoints,
+    saveStatus: saveStatus ?? this.saveStatus,
+    solution: solution ?? this.solution,
+    hintsUsed: hintsUsed ?? this.hintsUsed,
+    sawLiveValues: sawLiveValues ?? this.sawLiveValues,
+    streakUsed: streakUsed ?? this.streakUsed,
+    practice: practice,
+  );
 
   Map<String, dynamic> toJson() => {
-        'mode': mode.name,
-        'level': level.name,
-        'board': board.toJson(),
-        'history': [for (final b in history.take(30)) b.toJson()],
-        'secondsLeft': secondsLeft,
-        'elapsed': elapsed,
-        'pauseUsed': pauseUsed,
-        'phase': phase.name,
-        'alreadySolved': alreadySolved,
-        'solvedInTime': solvedInTime,
-        'pointsEarned': pointsEarned,
-        if (totalPoints != null) 'totalPoints': totalPoints,
-        'saveStatus': saveStatus.name,
-      };
+    'mode': mode.name,
+    'level': level.name,
+    'board': board.toJson(),
+    'history': [for (final b in history.take(30)) b.toJson()],
+    'secondsLeft': secondsLeft,
+    'elapsed': elapsed,
+    'pauseUsed': pauseUsed,
+    'phase': phase.name,
+    'alreadySolved': alreadySolved,
+    'solvedInTime': solvedInTime,
+    'pointsEarned': pointsEarned,
+    if (totalPoints != null) 'totalPoints': totalPoints,
+    'saveStatus': saveStatus.name,
+    'solution': ?solution,
+    'hints': hintsUsed,
+    'sawLive': sawLiveValues,
+    'streakUsed': streakUsed,
+    'practice': practice,
+  };
 
   factory GameState.fromJson(Map<String, dynamic> j) {
     final phase = GamePhase.values.byName(j['phase'] as String);
@@ -166,6 +238,11 @@ class GameState {
       pointsEarned: j['pointsEarned'] as int? ?? 0,
       totalPoints: j['totalPoints'] as int?,
       saveStatus: save,
+      solution: j['solution'] as String?,
+      hintsUsed: j['hints'] as int? ?? 0,
+      sawLiveValues: j['sawLive'] as bool? ?? true,
+      streakUsed: j['streakUsed'] as int? ?? 0,
+      practice: j['practice'] as bool? ?? false,
     );
   }
 }
@@ -217,7 +294,7 @@ class GameController extends Notifier<GameState?> {
     }
     state = s.copyWith(
       elapsed: s.elapsed + 1,
-      secondsLeft: s.secondsLeft > 0 ? s.secondsLeft - 1 : 0,
+      secondsLeft: s.practice ? s.secondsLeft : (s.secondsLeft > 0 ? s.secondsLeft - 1 : 0),
     );
   }
 
@@ -226,6 +303,8 @@ class GameController extends Notifier<GameState?> {
     required Level level,
     required String number,
     bool alreadySolved = false,
+    bool liveValues = true,
+    bool practice = false,
   }) {
     _ensureTimer();
     state = GameState(
@@ -234,7 +313,23 @@ class GameController extends Notifier<GameState?> {
       board: Board.start(number),
       secondsLeft: level.seconds,
       alreadySolved: alreadySolved,
+      sawLiveValues: liveValues,
+      practice: practice,
     );
+  }
+
+  void noteLiveValuesShown() {
+    final s = state;
+    if (s == null || s.sawLiveValues || s.phase != GamePhase.playing) return;
+    state = s.copyWith(sawLiveValues: true);
+  }
+
+  void useHint(String solution) {
+    final s = state;
+    if (s == null || !s.canHint) return;
+    final next = s.hintsUsed + 1;
+    state = s.copyWith(hintsUsed: next, solution: solution);
+    if (next >= 3) reveal(solution);
   }
 
   void clear() => state = null;
@@ -243,6 +338,13 @@ class GameController extends Notifier<GameState?> {
     final s = _editable;
     if (s == null) return;
     state = s.copyWith(selection: GapSelection(gap));
+  }
+
+  void selectEquals() {
+    final s = _editable;
+    if (s == null || s.board.eqGap == null) return;
+    final already = s.selection is EqualsSelection;
+    state = already ? s.copyWith(clearSelection: true) : s.copyWith(selection: const EqualsSelection());
   }
 
   void selectNode(int nodeId) {
@@ -258,6 +360,7 @@ class GameController extends Notifier<GameState?> {
     final targets = <Selection>[
       for (var g = 0; g < s.board.gapCount; g++)
         if (s.board.canLink(g) || s.board.canPlaceEquals(g)) GapSelection(g),
+      if (s.board.eqGap != null) const EqualsSelection(),
       for (final b in s.board.blocks)
         for (final n in b.descendants) NodeSelection(n.id),
     ];
@@ -325,6 +428,70 @@ class GameController extends Notifier<GameState?> {
     _commit(s, s.board.unwrap(sel.nodeId), select: NodeSelection(node.child.id));
   }
 
+  bool removeSelected() {
+    final s = _editable;
+    if (s == null) return false;
+    switch (s.selection) {
+      case EqualsSelection() when s.board.eqGap != null:
+        _commit(s, s.board.removeEquals());
+        return true;
+      case NodeSelection(:final nodeId):
+        final node = s.board.find(nodeId);
+        if (node is Unary) {
+          _commit(s, s.board.unwrap(nodeId), select: NodeSelection(node.child.id));
+          return true;
+        }
+        if (node is Binary) {
+          _commit(s, s.board.unlink(nodeId));
+          return true;
+        }
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  bool canDrop(SignDrag drag, int gap) {
+    final s = _editable;
+    if (s == null || gap < 0 || gap >= s.board.digits.length - 1) return false;
+    return !identical(_dropped(s.board, drag, gap), s.board);
+  }
+
+  bool drop(SignDrag drag, int gap) {
+    final s = _editable;
+    if (s == null) return false;
+    final next = _dropped(s.board, drag, gap);
+    if (identical(next, s.board)) return false;
+    _commit(s, next);
+    return true;
+  }
+
+  void dropOutside(SignDrag drag) {
+    final s = _editable;
+    if (s == null) return;
+    final from = switch (drag) {
+      MoveBinaryDrag(:final fromGap) => fromGap,
+      MoveEqualsDrag(:final fromGap) => fromGap,
+      _ => null,
+    };
+    if (from == null) return;
+    final next = s.board.clearGap(from);
+    if (!identical(next, s.board)) _commit(s, next);
+  }
+
+  Board _dropped(Board b, SignDrag drag, int gap) {
+    try {
+      return switch (drag) {
+        PaletteBinaryDrag(:final op) => b.dropBinary(op, gap),
+        PaletteEqualsDrag() => b.dropEquals(gap),
+        MoveBinaryDrag(:final nodeId) => b.moveBinary(nodeId, gap),
+        MoveEqualsDrag() => b.moveEquals(gap),
+      };
+    } on StateError {
+      return b;
+    }
+  }
+
   void toggleParens() {
     final s = _editable;
     final sel = s?.selection;
@@ -355,7 +522,7 @@ class GameController extends Notifier<GameState?> {
     state = s.copyWith(paused: false, clearPauseLeft: true);
   }
 
-  CheckResult check() {
+  CheckResult check({int streak = 0}) {
     final s = _editable;
     if (s == null || !s.board.isComplete) return CheckResult.notReady;
     final v = s.verdict;
@@ -365,15 +532,44 @@ class GameController extends Notifier<GameState?> {
       return CheckResult.wrong;
     }
     final inTime = !s.timeUp;
-    final points = s.alreadySolved ? 0 : s.level.pointsFor(secondsLeft: s.secondsLeft, inTime: inTime);
+    final points = s.alreadySolved || s.practice
+        ? 0
+        : s.level.pointsFor(
+            secondsLeft: s.secondsLeft,
+            inTime: inTime,
+            hints: s.hintsUsed,
+            blind: !s.sawLiveValues,
+            streak: streak,
+          );
     state = s.copyWith(
       phase: GamePhase.solved,
       clearSelection: true,
       solvedInTime: inTime,
       pointsEarned: points,
+      streakUsed: streak,
       saveStatus: SaveStatus.saving,
     );
     return CheckResult.right;
+  }
+
+  void reveal(String solution) {
+    final s = state;
+    if (s == null || s.phase != GamePhase.playing) return;
+    Board board;
+    try {
+      board = SolutionCodec.decode(s.number, solution);
+    } on FormatException {
+      return;
+    }
+    state = s.copyWith(
+      board: board,
+      history: [...s.history, s.board],
+      phase: GamePhase.revealed,
+      paused: false,
+      clearSelection: true,
+      wrongAttempt: false,
+      solution: solution,
+    );
   }
 
   void setSaveResult(SaveStatus status, {int? totalPoints, int? pointsEarned}) {

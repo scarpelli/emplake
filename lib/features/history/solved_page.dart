@@ -10,6 +10,8 @@ import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
 import '../../data/models.dart';
+import '../achievements/achievements.dart';
+import '../game/application/game_controller.dart';
 import '../game/domain/level.dart';
 
 class SolvedPage extends ConsumerStatefulWidget {
@@ -22,10 +24,11 @@ class SolvedPage extends ConsumerStatefulWidget {
 class _SolvedPageState extends ConsumerState<SolvedPage> {
   late Future<HistorySnapshot> _future = _load();
   Level? _filter;
+  bool _showSkipped = false;
 
   Future<HistorySnapshot> _load() async {
     final repo = ref.read(repositoryProvider);
-    if (repo == null) return const HistorySnapshot(entries: [], skippedCount: 0);
+    if (repo == null) return HistorySnapshot(entries: const [], skippedCount: 0);
     return repo.loadHistory();
   }
 
@@ -47,7 +50,14 @@ class _SolvedPageState extends ConsumerState<SolvedPage> {
             PageTitle(
               eyebrow: l.historyEyebrow,
               title: l.historyTitle,
-              trailing: BoxIconButton(icon: Icons.refresh, tooltip: l.retry, onPressed: _reload),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BoxIconButton(icon: Icons.refresh, tooltip: l.retry, onPressed: _reload),
+                  const SizedBox(width: 8),
+                  const HelpButton(),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -59,11 +69,14 @@ class _SolvedPageState extends ConsumerState<SolvedPage> {
                   }
                   if (snap.hasError) {
                     return Center(
-                      child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        Text(l.historyError),
-                        const SizedBox(height: 12),
-                        OutlinedButton(onPressed: _reload, child: Text(l.retry)),
-                      ]),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(l.historyError),
+                          const SizedBox(height: 12),
+                          OutlinedButton(onPressed: _reload, child: Text(l.retry)),
+                        ],
+                      ),
                     );
                   }
                   return _content(context, snap.data!);
@@ -81,28 +94,54 @@ class _SolvedPageState extends ConsumerState<SolvedPage> {
     final t = Theme.of(context).textTheme;
     final bp = context.bp;
     final entries = _filter == null ? data.entries : data.entries.where((e) => e.level == _filter).toList();
+    final skipped = _filter == null ? data.skipped : data.skipped.where((e) => e.level == _filter).toList();
+    final levels = _showSkipped ? [for (final e in data.skipped) e.level] : [for (final e in data.entries) e.level];
+    int countFor(Level? level) => level == null ? levels.length : levels.where((l) => l == level).length;
 
     Widget stat(String label, int value) => Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(border: Border.all(color: bp.line)),
-            child: Row(children: [
-              Eyebrow(label),
-              const Spacer(),
-              Text('$value', style: t.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
-            ]),
-          ),
-        );
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(border: Border.all(color: bp.line)),
+        child: Row(
+          children: [
+            Eyebrow(label),
+            const Spacer(),
+            Text('$value', style: t.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(children: [
-          stat(l.solvedCount, data.entries.length),
-          const SizedBox(width: 8),
-          stat(l.skippedCount, data.skippedCount),
-        ]),
+        Row(
+          children: [
+            stat(l.solvedCount, data.solvedCount),
+            const SizedBox(width: 8),
+            stat(l.skippedCount, data.skippedCount),
+          ],
+        ),
         const SizedBox(height: 12),
+        const _AchievementsStrip(),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            for (final (skippedTab, label) in [(false, l.solvedCount), (true, l.skippedCount)])
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: skippedTab ? 0 : 6),
+                  child: SelectTile(
+                    selected: _showSkipped == skippedTab,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    onTap: () => setState(() => _showSkipped = skippedTab),
+                    child: Center(child: Text(label)),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -114,7 +153,7 @@ class _SolvedPageState extends ConsumerState<SolvedPage> {
                     selected: _filter == level,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     onTap: () => setState(() => _filter = level),
-                    child: Text(level == null ? l.filterAll : level.shortLabel(l)),
+                    child: Text('${level == null ? l.filterAll : level.shortLabel(l)} · ${countFor(level)}'),
                   ),
                 ),
             ],
@@ -122,13 +161,25 @@ class _SolvedPageState extends ConsumerState<SolvedPage> {
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: entries.isEmpty
+          child: _showSkipped
+              ? (skipped.isEmpty
+                    ? Center(child: Text(l.skippedEmpty, textAlign: TextAlign.center))
+                    : ListView.separated(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        itemCount: skipped.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 8),
+                        itemBuilder: (context, i) => _SkippedTile(entry: skipped[i]),
+                      ))
+              : entries.isEmpty
               ? Center(
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Text(l.historyEmpty, textAlign: TextAlign.center),
-                    const SizedBox(height: 12),
-                    FilledButton(onPressed: () => context.go('/play'), child: Text(l.newGame)),
-                  ]),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(l.historyEmpty, textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      FilledButton(onPressed: () => context.go('/play'), child: Text(l.newGame)),
+                    ],
+                  ),
                 )
               : ListView.separated(
                   padding: const EdgeInsets.only(bottom: 20),
@@ -213,7 +264,9 @@ class _SolvedTileState extends State<_SolvedTile> {
                 ? const SizedBox(width: double.infinity)
                 : Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(border: Border(top: BorderSide(color: bp.lineSoft))),
+                    decoration: BoxDecoration(
+                      border: Border(top: BorderSide(color: bp.lineSoft)),
+                    ),
                     padding: const EdgeInsets.all(12),
                     child: Row(
                       children: [
@@ -241,6 +294,83 @@ class _SolvedTileState extends State<_SolvedTile> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SkippedTile extends StatelessWidget {
+  const _SkippedTile({required this.entry});
+  final SkippedEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final t = Theme.of(context).textTheme;
+    final meta = [
+      entry.level.label(l).toUpperCase(),
+      l.skippedTimes(entry.times),
+      if (entry.revealed) l.skippedRevealed,
+    ].join(' · ');
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(border: Border.all(color: bp.line)),
+      child: Row(
+        children: [
+          Text(entry.number, style: t.titleLarge?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 2)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(meta, style: t.labelSmall?.copyWith(color: bp.muted)),
+          ),
+          OutlinedButton(
+            onPressed: () =>
+                context.go('/play/level?mode=${GameMode.specific.name}&n=${entry.number}&level=${entry.level.name}'),
+            child: Text(l.tryAgain),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AchievementsStrip extends ConsumerWidget {
+  const _AchievementsStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final unlocked = ref.watch(profileProvider).value?.achievements ?? const <String>{};
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Eyebrow(l.achievementsTitle(unlocked.length, Achievement.values.length)),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final a in Achievement.values)
+              Tooltip(
+                message: '${a.title(l)} · ${a.description(l)}',
+                triggerMode: TooltipTriggerMode.tap,
+                child: Semantics(
+                  label: '${a.title(l)}: ${a.description(l)}',
+                  value: unlocked.contains(a.name) ? l.achievementUnlockedShort : l.achievementLocked,
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: unlocked.contains(a.name) ? bp.ink : null,
+                      border: Border.all(color: unlocked.contains(a.name) ? bp.ink : bp.lineSoft),
+                    ),
+                    child: Icon(a.icon, size: 20, color: unlocked.contains(a.name) ? bp.onInk : bp.faint),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

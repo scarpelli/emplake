@@ -4,35 +4,21 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n_helpers.dart';
 import '../../core/theme/blueprint.dart';
-import '../help/help_dialog.dart';
 
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
 
-  static const _helpIndex = 3;
-
-  static int? _branchFor(int barIndex) => switch (barIndex) {
-        0 => 0,
-        1 => 1,
-        2 => 2,
-        4 => 3,
-        _ => null,
-      };
-
-  static int _barFor(int branch) => branch == 3 ? 4 : branch;
-
   @override
   Widget build(BuildContext context) {
     final bp = context.bp;
     final l = context.l10n;
-    final current = _barFor(shell.currentIndex);
+    final current = shell.currentIndex;
     final icons = [
       (Icons.home_outlined, l.navHome),
       (Icons.history, l.navHistory),
       (Icons.account_tree_outlined, l.navGame),
-      (Icons.help_outline, l.navHelp),
       (Icons.settings_outlined, l.navSettings),
     ];
 
@@ -58,18 +44,7 @@ class AppShell extends StatelessWidget {
               ),
             ),
         ],
-        letIndexChange: (i) {
-          if (i == _helpIndex) {
-            showHelpDialog(context);
-            return false;
-          }
-          return true;
-        },
-        onTap: (i) {
-          final branch = _branchFor(i);
-          if (branch == null) return;
-          shell.goBranch(branch, initialLocation: branch == shell.currentIndex);
-        },
+        onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
       ),
     );
   }

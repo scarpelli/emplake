@@ -256,6 +256,24 @@ abstract class AppLocalizations {
   /// **'Idioma'**
   String get language;
 
+  /// No description provided for @loginOr.
+  ///
+  /// In pt, this message translates to:
+  /// **'OU'**
+  String get loginOr;
+
+  /// No description provided for @loginGoogle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar com Google'**
+  String get loginGoogle;
+
+  /// No description provided for @loginGoogleError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível entrar com o Google. Tente de novo.'**
+  String get loginGoogleError;
+
   /// No description provided for @greeting.
   ///
   /// In pt, this message translates to:
@@ -333,6 +351,48 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Uma placa por cidade, numa viagem pelo Brasil.'**
   String get modeAdventureDesc;
+
+  /// No description provided for @modeDaily.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placa do dia'**
+  String get modeDaily;
+
+  /// No description provided for @modeDailyDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.'**
+  String get modeDailyDesc;
+
+  /// No description provided for @dailyAlreadyPlayed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já jogou a placa de hoje. Volte amanhã para uma nova!'**
+  String get dailyAlreadyPlayed;
+
+  /// No description provided for @dailyCopy.
+  ///
+  /// In pt, this message translates to:
+  /// **'COPIAR RESULTADO'**
+  String get dailyCopy;
+
+  /// No description provided for @blindShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'às cegas'**
+  String get blindShort;
+
+  /// No description provided for @hintsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{sem dicas} =1{1 dica} other{{count} dicas}}'**
+  String hintsCount(int count);
+
+  /// No description provided for @streakShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'🔥 {count}'**
+  String streakShort(int count);
 
   /// No description provided for @comingSoon.
   ///
@@ -442,6 +502,12 @@ abstract class AppLocalizations {
   /// **'{seconds}s por número'**
   String secondsPerNumber(int seconds);
 
+  /// No description provided for @levelBasePoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'{points} pts base'**
+  String levelBasePoints(int points);
+
   /// No description provided for @fourDigitNumber.
   ///
   /// In pt, this message translates to:
@@ -454,11 +520,59 @@ abstract class AppLocalizations {
   /// **'Digite os 4 dígitos.'**
   String get typeFourDigits;
 
+  /// No description provided for @noSolutionOnLevel.
+  ///
+  /// In pt, this message translates to:
+  /// **'{number} não tem solução no {level}. Tente no: {others}.'**
+  String noSolutionOnLevel(String number, String level, String others);
+
+  /// No description provided for @noSolutionAnyLevel.
+  ///
+  /// In pt, this message translates to:
+  /// **'{number} não tem solução em nenhum nível. Escolha outro número.'**
+  String noSolutionAnyLevel(String number);
+
   /// No description provided for @start.
   ///
   /// In pt, this message translates to:
   /// **'COMEÇAR'**
   String get start;
+
+  /// No description provided for @levelProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{done} / {total} resolvidos'**
+  String levelProgress(int done, int total);
+
+  /// No description provided for @practiceMode.
+  ///
+  /// In pt, this message translates to:
+  /// **'Treino (sem relógio)'**
+  String get practiceMode;
+
+  /// No description provided for @practiceModeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogue no seu ritmo. Não vale pontos e não entra no histórico.'**
+  String get practiceModeHint;
+
+  /// No description provided for @practiceShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'treino'**
+  String get practiceShort;
+
+  /// No description provided for @practiceTimer.
+  ///
+  /// In pt, this message translates to:
+  /// **'sem relógio'**
+  String get practiceTimer;
+
+  /// No description provided for @practiceNoPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Treino: sem pontos, no seu ritmo.'**
+  String get practiceNoPoints;
 
   /// No description provided for @pointsShort.
   ///
@@ -475,7 +589,7 @@ abstract class AppLocalizations {
   /// No description provided for @hintStart.
   ///
   /// In pt, this message translates to:
-  /// **'Toque entre dois números e escolha um operador para ligá-los. O = entra do mesmo jeito, uma única vez.'**
+  /// **'Toque entre dois números e escolha um operador, ou arraste o sinal até o vão. O = entra do mesmo jeito, uma única vez. Arraste um sinal para outro vão para movê-lo, ou para fora da árvore para tirá-lo.'**
   String get hintStart;
 
   /// No description provided for @paletteBetween.
@@ -523,8 +637,116 @@ abstract class AppLocalizations {
   /// No description provided for @removeOperator.
   ///
   /// In pt, this message translates to:
-  /// **'Remover operador'**
+  /// **'Remover sinal'**
   String get removeOperator;
+
+  /// No description provided for @hintTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'DICA {n} DE 3'**
+  String hintTitle(int n);
+
+  /// No description provided for @hintEquals.
+  ///
+  /// In pt, this message translates to:
+  /// **'O = fica entre o {a} e o {b}.'**
+  String hintEquals(int a, int b);
+
+  /// No description provided for @hintLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Comece ligando o {a} e o {b} com {op}.'**
+  String hintLink(int a, int b, String op);
+
+  /// No description provided for @hintTooltip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dica {n} (custa 1/3 dos pontos)'**
+  String hintTooltip(int n);
+
+  /// No description provided for @hintTooltipReveal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Revelar a solução (sem pontos)'**
+  String get hintTooltipReveal;
+
+  /// No description provided for @hintRevealTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'REVELAR A SOLUÇÃO?'**
+  String get hintRevealTitle;
+
+  /// No description provided for @hintRevealBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este número termina sem pontos e volta ao sorteio para você tentar outro dia.'**
+  String get hintRevealBody;
+
+  /// No description provided for @secondsLeftA11y.
+  ///
+  /// In pt, this message translates to:
+  /// **'{seconds} segundos restantes'**
+  String secondsLeftA11y(int seconds);
+
+  /// No description provided for @tutorialTapGap.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque no vão entre o {a} e o {b} (o quadradinho tracejado).'**
+  String tutorialTapGap(int a, int b);
+
+  /// No description provided for @tutorialPickTimes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agora escolha × para ligar os dois. Dá também para arrastar o sinal até o vão.'**
+  String get tutorialPickTimes;
+
+  /// No description provided for @tutorialLinkThree.
+  ///
+  /// In pt, this message translates to:
+  /// **'A árvore cresceu! Ligue o resultado com o 3: toque no próximo vão.'**
+  String get tutorialLinkThree;
+
+  /// No description provided for @tutorialEqualsGap.
+  ///
+  /// In pt, this message translates to:
+  /// **'1 × 2 × 3 vale 6. Toque no último vão para pôr o =.'**
+  String get tutorialEqualsGap;
+
+  /// No description provided for @tutorialPickEquals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o =.'**
+  String get tutorialPickEquals;
+
+  /// No description provided for @tutorialVerify.
+  ///
+  /// In pt, this message translates to:
+  /// **'6 = 6! Toque em Verificar para conferir.'**
+  String get tutorialVerify;
+
+  /// No description provided for @tutorialOffScript.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tudo bem experimentar! Para seguir o tutorial, use ↶ desfazer até voltar ao passo anterior.'**
+  String get tutorialOffScript;
+
+  /// No description provided for @tutorialSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'PULAR TUTORIAL'**
+  String get tutorialSkip;
+
+  /// No description provided for @liveValuesShow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar valores em tempo real'**
+  String get liveValuesShow;
+
+  /// No description provided for @liveValuesHide.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esconder valores em tempo real'**
+  String get liveValuesHide;
 
   /// No description provided for @toggleParens.
   ///
@@ -543,6 +765,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'PULAR'**
   String get skip;
+
+  /// No description provided for @skipTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'PULAR ESTE NÚMERO?'**
+  String get skipTitle;
+
+  /// No description provided for @skipBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quer ver uma solução? Se preferir, não revelamos nada: o número volta ao sorteio para você tentar outro dia.'**
+  String get skipBody;
+
+  /// No description provided for @skipYes.
+  ///
+  /// In pt, this message translates to:
+  /// **'SIM, MOSTRAR'**
+  String get skipYes;
+
+  /// No description provided for @skipNo.
+  ///
+  /// In pt, this message translates to:
+  /// **'NÃO, PULAR'**
+  String get skipNo;
+
+  /// No description provided for @seeSolution.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver uma solução'**
+  String get seeSolution;
 
   /// No description provided for @verify.
   ///
@@ -645,6 +897,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Você já resolveu todos os números deste nível!'**
   String get allSolved;
+
+  /// No description provided for @allSolvedCatalog.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você resolveu todos os números deste nível por enquanto! Tente outro nível ou digite um número no modo Específico.'**
+  String get allSolvedCatalog;
 
   /// No description provided for @alreadySolved.
   ///
@@ -844,6 +1102,18 @@ abstract class AppLocalizations {
   /// **'{value} = {value} · o tempo acabou antes de verificar'**
   String resultLateDetail(String value);
 
+  /// No description provided for @revealedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'UMA SOLUÇÃO POSSÍVEL'**
+  String get revealedTitle;
+
+  /// No description provided for @revealedDetail.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem pontos desta vez. {number} continua no sorteio para você tentar de novo.'**
+  String revealedDetail(String number);
+
   /// No description provided for @points.
   ///
   /// In pt, this message translates to:
@@ -855,6 +1125,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'TOTAL'**
   String get total;
+
+  /// No description provided for @pointsBreakdown.
+  ///
+  /// In pt, this message translates to:
+  /// **'{base} base + {bonus} pelo tempo'**
+  String pointsBreakdown(int base, int bonus);
+
+  /// No description provided for @pointsLateZero.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora do tempo não vale pontos.'**
+  String get pointsLateZero;
+
+  /// No description provided for @pointsReplayZero.
+  ///
+  /// In pt, this message translates to:
+  /// **'Número já resolvido neste nível: sem pontos.'**
+  String get pointsReplayZero;
+
+  /// No description provided for @howScoringWorks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como funciona?'**
+  String get howScoringWorks;
+
+  /// No description provided for @scoreHints.
+  ///
+  /// In pt, this message translates to:
+  /// **'dicas ×{percent}%'**
+  String scoreHints(int count, int percent);
+
+  /// No description provided for @scoreBlind.
+  ///
+  /// In pt, this message translates to:
+  /// **'às cegas ×1,25'**
+  String get scoreBlind;
+
+  /// No description provided for @scoreStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'sequência {count}: +{percent}%'**
+  String scoreStreak(int count, int percent);
+
+  /// No description provided for @achievementUnlocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquista: {title}'**
+  String achievementUnlocked(String title);
 
   /// No description provided for @savedSolved.
   ///
@@ -970,6 +1288,144 @@ abstract class AppLocalizations {
   /// **'FORA DO TEMPO'**
   String get lateTag;
 
+  /// No description provided for @skippedEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum número pulado. Quando pular um, ele aparece aqui para você tentar de novo.'**
+  String get skippedEmpty;
+
+  /// No description provided for @skippedTimes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{pulado 1 vez} other{pulado {count} vezes}}'**
+  String skippedTimes(int count);
+
+  /// No description provided for @skippedRevealed.
+  ///
+  /// In pt, this message translates to:
+  /// **'solução vista'**
+  String get skippedRevealed;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In pt, this message translates to:
+  /// **'TENTAR'**
+  String get tryAgain;
+
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'CONQUISTAS · {count}/{total}'**
+  String achievementsTitle(int count, int total);
+
+  /// No description provided for @achievementUnlockedShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'desbloqueada'**
+  String get achievementUnlockedShort;
+
+  /// No description provided for @achievementLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'bloqueada'**
+  String get achievementLocked;
+
+  /// No description provided for @achFirstSolve.
+  ///
+  /// In pt, this message translates to:
+  /// **'Primeira placa'**
+  String get achFirstSolve;
+
+  /// No description provided for @achFirstSolveDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva o seu primeiro número.'**
+  String get achFirstSolveDesc;
+
+  /// No description provided for @achTenInTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contra o relógio'**
+  String get achTenInTime;
+
+  /// No description provided for @achTenInTimeDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva 10 números dentro do tempo.'**
+  String get achTenInTimeDesc;
+
+  /// No description provided for @achBlind.
+  ///
+  /// In pt, this message translates to:
+  /// **'Às cegas'**
+  String get achBlind;
+
+  /// No description provided for @achBlindDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva um número sem os valores em tempo real.'**
+  String get achBlindDesc;
+
+  /// No description provided for @achThreeStars.
+  ///
+  /// In pt, this message translates to:
+  /// **'Osso duro'**
+  String get achThreeStars;
+
+  /// No description provided for @achThreeStarsDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva um número ★3.'**
+  String get achThreeStarsDesc;
+
+  /// No description provided for @achAllLevels.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escada completa'**
+  String get achAllLevels;
+
+  /// No description provided for @achAllLevelsDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva um número em cada nível.'**
+  String get achAllLevelsDesc;
+
+  /// No description provided for @achStreak5.
+  ///
+  /// In pt, this message translates to:
+  /// **'Embalado'**
+  String get achStreak5;
+
+  /// No description provided for @achStreak5Desc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acerte 5 seguidos, no tempo e sem dicas.'**
+  String get achStreak5Desc;
+
+  /// No description provided for @achDaily7.
+  ///
+  /// In pt, this message translates to:
+  /// **'Semana cheia'**
+  String get achDaily7;
+
+  /// No description provided for @achDaily7Desc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva a placa do dia 7 dias seguidos.'**
+  String get achDaily7Desc;
+
+  /// No description provided for @achHundred.
+  ///
+  /// In pt, this message translates to:
+  /// **'Centena'**
+  String get achHundred;
+
+  /// No description provided for @achHundredDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva 100 números.'**
+  String get achHundredDesc;
+
   /// No description provided for @settingsEyebrow.
   ///
   /// In pt, this message translates to:
@@ -1012,35 +1468,53 @@ abstract class AppLocalizations {
   /// **'Segue o tema do aparelho até você escolher outro.'**
   String get themeHint;
 
-  /// No description provided for @presets.
+  /// No description provided for @settingsGame.
   ///
   /// In pt, this message translates to:
-  /// **'TEMAS PRONTOS'**
-  String get presets;
+  /// **'JOGO'**
+  String get settingsGame;
 
-  /// No description provided for @presetBlueprint.
+  /// No description provided for @settingsLiveValues.
   ///
   /// In pt, this message translates to:
-  /// **'Planta'**
-  String get presetBlueprint;
+  /// **'Valores em tempo real'**
+  String get settingsLiveValues;
 
-  /// No description provided for @presetGraphite.
+  /// No description provided for @settingsLiveValuesHint.
   ///
   /// In pt, this message translates to:
-  /// **'Grafite'**
-  String get presetGraphite;
+  /// **'Mostra quanto vale cada ramo e cada lado do = enquanto você monta.'**
+  String get settingsLiveValuesHint;
 
-  /// No description provided for @presetSepia.
+  /// No description provided for @settingsHaptics.
   ///
   /// In pt, this message translates to:
-  /// **'Sépia'**
-  String get presetSepia;
+  /// **'Vibração'**
+  String get settingsHaptics;
 
-  /// No description provided for @presetForest.
+  /// No description provided for @settingsReduceMotion.
   ///
   /// In pt, this message translates to:
-  /// **'Floresta'**
-  String get presetForest;
+  /// **'Reduzir animações'**
+  String get settingsReduceMotion;
+
+  /// No description provided for @settingsReduceMotionHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desliga as animações da árvore, da comemoração e das dicas.'**
+  String get settingsReduceMotionHint;
+
+  /// No description provided for @settingsHints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tutorial da primeira partida'**
+  String get settingsHints;
+
+  /// No description provided for @settingsHintsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligue para refazer o passo a passo (1 × 2 × 3 = 6) na próxima partida.'**
+  String get settingsHintsHint;
 
   /// No description provided for @seedColor.
   ///
@@ -1065,12 +1539,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Use os quatro dígitos na ordem.'**
   String get fontSample;
-
-  /// No description provided for @fontFamily.
-  ///
-  /// In pt, this message translates to:
-  /// **'TIPO DE FONTE'**
-  String get fontFamily;
 
   /// No description provided for @sound.
   ///
@@ -1132,6 +1600,204 @@ abstract class AppLocalizations {
   /// **'COMO JOGAR'**
   String get helpTitle;
 
+  /// No description provided for @helpTabPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'JOGAR'**
+  String get helpTabPlay;
+
+  /// No description provided for @helpTabOperators.
+  ///
+  /// In pt, this message translates to:
+  /// **'OPERADORES'**
+  String get helpTabOperators;
+
+  /// No description provided for @helpTabScoring.
+  ///
+  /// In pt, this message translates to:
+  /// **'PONTOS'**
+  String get helpTabScoring;
+
+  /// No description provided for @helpExample.
+  ///
+  /// In pt, this message translates to:
+  /// **'EXEMPLO'**
+  String get helpExample;
+
+  /// No description provided for @helpExampleCaption.
+  ///
+  /// In pt, this message translates to:
+  /// **'1236 → 1 × 2 × 3 = 6. Cada ligação sobe um andar na árvore.'**
+  String get helpExampleCaption;
+
+  /// No description provided for @helpKeys.
+  ///
+  /// In pt, this message translates to:
+  /// **'TECLADO'**
+  String get helpKeys;
+
+  /// No description provided for @helpKeysList.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enter verificar · Esc pular · Tab seleção · Ctrl+Z desfazer · ⌫ remover · H dica\n+ − * / ^ = ( ) operadores · ! fatorial · r √ · c ∛ · a |x| · n −x · f ⌊x⌋ · F ⌈x⌉'**
+  String get helpKeysList;
+
+  /// No description provided for @helpOperatorsIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os binários (+ − × ÷ xʸ) ligam dois blocos num vão. Os outros agem sobre um trecho: toque num número ou ramo e escolha.'**
+  String get helpOperatorsIntro;
+
+  /// No description provided for @opAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Soma'**
+  String get opAdd;
+
+  /// No description provided for @opSub.
+  ///
+  /// In pt, this message translates to:
+  /// **'Subtração'**
+  String get opSub;
+
+  /// No description provided for @opMul.
+  ///
+  /// In pt, this message translates to:
+  /// **'Multiplicação'**
+  String get opMul;
+
+  /// No description provided for @opDiv.
+  ///
+  /// In pt, this message translates to:
+  /// **'Divisão'**
+  String get opDiv;
+
+  /// No description provided for @opPow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Potência'**
+  String get opPow;
+
+  /// No description provided for @opNeg.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oposto (troca o sinal)'**
+  String get opNeg;
+
+  /// No description provided for @opSqrt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Raiz quadrada'**
+  String get opSqrt;
+
+  /// No description provided for @opCbrt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Raiz cúbica'**
+  String get opCbrt;
+
+  /// No description provided for @opFact.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fatorial'**
+  String get opFact;
+
+  /// No description provided for @opAbs.
+  ///
+  /// In pt, this message translates to:
+  /// **'Módulo (valor absoluto)'**
+  String get opAbs;
+
+  /// No description provided for @opFloor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Piso (arredonda para baixo)'**
+  String get opFloor;
+
+  /// No description provided for @opCeil.
+  ///
+  /// In pt, this message translates to:
+  /// **'Teto (arredonda para cima)'**
+  String get opCeil;
+
+  /// No description provided for @lessonsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprender os operadores'**
+  String get lessonsTitle;
+
+  /// No description provided for @lessonsEyebrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'{done} DE {total} LIÇÕES'**
+  String lessonsEyebrow(int done, int total);
+
+  /// No description provided for @lessonsIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada lição mostra uma placa resolvida passo a passo usando um operador. Depois é a sua vez, sem relógio.'**
+  String get lessonsIntro;
+
+  /// No description provided for @lessonDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'lição concluída'**
+  String get lessonDone;
+
+  /// No description provided for @lessonPrev.
+  ///
+  /// In pt, this message translates to:
+  /// **'Passo anterior'**
+  String get lessonPrev;
+
+  /// No description provided for @lessonNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo passo'**
+  String get lessonNext;
+
+  /// No description provided for @lessonPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reproduzir'**
+  String get lessonPlay;
+
+  /// No description provided for @lessonNowYou.
+  ///
+  /// In pt, this message translates to:
+  /// **'AGORA VOCÊ'**
+  String get lessonNowYou;
+
+  /// No description provided for @lessonNowYouHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você joga outra placa que também usa este operador, sem relógio e sem pontos.'**
+  String get lessonNowYouHint;
+
+  /// No description provided for @lessonStepStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'A placa {number}: quatro dígitos, na ordem.'**
+  String lessonStepStart(String number);
+
+  /// No description provided for @lessonStepLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligamos o {a} e o {b} com {op} ({name}).'**
+  String lessonStepLink(int a, int b, String op, String name);
+
+  /// No description provided for @lessonStepUnary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aplicamos {op} ({name}) sobre o trecho.'**
+  String lessonStepUnary(String op, String name);
+
+  /// No description provided for @lessonStepEquals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Por fim, o = entre o {a} e o {b}: os dois lados valem o mesmo.'**
+  String lessonStepEquals(int a, int b);
+
   /// No description provided for @help1.
   ///
   /// In pt, this message translates to:
@@ -1147,13 +1813,13 @@ abstract class AppLocalizations {
   /// No description provided for @help3.
   ///
   /// In pt, this message translates to:
-  /// **'Toque num vão para ligar dois blocos com + − × ÷ xʸ. Toque num nó para trocar o operador ou aplicar √, !, |x| e outros sobre aquele trecho; ( ) agrupa o trecho.'**
+  /// **'Toque num vão (ou arraste um sinal até ele) para ligar dois blocos com + − × ÷ xʸ. Toque num nó para trocar o operador ou aplicar √, !, |x| e outros sobre aquele trecho; ( ) agrupa o trecho. Arraste um sinal ou o = para outro vão para movê-lo; arraste para fora da árvore, ou use ⌫, para tirá-lo.'**
   String get help3;
 
   /// No description provided for @help4.
   ///
   /// In pt, this message translates to:
-  /// **'Logo abaixo da sua fórmula aparece a mesma fórmula em LaTeX. Verificar confere se os dois lados são iguais; Pular troca por outro número ainda não resolvido.'**
+  /// **'Abra o LATEX ▾ ao lado da fórmula para vê-la em LaTeX e copiar o código. Verificar confere se os dois lados são iguais. Pular pergunta se você quer ver uma solução; se não quiser, o número volta outro dia.'**
   String get help4;
 
   /// No description provided for @helpEasyOps.
@@ -1167,6 +1833,84 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Divisão com resultado não inteiro (como 5 ÷ 2) só vale no Fácil.'**
   String get helpFraction;
+
+  /// No description provided for @helpScoringTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'PONTUAÇÃO'**
+  String get helpScoringTitle;
+
+  /// No description provided for @helpScoringTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'TEMPO'**
+  String get helpScoringTime;
+
+  /// No description provided for @helpScoringBaseCol.
+  ///
+  /// In pt, this message translates to:
+  /// **'BASE'**
+  String get helpScoringBaseCol;
+
+  /// No description provided for @helpScoringBase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada número certo vale os pontos base do nível.'**
+  String get helpScoringBase;
+
+  /// No description provided for @helpScoringBonus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bônus de tempo: +1 ponto a cada 5 segundos que sobram no relógio quando você verifica.'**
+  String get helpScoringBonus;
+
+  /// No description provided for @helpScoringExample.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exemplo: no Intermediário ({base} base), verificar com {seconds}s restantes dá {total} pontos.'**
+  String helpScoringExample(int base, int seconds, int total);
+
+  /// No description provided for @helpScoringLate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Se o tempo acabar, ainda dá para terminar e o número conta como resolvido, mas vale 0 pontos.'**
+  String get helpScoringLate;
+
+  /// No description provided for @helpScoringReplay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repetir um número que você já resolveu no mesmo nível não dá pontos de novo.'**
+  String get helpScoringReplay;
+
+  /// No description provided for @helpScoringHints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dicas: a 1ª mostra onde vai o = (fica com 2/3 dos pontos), a 2ª uma primeira ligação (1/3), a 3ª revela a solução (0 pontos; o número volta ao sorteio).'**
+  String get helpScoringHints;
+
+  /// No description provided for @helpScoringBlind.
+  ///
+  /// In pt, this message translates to:
+  /// **'Às cegas: jogando o número inteiro com os valores em tempo real desligados, os pontos valem ×1,25.'**
+  String get helpScoringBlind;
+
+  /// No description provided for @helpScoringStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sequência: cada acerto seguido, no tempo e sem dicas, soma +10% (até +50%). Pular zera a sequência.'**
+  String get helpScoringStreak;
+
+  /// No description provided for @helpScoringPractice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Treino e lições não valem pontos.'**
+  String get helpScoringPractice;
+
+  /// No description provided for @helpScoringPause.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você tem uma pausa de {seconds}s por número; durante a pausa o relógio para e a árvore fica escondida.'**
+  String helpScoringPause(int seconds);
 
   /// No description provided for @helpGotIt.
   ///

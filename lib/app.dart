@@ -38,7 +38,10 @@ class EmplakeApp extends ConsumerWidget {
         final mq = MediaQuery.of(context);
         final scale = mq.textScaler.scale(1) * settings.fontScale;
         return MediaQuery(
-          data: mq.copyWith(textScaler: TextScaler.linear(scale)),
+          data: mq.copyWith(
+            textScaler: TextScaler.linear(scale),
+            disableAnimations: mq.disableAnimations || settings.reduceMotion,
+          ),
           child: child!,
         );
       },

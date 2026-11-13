@@ -40,7 +40,6 @@ dependencies:
   firebase_auth: ^6.7.1
   cloud_firestore: ^6.10.2
   firebase_ui_auth: ^3.1.1
-  firebase_ui_oauth_google: ^2.1.1
   firebase_ui_localizations: ^2.1.0
   intl: ^0.20.3
   curved_navigation_bar: ^1.0.6
@@ -50,7 +49,6 @@ dependencies:
   audioplayers: ^6.8.1
   google_fonts: ^9.0.0
   country_flags: ^4.1.2
-  flex_color_picker: ^4.0.0
   flutter_localizations:
     sdk: flutter
   flutter_web_plugins:
@@ -81,6 +79,7 @@ flutter:
 
   assets:
     - assets/audio/
+    - assets/catalog.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

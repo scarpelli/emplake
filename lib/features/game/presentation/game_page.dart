@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,16 +10,28 @@ import '../../../core/l10n_helpers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/blueprint.dart';
 import '../../../core/widgets/bp_widgets.dart';
+import '../../../core/widgets/emplake_logo.dart';
 import '../../../data/firestore_repository.dart';
+import '../../achievements/achievements.dart';
+import '../../daily/daily.dart';
+import '../../help/help_dialog.dart';
+import '../../settings/settings_controller.dart';
+import '../application/catalog_provider.dart';
 import '../application/game_controller.dart';
 import '../domain/expr.dart';
 import '../domain/format.dart';
+import '../domain/hints.dart';
 import '../domain/level.dart';
+import '../domain/board.dart';
 import 'fly_back_overlay.dart';
+import 'coach_overlay.dart';
 import 'formula_panel.dart';
 import 'operator_palette.dart';
 import 'result_sheet.dart';
+import 'skip_dialog.dart';
 import 'tree_view.dart';
+
+const tutorialNumber = '1236';
 
 class GamePage extends ConsumerStatefulWidget {
   const GamePage({super.key});
@@ -40,6 +54,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   void initState() {
     super.initState();
     final s = ref.read(gameControllerProvider);
+    if (s?.phase == GamePhase.revealed) _sheetVisible = true;
     if (s?.phase == GamePhase.solved) {
       _sheetVisible = true;
       if (s!.saveStatus == SaveStatus.failed) WidgetsBinding.instance.addPostFrameCallback((_) => _save());
@@ -52,27 +67,35 @@ class _GamePageState extends ConsumerState<GamePage> {
     super.dispose();
   }
 
+  void _buzz({bool strong = false}) {
+    if (!ref.read(settingsProvider).haptics) return;
+    strong ? HapticFeedback.heavyImpact() : HapticFeedback.selectionClick();
+  }
+
   List<FlyItem> _flyItems() => [
-        for (final n in _geometry.operatorNodes)
-          if (_geometry.globalCenter(n.id) case final from?)
-            if (_paletteKeys.globalCenter(n.flySymbol!) case final to?)
-              FlyItem(label: n.label.replaceAll(RegExp(r'[()]'), ''), from: from, to: to),
-      ];
+    for (final n in _geometry.operatorNodes)
+      if (_geometry.globalCenter(n.id) case final from?)
+        if (_paletteKeys.globalCenter(n.flySymbol!) case final to?)
+          FlyItem(label: n.label.replaceAll(RegExp(r'[()]'), ''), from: from, to: to),
+  ];
 
   Future<void> _verify() async {
     if (_flying) return;
     final items = _flyItems();
-    switch (_ctrl.check()) {
+    final s0 = ref.read(gameControllerProvider);
+    final streak = s0 == null || s0.practice ? 0 : (ref.read(profileProvider).value?.streak ?? 0);
+    switch (_ctrl.check(streak: streak)) {
       case CheckResult.notReady:
         return;
       case CheckResult.error:
       case CheckResult.wrong:
         _sound.play(Sfx.error);
+        _buzz(strong: true);
       case CheckResult.right:
         _sound.play(Sfx.success);
         _flying = true;
         final save = _save();
-        await runFlyBack(context, items);
+        if (!MediaQuery.disableAnimationsOf(context)) await runFlyBack(context, items);
         _flying = false;
         if (mounted) setState(() => _sheetVisible = true);
         await save;
@@ -82,6 +105,15 @@ class _GamePageState extends ConsumerState<GamePage> {
   Future<void> _save() async {
     final s = ref.read(gameControllerProvider);
     if (s == null) return;
+    if (s.mode == GameMode.educational) {
+      final catalog = await ref.read(catalogProvider.future);
+      final lesson = catalog.lessons.where((x) => x.practice.number == s.number).firstOrNull;
+      if (lesson != null) ref.read(settingsProvider.notifier).markLessonDone(lesson.op.name);
+    }
+    if (s.practice) {
+      _ctrl.setSaveResult(SaveStatus.none);
+      return;
+    }
     final repo = ref.read(repositoryProvider);
     if (repo == null) {
       _ctrl.setSaveResult(SaveStatus.failed);
@@ -97,31 +129,174 @@ class _GamePageState extends ConsumerState<GamePage> {
         points: s.pointsEarned,
         seconds: s.elapsed,
         inTime: s.solvedInTime,
+        hints: s.hintsUsed,
+        blind: !s.sawLiveValues,
       );
       _ctrl.setSaveResult(
         out.isNew ? SaveStatus.savedNew : SaveStatus.savedReplay,
         totalPoints: out.totalPoints,
         pointsEarned: out.pointsAwarded,
       );
+      if (s.mode == GameMode.daily) {
+        await repo.finishDaily(
+          Daily.keyFor(DateTime.now()),
+          solved: true,
+          seconds: s.elapsed,
+          hints: s.hintsUsed,
+          blind: !s.sawLiveValues,
+        );
+      }
       ref.invalidate(profileProvider);
+      if (out.isNew || s.mode == GameMode.daily) await _checkAchievements(repo, s);
     } catch (_) {
       _ctrl.setSaveResult(SaveStatus.failed);
     }
   }
 
-  void _skip() {
+  Future<void> _checkAchievements(FirestoreRepository repo, GameState s) async {
+    try {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) return;
+      final catalog = await ref.read(catalogProvider.future);
+      final stars = catalog.lookup(s.level, s.number)?.stars;
+      final unlocked = Achievement.newlyReached(profile, solvedStars: stars);
+      if (unlocked.isEmpty) return;
+      await repo.unlockAchievements(unlocked.map((a) => a.name));
+      ref.invalidate(profileProvider);
+      if (!mounted) return;
+      final l = context.l10n;
+      for (final a in unlocked) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 4),
+            content: Row(
+              children: [
+                Icon(a.icon, color: context.bp.onInk),
+                const SizedBox(width: 12),
+                Expanded(child: Text(l.achievementUnlocked(a.title(l)))),
+              ],
+            ),
+          ),
+        );
+      }
+    } catch (_) {
+    }
+  }
+
+  void _failDaily(GameState s) {
+    if (s.mode != GameMode.daily) return;
+    ref
+        .read(repositoryProvider)
+        ?.finishDaily(Daily.keyFor(DateTime.now()), solved: false, seconds: s.elapsed, hints: s.hintsUsed, blind: false)
+        .then((_) => ref.invalidate(profileProvider))
+        .catchError((_) {});
+  }
+
+  Future<void> _shareDaily() async {
+    final s = ref.read(gameControllerProvider);
+    if (s == null) return;
+    final l = context.l10n;
+    final profile = await ref.read(profileProvider.future);
+    final text = Daily.shareText(
+      key: Daily.keyFor(DateTime.now()),
+      solved: s.phase == GamePhase.solved,
+      seconds: s.elapsed,
+      hints: s.hintsUsed,
+      blind: !s.sawLiveValues,
+      streak: profile?.dailyStreak ?? 0,
+      hintsLabel: l.hintsCount(s.hintsUsed),
+      blindLabel: l.blindShort,
+    );
+    await Clipboard.setData(ClipboardData(text: text));
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.copied)));
+  }
+
+  Future<void> _hint() async {
+    final s = ref.read(gameControllerProvider);
+    if (s == null || !s.canHint) return;
+    if (s.hintsUsed == 2) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          final l = context.l10n;
+          return AlertDialog(
+            title: Text(l.hintRevealTitle),
+            content: Text(l.hintRevealBody),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l.cancel)),
+              FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l.skipYes)),
+            ],
+          );
+        },
+      );
+      if (ok != true || !mounted) return;
+    }
+    final solution = s.solution ?? await ref.read(solutionProvider((s.level, s.number)).future);
+    if (!mounted || solution == null) return;
+    _sound.play(Sfx.tap);
+    final wasLast = s.hintsUsed == 2;
+    _ctrl.useHint(solution);
+    if (wasLast) {
+      ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: true).catchError((_) {});
+      _failDaily(s);
+      setState(() => _sheetVisible = true);
+    }
+  }
+
+  Future<void> _skip() async {
     final s = ref.read(gameControllerProvider);
     if (s == null || _flying) return;
     _sound.play(Sfx.tap);
-    if (s.phase == GamePhase.playing) {
-      ref.read(repositoryProvider)?.recordSkip(s.level, s.number).catchError((_) {});
+    if (s.phase != GamePhase.playing) {
+      _goNext(s);
+      return;
     }
-    _goNext(s);
+    final show = await showSkipDialog(context);
+    if (show == null || !mounted) return;
+    ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: show).catchError((_) {});
+    _failDaily(s);
+    if (show) {
+      await _reveal();
+    } else {
+      _goNext(s);
+    }
+  }
+
+  Future<void> _reveal() async {
+    final s = ref.read(gameControllerProvider);
+    if (s == null) return;
+    final solution = await ref.read(solutionProvider((s.level, s.number)).future);
+    if (!mounted || solution == null) return;
+    _ctrl.reveal(solution);
+    setState(() => _sheetVisible = true);
+  }
+
+  Future<void> _revealAfterTimeUp() async {
+    final s = ref.read(gameControllerProvider);
+    if (s == null || s.phase != GamePhase.playing) return;
+    ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: true).catchError((_) {});
+    _failDaily(s);
+    await _reveal();
   }
 
   void _goNext(GameState s) {
+    if (s.mode == GameMode.daily) {
+      _menu();
+      return;
+    }
+    if (s.mode == GameMode.educational) {
+      setState(() => _sheetVisible = false);
+      _ctrl.clear();
+      context.go('/play/learn');
+      return;
+    }
     setState(() => _sheetVisible = false);
-    context.go(newGameLocation(mode: GameMode.random, level: s.level, exclude: s.number));
+    if (s.mode == GameMode.specific) {
+      _ctrl.clear();
+      context.go('/play/level?mode=${GameMode.specific.name}');
+      return;
+    }
+    context.go(newGameLocation(mode: s.mode, level: s.level, exclude: s.number, practice: s.practice));
   }
 
   void _menu() {
@@ -133,6 +308,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   void _binary(BinOp op) {
     final linking = ref.read(gameControllerProvider)?.selection is GapSelection;
     _ctrl.applyBinary(op);
+    if (linking) _buzz();
     _sound.play(linking ? Sfx.link : Sfx.tap);
   }
 
@@ -145,6 +321,32 @@ class _GamePageState extends ConsumerState<GamePage> {
     _ctrl.applyUnary(op);
     _sound.play(Sfx.tap);
   }
+
+  void _remove() {
+    if (_ctrl.removeSelected()) _sound.play(Sfx.tap);
+  }
+
+  void _drop(SignDrag drag, int gap) {
+    if (_ctrl.drop(drag, gap)) {
+      _sound.play(Sfx.link);
+      _buzz();
+    }
+  }
+
+  void _dropOutside(SignDrag drag) {
+    _ctrl.dropOutside(drag);
+    _sound.play(Sfx.tap);
+  }
+
+  static const _unaryKeys = {
+    '!': UnOp.fact,
+    'r': UnOp.sqrt,
+    'c': UnOp.cbrt,
+    'a': UnOp.abs,
+    'n': UnOp.neg,
+    'f': UnOp.floor,
+    'F': UnOp.ceil,
+  };
 
   void _key(String ch) {
     final s = ref.read(gameControllerProvider);
@@ -162,8 +364,9 @@ class _GamePageState extends ConsumerState<GamePage> {
         if (s.level.binary.contains(BinOp.pow)) _binary(BinOp.pow);
       case '=':
         _equals();
-      case '!':
-        if (s.level.unary.contains(UnOp.fact)) _unary(UnOp.fact);
+      case '!' || 'r' || 'c' || 'a' || 'n' || 'f' || 'F':
+        final op = _unaryKeys[ch]!;
+        if (s.level.unary.contains(op)) _unary(op);
       case '(' || ')':
         _ctrl.toggleParens();
     }
@@ -174,6 +377,15 @@ class _GamePageState extends ConsumerState<GamePage> {
     final state = ref.watch(gameControllerProvider);
     ref.listen(gameControllerProvider.select((s) => s?.secondsLeft), (prev, next) {
       if (prev == 1 && next == 0) _sound.play(Sfx.timeUp);
+      if (next != null && next > 0 && next <= 5 && prev != next) _sound.play(Sfx.tap);
+    });
+    ref.listen(settingsProvider.select((s) => s.showLiveValues), (_, on) {
+      if (on) _ctrl.noteLiveValuesShown();
+    });
+    ref.listen(gameControllerProvider.select((s) => s?.phase), (_, phase) {
+      if (phase != null && phase != GamePhase.playing && _inTutorial) {
+        ref.read(settingsProvider.notifier).markTutorialDone();
+      }
     });
     final l = context.l10n;
 
@@ -200,7 +412,11 @@ class _GamePageState extends ConsumerState<GamePage> {
       const SingleActivator(LogicalKeyboardKey.tab, shift: true): () => _ctrl.cycleSelection(backwards: true),
       const SingleActivator(LogicalKeyboardKey.keyZ, control: true): _ctrl.undo,
       const SingleActivator(LogicalKeyboardKey.keyZ, meta: true): _ctrl.undo,
-      for (final ch in ['+', '-', '*', 'x', '/', '^', '=', '!', '(', ')']) CharacterActivator(ch): () => _key(ch),
+      const SingleActivator(LogicalKeyboardKey.keyH): _hint,
+      const SingleActivator(LogicalKeyboardKey.backspace): _remove,
+      const SingleActivator(LogicalKeyboardKey.delete): _remove,
+      for (final ch in ['+', '-', '*', 'x', '/', '^', '=', '(', ')', ..._unaryKeys.keys])
+        CharacterActivator(ch): () => _key(ch),
     };
 
     return CallbackShortcuts(
@@ -215,53 +431,132 @@ class _GamePageState extends ConsumerState<GamePage> {
               _focus.requestFocus();
             }
           },
-          child: LayoutBuilder(
-            builder: (context, c) => c.maxWidth >= 1024 ? _desktop(context, state) : _mobile(context, state, c),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: LayoutBuilder(
+                  builder: (context, c) => c.maxWidth >= 1024 ? _desktop(context, state) : _mobile(context, state, c),
+                ),
+              ),
+              if (_tutorialStep(state) case final step?)
+                Positioned.fill(
+                  child: CoachOverlay(step: step, onSkip: () => ref.read(settingsProvider.notifier).markTutorialDone()),
+                ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _tree(GameState state) => Stack(
-        children: [
-          Positioned.fill(
-            child: PausedVeil(
-              paused: state.paused,
-              child: TreeView(
-                state: state,
-                geometry: _geometry,
-                emptyHint: context.l10n.treeGrowsHint,
-                onTapNode: (id) {
-                  _ctrl.selectNode(id);
-                  _sound.play(Sfx.tap);
-                },
-                onTapGap: (g) {
-                  _ctrl.selectGap(g);
-                  _sound.play(Sfx.tap);
-                },
-              ),
+  bool get _inTutorial {
+    final s = ref.read(gameControllerProvider);
+    return s != null && s.number == tutorialNumber && ref.read(settingsProvider).hintsVisible;
+  }
+
+  Offset? _gapCenter(Board board, int digitGap) {
+    final blockGap = board.blockGapAt(digitGap);
+    return blockGap == null ? null : _geometry.globalCenter(TreeLayout.gapId(blockGap));
+  }
+
+  CoachStep? _tutorialStep(GameState s) {
+    final settings = ref.watch(settingsProvider);
+    if (!settings.hintsVisible || s.number != tutorialNumber || s.phase != GamePhase.playing || s.paused) return null;
+    final l = context.l10n;
+    final b = s.board;
+    final sel = s.selection;
+    final mul = BinOp.mul;
+    bool selectedGap(int digitGap) => sel is GapSelection && b.digitGapOf(sel.gap) == digitGap;
+
+    final onScript = b.eqGap == null || b.eqDigitGap == 2
+        ? [0, 1].every((g) => b.binaryAt(g) == null || b.binaryAt(g)!.op == mul)
+        : false;
+    if (!onScript || b.binaryAt(2) != null) {
+      return CoachStep(text: l.tutorialOffScript);
+    }
+    if (b.binaryAt(0) == null) {
+      return selectedGap(0)
+          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul))
+          : CoachStep(text: l.tutorialTapGap(1, 2), target: () => _gapCenter(b, 0));
+    }
+    if (b.binaryAt(1) == null) {
+      return selectedGap(1)
+          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul))
+          : CoachStep(text: l.tutorialLinkThree, target: () => _gapCenter(b, 1));
+    }
+    if (b.eqGap == null) {
+      return selectedGap(2)
+          ? CoachStep(text: l.tutorialPickEquals, target: () => _paletteKeys.globalCenter('='))
+          : CoachStep(text: l.tutorialEqualsGap, target: () => _gapCenter(b, 2));
+    }
+    return CoachStep(text: l.tutorialVerify, target: () => _globalCenterOf(_verifyKey));
+  }
+
+  final _verifyKey = GlobalKey(debugLabel: 'verify');
+
+  static Offset? _globalCenterOf(GlobalKey key) {
+    final box = key.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.attached || !box.hasSize) return null;
+    return box.localToGlobal(box.size.center(Offset.zero));
+  }
+
+  Set<int> _hintGaps(GameState state) {
+    if (state.phase != GamePhase.playing || state.hintsUsed == 0 || state.solution == null) return const {};
+    final h = HintInfo.from(state.number, state.solution!);
+    return {h.equalsGap, if (state.hintsUsed >= 2) h.linkGap};
+  }
+
+  Widget _tree(GameState state) {
+    final settings = ref.watch(settingsProvider);
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: PausedVeil(
+            paused: state.paused,
+            child: TreeView(
+              state: state,
+              geometry: _geometry,
+              emptyHint: null,
+              showValues: settings.showLiveValues,
+              hintGaps: _hintGaps(state),
+              onTapNode: (id) {
+                _ctrl.selectNode(id);
+                _sound.play(Sfx.tap);
+              },
+              onTapGap: (g) {
+                _ctrl.selectGap(g);
+                _sound.play(Sfx.tap);
+              },
+              onTapEquals: () {
+                _ctrl.selectEquals();
+                _sound.play(Sfx.tap);
+              },
+              onDrop: _drop,
+              canDrop: _ctrl.canDrop,
+              onDropOutside: _dropOutside,
             ),
           ),
-          if (state.paused) Center(child: _PausedCard(onResume: _ctrl.resume, left: state.pauseLeft)),
-        ],
-      );
+        ),
+        if (state.paused)
+          Center(
+            child: _PausedCard(onResume: _ctrl.resume, left: state.pauseLeft),
+          ),
+      ],
+    );
+  }
 
   Widget _palette(GameState state) => OperatorPalette(
-        state: state,
-        keys: _paletteKeys,
-        onBinary: _binary,
-        onEquals: _equals,
-        onUnary: _unary,
-        onParens: () {
-          _ctrl.toggleParens();
-          _sound.play(Sfx.tap);
-        },
-        onRemove: () {
-          _ctrl.removeUnary();
-          _sound.play(Sfx.tap);
-        },
-      );
+    state: state,
+    keys: _paletteKeys,
+    onBinary: _binary,
+    onEquals: _equals,
+    onUnary: _unary,
+    onParens: () {
+      _ctrl.toggleParens();
+      _sound.play(Sfx.tap);
+    },
+    onRemove: _remove,
+  );
 
   Widget _formula(GameState state) {
     final sel = state.selection;
@@ -269,20 +564,30 @@ class _GamePageState extends ConsumerState<GamePage> {
       tokens: linearTokens(state.board),
       latex: latexOf(state.board),
       highlightNodeId: sel is NodeSelection ? sel.nodeId : null,
+      open: ref.watch(settingsProvider.select((s) => s.latexOpen)),
+      onOpenChanged: ref.read(settingsProvider.notifier).setLatexOpen,
     );
   }
 
-  Widget _sheet(GameState state) => IgnorePointer(
-        ignoring: !(_sheetVisible && state.phase == GamePhase.solved),
-        child: AnimatedSlide(
-          offset: _sheetVisible && state.phase == GamePhase.solved ? Offset.zero : const Offset(0, 1.1),
-          duration: const Duration(milliseconds: 420),
-          curve: Curves.easeOutCubic,
-          child: state.phase == GamePhase.solved
-              ? ResultSheet(state: state, onMenu: _menu, onNext: () => _goNext(state))
-              : const SizedBox.shrink(),
-        ),
-      );
+  Widget _sheet(GameState state) {
+    final over = state.phase != GamePhase.playing;
+    return IgnorePointer(
+      ignoring: !(_sheetVisible && over),
+      child: AnimatedSlide(
+        offset: _sheetVisible && over ? Offset.zero : const Offset(0, 1.1),
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+        child: over
+            ? ResultSheet(
+                state: state,
+                onMenu: _menu,
+                onNext: () => _goNext(state),
+                onShare: state.mode == GameMode.daily ? _shareDaily : null,
+              )
+            : const SizedBox.shrink(),
+      ),
+    );
+  }
 
   Widget _mobile(BuildContext context, GameState state, BoxConstraints c) {
     final tall = c.maxHeight >= 720;
@@ -296,36 +601,43 @@ class _GamePageState extends ConsumerState<GamePage> {
     final bottom = [
       _formula(state),
       const SizedBox(height: 10),
-      _Feedback(state: state),
+      _Feedback(state: state, showHint: false),
       _palette(state),
       const SizedBox(height: 10),
-      _Actions(state: state, onUndo: _ctrl.undo, onSkip: _skip, onVerify: _verify),
+      _Actions(
+        state: state,
+        onUndo: _ctrl.undo,
+        onSkip: _skip,
+        onVerify: _verify,
+        onRevealSolution: _revealAfterTimeUp,
+        onHint: _hint,
+        verifyKey: _verifyKey,
+      ),
       const SizedBox(height: 12),
     ];
 
     final content = tall
-        ? Column(children: [
-            ...fixed,
-            Expanded(child: _tree(state)),
-            ...bottom,
-          ])
-        : ListView(children: [
-            ...fixed,
-            SizedBox(height: 240, child: _tree(state)),
-            ...bottom,
-          ]);
+        ? Column(
+            children: [
+              ...fixed,
+              Expanded(child: _tree(state)),
+              ...bottom,
+            ],
+          )
+        : ListView(
+            children: [
+              ...fixed,
+              SizedBox(height: 240, child: _tree(state)),
+              ...bottom,
+            ],
+          );
 
     return Stack(
       children: [
         ContentWidth(
           child: Padding(padding: const EdgeInsets.fromLTRB(20, 12, 20, 0), child: content),
         ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: ContentWidth(child: _sheet(state)),
-        ),
+        Positioned(left: 0, right: 0, bottom: 0, child: ContentWidth(child: _sheet(state))),
       ],
     );
   }
@@ -368,20 +680,36 @@ class _GamePageState extends ConsumerState<GamePage> {
                           Eyebrow(l.formula),
                           const SizedBox(height: 6),
                           _formula(state),
-                          if (state.board.isComplete && v.result.ok) ...[
+                          if (ref.watch(settingsProvider.select((s) => s.showLiveValues)) &&
+                              state.board.isComplete &&
+                              v.result.ok) ...[
                             const SizedBox(height: 8),
-                            Wrap(spacing: 12, children: [
-                              Text(l.leftSide(v.left!.display(decimalSeparator: sep))),
-                              Text(l.rightSide(v.right!.display(decimalSeparator: sep))),
-                              Text(v.isTrue ? l.equalityTrue : l.equalityFalse,
-                                  style: TextStyle(color: v.isTrue ? bp.ok : bp.danger)),
-                            ]),
+                            Wrap(
+                              spacing: 12,
+                              children: [
+                                Text(l.leftSide(v.left!.display(decimalSeparator: sep))),
+                                Text(l.rightSide(v.right!.display(decimalSeparator: sep))),
+                                Text(
+                                  v.isTrue ? l.equalityTrue : l.equalityFalse,
+                                  style: TextStyle(color: v.isTrue ? bp.ok : bp.danger),
+                                ),
+                              ],
+                            ),
                           ],
                           const SizedBox(height: 12),
-                          _Feedback(state: state),
+                          _Feedback(state: state, showHint: false),
                           _palette(state),
                           const SizedBox(height: 12),
-                          _Actions(state: state, onUndo: _ctrl.undo, onSkip: _skip, onVerify: _verify, showKeys: true),
+                          _Actions(
+                            state: state,
+                            onUndo: _ctrl.undo,
+                            onSkip: _skip,
+                            onVerify: _verify,
+                            onRevealSolution: _revealAfterTimeUp,
+                            onHint: _hint,
+                            verifyKey: _verifyKey,
+                            showKeys: true,
+                          ),
                         ],
                       ),
                       Positioned(left: 0, right: 0, bottom: 0, child: _sheet(state)),
@@ -397,12 +725,13 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 }
 
-String _subtitle(BuildContext context, GameState s, int? points) {
+String _subtitle(BuildContext context, GameState s, int? points, {int streak = 0}) {
   final l = context.l10n;
   final parts = [
-    s.mode.label(l).toLowerCase(),
+    if (s.practice) l.practiceShort else s.mode.label(l).toLowerCase(),
     s.level.label(l).toLowerCase(),
     if (points != null) l.pointsShort(points),
+    if (streak > 0 && !s.practice) l.streakShort(streak),
   ];
   return parts.join(' · ');
 }
@@ -414,19 +743,32 @@ class _GameHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context).textTheme;
-    final points = ref.watch(profileProvider).value?.totalPoints;
+    final profile = ref.watch(profileProvider).value;
+    final points = profile?.totalPoints;
     return Row(
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${context.l10n.infoNumber} ${state.number}',
-                  style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1)),
-              Text(_subtitle(context, state, points), style: t.bodySmall?.copyWith(color: context.bp.muted)),
+              Text(
+                '${context.l10n.infoNumber} ${state.number}',
+                style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1),
+              ),
+              InkWell(
+                onTap: () => showHelpDialog(context, scoring: true),
+                child: Text(
+                  _subtitle(context, state, points, streak: profile?.streak ?? 0),
+                  style: t.bodySmall?.copyWith(color: context.bp.muted),
+                ),
+              ),
             ],
           ),
         ),
+        const LiveValuesToggle(),
+        const SizedBox(width: 6),
+        const HelpButton(),
+        const SizedBox(width: 6),
         const SoundToggle(),
       ],
     );
@@ -445,15 +787,22 @@ class _DesktopHeader extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final points = ref.watch(profileProvider).value?.totalPoints;
     Widget cell(String label, String value) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(border: Border(left: BorderSide(color: bp.lineSoft))),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Eyebrow(label, opacity: 0.6),
-            Text(value, style: t.labelLarge?.copyWith(fontWeight: FontWeight.w600)),
-          ]),
-        );
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        border: Border(left: BorderSide(color: bp.lineSoft)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Eyebrow(label, opacity: 0.6),
+          Text(value, style: t.labelLarge?.copyWith(fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
     return Row(
       children: [
+        const EmplakeLogo(size: 36),
+        const SizedBox(width: 10),
         Text('EMPLAKE', style: t.titleLarge?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 4)),
         const SizedBox(width: 16),
         cell(l.infoNumber, state.number),
@@ -461,10 +810,26 @@ class _DesktopHeader extends ConsumerWidget {
         cell(l.infoMode, state.mode.label(l).toUpperCase()),
         cell(l.infoLevel, state.level.label(l).toUpperCase()),
         const SizedBox(width: 16),
-        Expanded(child: _TimerBar(state: state, onPause: onPause)),
+        Expanded(
+          child: _TimerBar(state: state, onPause: onPause),
+        ),
         const SizedBox(width: 16),
-        if (points != null) Text(l.pointsShort(points), style: t.labelLarge),
+        if (points != null)
+          Tooltip(
+            message: l.helpScoringTitle,
+            child: InkWell(
+              onTap: () => showHelpDialog(context, scoring: true),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                child: Text(l.pointsShort(points), style: t.labelLarge),
+              ),
+            ),
+          ),
         const SizedBox(width: 12),
+        const LiveValuesToggle(),
+        const SizedBox(width: 8),
+        const HelpButton(),
+        const SizedBox(width: 8),
         const SoundToggle(),
       ],
     );
@@ -482,11 +847,29 @@ class _TimerBar extends StatelessWidget {
     final bp = context.bp;
     final t = Theme.of(context).textTheme;
     final frac = (state.secondsLeft / state.level.seconds).clamp(0.0, 1.0);
+    if (state.practice) {
+      return Row(
+        children: [
+          const Icon(Icons.all_inclusive, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(l.practiceTimer, style: t.labelMedium?.copyWith(color: bp.muted)),
+          ),
+          Text('${state.elapsed}s', style: t.labelMedium),
+        ],
+      );
+    }
     final low = state.secondsLeft <= 10;
+    final last = !state.timeUp && state.secondsLeft <= 5;
     final canPause = !state.pauseUsed && state.phase == GamePhase.playing && !state.timeUp;
+    final announce = state.secondsLeft == 10 || state.secondsLeft == 5 || state.timeUp;
     return Row(
       children: [
-        Icon(state.timeUp ? Icons.timer_off_outlined : Icons.timer_outlined, size: 18),
+        Icon(
+          state.timeUp ? Icons.timer_off_outlined : (low ? Icons.warning_amber_rounded : Icons.timer_outlined),
+          size: 18,
+          color: low ? bp.accent : bp.ink,
+        ),
         const SizedBox(width: 8),
         Expanded(
           child: Container(
@@ -501,8 +884,23 @@ class _TimerBar extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(state.timeUp ? l.timeUp : '${state.secondsLeft}s',
-            style: t.labelMedium?.copyWith(color: state.timeUp ? bp.accent : bp.ink)),
+        Semantics(
+          liveRegion: announce,
+          label: state.timeUp ? l.timeUp : l.secondsLeftA11y(state.secondsLeft),
+          child: ExcludeSemantics(
+            child: AnimatedScale(
+              scale: last && state.secondsLeft.isOdd ? 1.25 : 1,
+              duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 250),
+              child: Text(
+                state.timeUp ? l.timeUp : (last ? '${state.secondsLeft}…' : '${state.secondsLeft}s'),
+                style: t.labelMedium?.copyWith(
+                  color: state.timeUp || low ? bp.accent : bp.ink,
+                  fontWeight: low ? FontWeight.w700 : null,
+                ),
+              ),
+            ),
+          ),
+        ),
         const SizedBox(width: 8),
         Tooltip(
           message: l.pause,
@@ -514,12 +912,16 @@ class _TimerBar extends StatelessWidget {
                 height: 32,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(border: Border.all(color: bp.line)),
-                child: Row(children: [
-                  Icon(Icons.pause, size: 16, semanticLabel: l.pause),
-                  const SizedBox(width: 4),
-                  Text('${state.paused ? (state.pauseLeft ?? Level.pauseSeconds) : Level.pauseSeconds}s',
-                      style: t.labelMedium),
-                ]),
+                child: Row(
+                  children: [
+                    Icon(Icons.pause, size: 16, semanticLabel: l.pause),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${state.paused ? (state.pauseLeft ?? Level.pauseSeconds) : Level.pauseSeconds}s',
+                      style: t.labelMedium,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -545,9 +947,13 @@ class _DigitsStrip extends StatelessWidget {
               child: Container(
                 height: 40,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(border: i == 3 ? null : Border(right: BorderSide(color: bp.lineSoft))),
-                child: Text('${digits[i]}',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+                decoration: BoxDecoration(
+                  border: i == 3 ? null : Border(right: BorderSide(color: bp.lineSoft)),
+                ),
+                child: Text(
+                  '${digits[i]}',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
               ),
             ),
         ],
@@ -557,8 +963,10 @@ class _DigitsStrip extends StatelessWidget {
 }
 
 class _Feedback extends StatelessWidget {
-  const _Feedback({required this.state});
+  const _Feedback({required this.state, required this.showHint});
   final GameState state;
+
+  final bool showHint;
 
   @override
   Widget build(BuildContext context) {
@@ -568,30 +976,39 @@ class _Feedback extends StatelessWidget {
     final v = state.verdict;
     final sep = context.decimalSeparator;
 
-    Widget banner(IconData icon, String title, String body, Color color) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(border: Border.all(color: color), color: color.withValues(alpha: 0.12)),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (title.isNotEmpty)
-                        Text(title, style: t.labelLarge?.copyWith(fontWeight: FontWeight.w700, color: color)),
-                      Text(body, style: t.bodySmall?.copyWith(height: 1.4)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+    Widget banner(IconData icon, String title, String body, Color color) => Semantics(
+      liveRegion: true,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            border: Border.all(color: color),
+            color: color.withValues(alpha: 0.12),
           ),
-        );
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (title.isNotEmpty)
+                      Text(
+                        title,
+                        style: t.labelLarge?.copyWith(fontWeight: FontWeight.w700, color: color),
+                      ),
+                    Text(body, style: t.bodySmall?.copyWith(height: 1.4)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
 
     if (state.phase != GamePhase.playing) return const SizedBox.shrink();
     final error = v.result.error;
@@ -600,13 +1017,28 @@ class _Feedback extends StatelessWidget {
       return banner(Icons.error_outline, title, body, bp.danger);
     }
     if (state.wrongAttempt && v.left != null && v.right != null) {
-      return banner(Icons.close, l.wrongTitle,
-          l.wrongBody(v.left!.display(decimalSeparator: sep), v.right!.display(decimalSeparator: sep)), bp.danger);
+      return _Shake(
+        child: banner(
+          Icons.close,
+          l.wrongTitle,
+          l.wrongBody(v.left!.display(decimalSeparator: sep), v.right!.display(decimalSeparator: sep)),
+          bp.danger,
+        ),
+      );
+    }
+    if (state.hintsUsed > 0 && state.solution != null) {
+      final h = HintInfo.from(state.number, state.solution!);
+      final d = state.board.digits;
+      final lines = [
+        l.hintEquals(d[h.equalsGap], d[h.equalsGap + 1]),
+        if (state.hintsUsed >= 2) l.hintLink(d[h.linkGap], d[h.linkGap + 1], h.linkOp.label),
+      ];
+      return banner(Icons.lightbulb_outline, l.hintTitle(state.hintsUsed), lines.join('\n'), bp.accent);
     }
     if (state.alreadySolved && state.board.linksMade == 0) {
       return banner(Icons.info_outline, '', l.alreadySolved, bp.accent);
     }
-    if (state.board.linksMade == 0 && state.selection == null) {
+    if (showHint && state.board.linksMade == 0 && state.selection == null) {
       return banner(Icons.touch_app_outlined, '', l.hintStart, bp.ink);
     }
     return const SizedBox.shrink();
@@ -619,6 +1051,9 @@ class _Actions extends StatelessWidget {
     required this.onUndo,
     required this.onSkip,
     required this.onVerify,
+    required this.onRevealSolution,
+    required this.onHint,
+    this.verifyKey,
     this.showKeys = false,
   });
 
@@ -626,6 +1061,9 @@ class _Actions extends StatelessWidget {
   final VoidCallback onUndo;
   final VoidCallback onSkip;
   final VoidCallback onVerify;
+  final VoidCallback onRevealSolution;
+  final VoidCallback onHint;
+  final Key? verifyKey;
   final bool showKeys;
 
   @override
@@ -645,9 +1083,11 @@ class _Actions extends StatelessWidget {
       verifyLabel = showKeys ? '${l.verify} · Enter' : l.verify;
       canVerify = playing;
     }
-    return Row(
+    final row = Row(
       children: [
         BoxIconButton(icon: Icons.undo, tooltip: l.undo, size: 48, onPressed: playing && state.canUndo ? onUndo : null),
+        const SizedBox(width: 8),
+        _HintButton(state: state, onPressed: onHint, showKey: showKeys),
         const SizedBox(width: 8),
         Expanded(
           flex: 2,
@@ -661,9 +1101,23 @@ class _Actions extends StatelessWidget {
         Expanded(
           flex: 3,
           child: FilledButton(
+            key: verifyKey,
             onPressed: canVerify ? onVerify : null,
             child: FittedBox(child: Text(verifyLabel)),
           ),
+        ),
+      ],
+    );
+    if (!(state.timeUp && playing)) return row;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        row,
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: onRevealSolution,
+          icon: const Icon(Icons.lightbulb_outline, size: 18),
+          label: Text(l.seeSolution),
         ),
       ],
     );
@@ -682,18 +1136,80 @@ class _PausedCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: bp.panel, border: Border.all(color: bp.line)),
+      decoration: BoxDecoration(
+        color: bp.panel,
+        border: Border.all(color: bp.line),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(left == null ? l.pausedTitle : '${l.pausedTitle} · ${left}s',
-              style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 2)),
+          Text(
+            left == null ? l.pausedTitle : '${l.pausedTitle} · ${left}s',
+            style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 2),
+          ),
           const SizedBox(height: 4),
           Text(l.pausedBody, style: t.bodySmall?.copyWith(color: bp.muted)),
           const SizedBox(height: 12),
           FilledButton.icon(onPressed: onResume, icon: const Icon(Icons.play_arrow), label: Text(l.resume)),
         ],
       ),
+    );
+  }
+}
+
+class _HintButton extends StatelessWidget {
+  const _HintButton({required this.state, required this.onPressed, this.showKey = false});
+  final GameState state;
+  final VoidCallback onPressed;
+  final bool showKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final left = 3 - state.hintsUsed;
+    final tooltip = state.hintsUsed == 2 ? l.hintTooltipReveal : l.hintTooltip(state.hintsUsed + 1);
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        BoxIconButton(
+          icon: Icons.lightbulb_outline,
+          tooltip: showKey ? '$tooltip · H' : tooltip,
+          size: 48,
+          onPressed: state.canHint ? onPressed : null,
+        ),
+        if (state.phase == GamePhase.playing)
+          Positioned(
+            right: -4,
+            top: -4,
+            child: IgnorePointer(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                color: left > 0 ? bp.ink : bp.faint,
+                child: Text('$left', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: bp.onInk)),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _Shake extends StatelessWidget {
+  const _Shake({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 420),
+      builder: (context, t, child) {
+        final dx = math.sin(t * math.pi * 6) * 8 * (1 - t);
+        return Transform.translate(offset: Offset(dx, 0), child: child);
+      },
+      child: child,
     );
   }
 }

@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n_helpers.dart';
 import '../../../core/theme/blueprint.dart';
 import '../../../core/widgets/bp_widgets.dart';
+import '../../help/help_dialog.dart';
 import '../application/game_controller.dart';
 import '../domain/format.dart';
 import 'formula_panel.dart';
 
 class ResultSheet extends StatelessWidget {
-  const ResultSheet({super.key, required this.state, required this.onMenu, required this.onNext});
+  const ResultSheet({super.key, required this.state, required this.onMenu, required this.onNext, this.onShare});
 
   final GameState state;
   final VoidCallback onMenu;
   final VoidCallback onNext;
+
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +25,23 @@ class ResultSheet extends StatelessWidget {
     final sep = context.decimalSeparator;
     final v = state.verdict;
     final value = v.left?.display(decimalSeparator: sep) ?? '';
-    final inTime = state.solvedInTime;
-    final accent = inTime ? bp.ok : bp.accent;
+    final revealed = state.phase == GamePhase.revealed;
+    final inTime = state.solvedInTime && !revealed;
+    final accent = revealed ? bp.ink : (inTime ? bp.ok : bp.accent);
+    final sc = state.score;
+    final String breakdown;
+    if (state.practice) {
+      breakdown = l.practiceNoPoints;
+    } else if (state.pointsEarned > 0) {
+      breakdown = [
+        l.pointsBreakdown(sc.base, sc.timeBonus),
+        if (sc.hints > 0) l.scoreHints(sc.hints, (sc.hintFactor * 100).round()),
+        if (sc.blind) l.scoreBlind,
+        if (sc.streak > 0) l.scoreStreak(sc.streak, ((sc.streakFactor - 1) * 100).round()),
+      ].join(' · ');
+    } else {
+      breakdown = !inTime ? l.pointsLateZero : l.pointsReplayZero;
+    }
 
     final saved = switch (state.saveStatus) {
       SaveStatus.saving => (Icons.cloud_upload_outlined, l.saving),
@@ -38,7 +56,9 @@ class ResultSheet extends StatelessWidget {
       color: bp.panel,
       elevation: 12,
       child: Container(
-        decoration: BoxDecoration(border: Border(top: BorderSide(color: bp.line))),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: bp.line)),
+        ),
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -52,17 +72,27 @@ class ResultSheet extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(shape: BoxShape.circle, color: accent),
-                  child: Icon(inTime ? Icons.check : Icons.hourglass_bottom, color: bp.paper),
+                  child: Icon(
+                    revealed ? Icons.lightbulb_outline : (inTime ? Icons.check : Icons.hourglass_bottom),
+                    color: bp.paper,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(inTime ? l.resultTrue : l.resultLate,
-                          style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1, color: accent)),
+                      Semantics(
+                        liveRegion: true,
+                        child: Text(
+                          revealed ? l.revealedTitle : (inTime ? l.resultTrue : l.resultLate),
+                          style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1, color: accent),
+                        ),
+                      ),
                       Text(
-                        inTime ? l.resultTrueDetail(value, state.elapsed) : l.resultLateDetail(value),
+                        revealed
+                            ? l.revealedDetail(state.number)
+                            : (inTime ? l.resultTrueDetail(value, state.elapsed) : l.resultLateDetail(value)),
                         style: t.bodySmall?.copyWith(color: bp.muted),
                       ),
                     ],
@@ -72,15 +102,37 @@ class ResultSheet extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             FormulaPanel(tokens: linearTokens(state.board), latex: latexOf(state.board), compact: true),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _Stat(label: l.points, value: '+${state.pointsEarned}'),
-                const SizedBox(width: 8),
-                _Stat(label: l.total, value: state.totalPoints?.toString() ?? '—'),
-              ],
-            ),
-            if (saved.$2.isNotEmpty) ...[
+            if (!revealed) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _Stat(label: l.points, value: '+${state.pointsEarned}'),
+                  const SizedBox(width: 8),
+                  _Stat(label: l.total, value: state.totalPoints?.toString() ?? '—'),
+                ],
+              ),
+              const SizedBox(height: 6),
+              InkWell(
+                onTap: () => showHelpDialog(context, scoring: true),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, size: 16, color: bp.muted),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(breakdown, style: t.bodySmall?.copyWith(color: bp.muted)),
+                      ),
+                      Text(
+                        l.howScoringWorks,
+                        style: t.bodySmall?.copyWith(color: bp.ink, decoration: TextDecoration.underline),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            if (!revealed && saved.$2.isNotEmpty) ...[
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -89,23 +141,33 @@ class ResultSheet extends StatelessWidget {
                   else
                     Icon(saved.$1, size: 18, color: state.saveStatus == SaveStatus.failed ? bp.danger : bp.muted),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(saved.$2, style: t.bodySmall?.copyWith(color: bp.muted))),
+                  Expanded(
+                    child: Text(saved.$2, style: t.bodySmall?.copyWith(color: bp.muted)),
+                  ),
                 ],
               ),
             ],
             const SizedBox(height: 14),
             Row(
               children: [
-                Expanded(child: OutlinedButton(onPressed: onMenu, child: Text(l.menu))),
+                Expanded(
+                  child: OutlinedButton(onPressed: onMenu, child: Text(l.menu)),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   flex: 2,
-                  child: FilledButton.icon(
-                    iconAlignment: IconAlignment.end,
-                    icon: const Icon(Icons.arrow_forward),
-                    onPressed: onNext,
-                    label: Text(l.nextNumber),
-                  ),
+                  child: onShare != null
+                      ? FilledButton.icon(
+                          icon: const Icon(Icons.content_copy, size: 18),
+                          onPressed: onShare,
+                          label: Text(l.dailyCopy),
+                        )
+                      : FilledButton.icon(
+                          iconAlignment: IconAlignment.end,
+                          icon: const Icon(Icons.arrow_forward),
+                          onPressed: onNext,
+                          label: Text(l.nextNumber),
+                        ),
                 ),
               ],
             ),

@@ -7,7 +7,9 @@ import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
 import '../../data/models.dart';
+import '../../core/router.dart';
 import '../game/application/game_controller.dart';
+import '../game/domain/level.dart';
 
 class ModePage extends ConsumerStatefulWidget {
   const ModePage({super.key});
@@ -32,7 +34,21 @@ class _ModePageState extends ConsumerState<ModePage> {
     GameMode.specific: Icons.pin_outlined,
     GameMode.challenges: Icons.flag_outlined,
     GameMode.adventure: Icons.map_outlined,
+    GameMode.daily: Icons.today_outlined,
   };
+
+  static final _listed = [
+    for (final m in GameMode.values)
+      if (m.listed) m,
+  ];
+
+  void _continue() {
+    if (_mode == GameMode.educational) {
+      context.go('/play/learn');
+    } else {
+      context.go('/play/level?mode=${_mode.name}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,32 +74,42 @@ class _ModePageState extends ConsumerState<ModePage> {
                             ? snap.data!.displayName.split(' ').first.toUpperCase()
                             : fallbackName;
                         if (snap.connectionState == ConnectionState.waiting) {
-                          return Row(children: [
-                            Eyebrow(name),
-                            const SizedBox(width: 8),
-                            const SizedBox(width: 28, height: 14, child: BpLoader(size: 14)),
-                          ]);
+                          return Row(
+                            children: [
+                              Eyebrow(name),
+                              const SizedBox(width: 8),
+                              const SizedBox(width: 28, height: 14, child: BpLoader(size: 14)),
+                            ],
+                          );
                         }
                         return Eyebrow(l.greeting(name, snap.data?.totalPoints ?? 0));
                       },
                     ),
                   ),
+                  const HelpButton(),
+                  const SizedBox(width: 8),
                   const SoundToggle(),
                 ],
               ),
             ),
           ),
           SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            sliver: SliverToBoxAdapter(child: _DailyCard(profile: _profile)),
+          ),
+          SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-            sliver: SliverToBoxAdapter(child: PageTitle(eyebrow: l.stepOf(1, 2), title: l.modeQuestion)),
+            sliver: SliverToBoxAdapter(
+              child: PageTitle(eyebrow: l.stepOf(1, 2), title: l.modeQuestion),
+            ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverList.separated(
-              itemCount: GameMode.values.length,
+              itemCount: _listed.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, i) {
-                final m = GameMode.values[i];
+                final m = _listed[i];
                 final selected = m == _mode;
                 return SelectTile(
                   selected: selected,
@@ -101,9 +127,13 @@ class _ModePageState extends ConsumerState<ModePage> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Text(m.label(l),
-                                      style: t.titleSmall?.copyWith(
-                                          fontWeight: FontWeight.w600, color: selected ? bp.onInk : bp.ink)),
+                                  child: Text(
+                                    m.label(l),
+                                    style: t.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: selected ? bp.onInk : bp.ink,
+                                    ),
+                                  ),
                                 ),
                                 if (!m.isAvailable)
                                   Container(
@@ -112,14 +142,20 @@ class _ModePageState extends ConsumerState<ModePage> {
                                     child: Text(l.comingSoon, style: t.labelSmall?.copyWith(letterSpacing: 1)),
                                   )
                                 else
-                                  Text((i + 1).toString().padLeft(2, '0'),
-                                      style: t.labelSmall?.copyWith(color: selected ? bp.onInk : bp.muted)),
+                                  Text(
+                                    (i + 1).toString().padLeft(2, '0'),
+                                    style: t.labelSmall?.copyWith(color: selected ? bp.onInk : bp.muted),
+                                  ),
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(m.description(l),
-                                style: t.bodySmall?.copyWith(
-                                    height: 1.4, color: (selected ? bp.onInk : bp.ink).withValues(alpha: 0.8))),
+                            Text(
+                              m.description(l),
+                              style: t.bodySmall?.copyWith(
+                                height: 1.4,
+                                color: (selected ? bp.onInk : bp.ink).withValues(alpha: 0.8),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -136,11 +172,59 @@ class _ModePageState extends ConsumerState<ModePage> {
                 iconAlignment: IconAlignment.end,
                 icon: const Icon(Icons.arrow_forward),
                 label: Text(l.continueLabel),
-                onPressed: () => context.go('/play/level?mode=${_mode.name}'),
+                onPressed: _continue,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DailyCard extends StatelessWidget {
+  const _DailyCard({required this.profile});
+  final Future<UserProfile>? profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final t = Theme.of(context).textTheme;
+    return Material(
+      color: bp.ink,
+      child: InkWell(
+        onTap: () => context.go(newGameLocation(mode: GameMode.daily, level: Level.intermediate)),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Icon(Icons.today_outlined, color: bp.onInk),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.modeDaily,
+                      style: t.titleSmall?.copyWith(color: bp.onInk, fontWeight: FontWeight.w600),
+                    ),
+                    Text(l.modeDailyDesc, style: t.bodySmall?.copyWith(color: bp.onInk.withValues(alpha: 0.8))),
+                  ],
+                ),
+              ),
+              FutureBuilder<UserProfile>(
+                future: profile,
+                builder: (context, snap) {
+                  final streak = snap.data?.dailyStreak ?? 0;
+                  return streak > 0
+                      ? Text(l.streakShort(streak), style: t.labelLarge?.copyWith(color: bp.onInk))
+                      : Icon(Icons.arrow_forward, color: bp.onInk);
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../data/firestore_repository.dart';
 import '../features/auth/login_page.dart';
 import '../features/cover/cover_page.dart';
+import '../features/educational/lesson_page.dart';
 import '../features/game/application/game_controller.dart';
 import '../features/game/domain/level.dart';
 import '../features/game/presentation/game_page.dart';
@@ -65,47 +66,65 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/play',
-              builder: (_, _) => const ModePage(),
-              routes: [
-                GoRoute(
-                  path: 'level',
-                  builder: (_, state) => LevelPage(
-                    mode: GameMode.values.asNameMap()[state.uri.queryParameters['mode']] ?? GameMode.random,
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/play',
+                builder: (_, _) => const ModePage(),
+                routes: [
+                  GoRoute(
+                    path: 'learn',
+                    builder: (_, _) => const LessonsPage(),
+                    routes: [
+                      GoRoute(
+                        path: ':op',
+                        builder: (_, state) => LessonPlayerPage(op: state.pathParameters['op']!),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/history', builder: (_, _) => const SolvedPage()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/game',
-              builder: (_, _) => const GamePage(),
-              routes: [
-                GoRoute(
-                  path: 'new',
-                  builder: (_, state) {
-                    final q = state.uri.queryParameters;
-                    return NewGamePage(
+                  GoRoute(
+                    path: 'level',
+                    builder: (_, state) => LevelPage(
                       key: ValueKey(state.uri.toString()),
-                      mode: GameMode.values.asNameMap()[q['mode']] ?? GameMode.random,
-                      level: Level.values.asNameMap()[q['level']] ?? Level.intermediate,
-                      number: q['n'],
-                      exclude: q['exclude'],
-                    );
-                  },
-                ),
-              ],
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/settings', builder: (_, _) => const SettingsPage()),
-          ]),
+                      mode: GameMode.values.asNameMap()[state.uri.queryParameters['mode']] ?? GameMode.random,
+                      number: state.uri.queryParameters['n'],
+                      level: Level.values.asNameMap()[state.uri.queryParameters['level']],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/history', builder: (_, _) => const SolvedPage())],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/game',
+                builder: (_, _) => const GamePage(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    builder: (_, state) {
+                      final q = state.uri.queryParameters;
+                      return NewGamePage(
+                        key: ValueKey(state.uri.toString()),
+                        mode: GameMode.values.asNameMap()[q['mode']] ?? GameMode.random,
+                        level: Level.values.asNameMap()[q['level']] ?? Level.easy,
+                        number: q['n'],
+                        exclude: q['exclude'],
+                        practice: q['practice'] == '1',
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/settings', builder: (_, _) => const SettingsPage())],
+          ),
         ],
       ),
     ],
@@ -124,10 +143,19 @@ final routerProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-String newGameLocation({required GameMode mode, required Level level, String? number, String? exclude}) =>
-    Uri(path: '/game/new', queryParameters: {
-      'mode': mode.name,
-      'level': level.name,
-      'n': ?number,
-      'exclude': ?exclude,
-    }).toString();
+String newGameLocation({
+  required GameMode mode,
+  required Level level,
+  String? number,
+  String? exclude,
+  bool practice = false,
+}) => Uri(
+  path: '/game/new',
+  queryParameters: {
+    'mode': mode.name,
+    'level': level.name,
+    'n': ?number,
+    'exclude': ?exclude,
+    if (practice) 'practice': '1',
+  },
+).toString();

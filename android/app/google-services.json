@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "502048843819",
+    "project_id": "emplake-20262",
+    "storage_bucket": "emplake-20262.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502048843819:android:d1a9132d119f3afc01626e",
+        "android_client_info": {
+          "package_name": "br.emplake.emplake"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "502048843819-feh7pu6ee6mared07grb1ndur9bf0n6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6_uiCUAi5vqwVzZnN61pj4nGgP1bJq7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "502048843819-feh7pu6ee6mared07grb1ndur9bf0n6c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

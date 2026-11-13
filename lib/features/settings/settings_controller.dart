@@ -4,26 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/prefs.dart';
-
-enum ThemePreset {
-  blueprint(Color(0xFF2460B7)),
-  graphite(Color(0xFF4E5661)),
-  sepia(Color(0xFF8A5A2B)),
-  forest(Color(0xFF008966));
-
-  const ThemePreset(this.seed);
-  final Color seed;
-}
-
-enum AppFont {
-  plexMono('IBM Plex Mono'),
-  roboto('Roboto'),
-  garamond('EB Garamond'),
-  helvetica('Helvetica');
-
-  const AppFont(this.label);
-  final String label;
-}
+import '../game/domain/level.dart';
 
 const seedSwatches = <Color>[
   Color(0xFF2460B7),
@@ -42,59 +23,95 @@ class AppSettings {
     this.themeMode = ThemeMode.system,
     this.seed = const Color(0xFF2460B7),
     this.fontScale = 1.0,
-    this.font = AppFont.plexMono,
     this.sfx = false,
     this.music = false,
     this.locale,
+    this.showLiveValues = true,
+    this.showHints = true,
+    this.tutorialDone = false,
+    this.latexOpen = false,
+    this.lastLevel = Level.easy,
+    this.haptics = true,
+    this.reduceMotion = false,
+    this.lessonsDone = const {},
   });
 
   final ThemeMode themeMode;
   final Color seed;
   final double fontScale;
-  final AppFont font;
 
   final bool sfx;
   final bool music;
 
   final Locale? locale;
 
-  bool get anySound => sfx || music;
+  final bool showLiveValues;
 
-  ThemePreset? get preset {
-    for (final p in ThemePreset.values) {
-      if (p.seed.toARGB32() == seed.toARGB32()) return p;
-    }
-    return null;
-  }
+  final bool showHints;
+  final bool tutorialDone;
+
+  final bool latexOpen;
+
+  final Level lastLevel;
+
+  final bool haptics;
+
+  final bool reduceMotion;
+
+  final Set<String> lessonsDone;
+
+  bool get hintsVisible => showHints && !tutorialDone;
+
+  bool get anySound => sfx || music;
 
   AppSettings copyWith({
     ThemeMode? themeMode,
     Color? seed,
     double? fontScale,
-    AppFont? font,
     bool? sfx,
     bool? music,
     Locale? locale,
-  }) =>
-      AppSettings(
-        themeMode: themeMode ?? this.themeMode,
-        seed: seed ?? this.seed,
-        fontScale: fontScale ?? this.fontScale,
-        font: font ?? this.font,
-        sfx: sfx ?? this.sfx,
-        music: music ?? this.music,
-        locale: locale ?? this.locale,
-      );
+    bool? showLiveValues,
+    bool? showHints,
+    bool? tutorialDone,
+    bool? latexOpen,
+    Level? lastLevel,
+    bool? haptics,
+    bool? reduceMotion,
+    Set<String>? lessonsDone,
+  }) => AppSettings(
+    themeMode: themeMode ?? this.themeMode,
+    seed: seed ?? this.seed,
+    fontScale: fontScale ?? this.fontScale,
+    sfx: sfx ?? this.sfx,
+    music: music ?? this.music,
+    locale: locale ?? this.locale,
+    showLiveValues: showLiveValues ?? this.showLiveValues,
+    showHints: showHints ?? this.showHints,
+    tutorialDone: tutorialDone ?? this.tutorialDone,
+    latexOpen: latexOpen ?? this.latexOpen,
+    lastLevel: lastLevel ?? this.lastLevel,
+    haptics: haptics ?? this.haptics,
+    reduceMotion: reduceMotion ?? this.reduceMotion,
+    lessonsDone: lessonsDone ?? this.lessonsDone,
+  );
 
   Map<String, dynamic> toJson() => {
-        'themeMode': themeMode.name,
-        'seed': seed.toARGB32(),
-        'fontScale': fontScale,
-        'font': font.name,
-        'sfx': sfx,
-        'music': music,
-        if (locale != null) 'locale': locale!.languageCode,
-      };
+    'themeMode': themeMode.name,
+    'seed': seed.toARGB32(),
+    'fontScale': fontScale,
+    'sfx': sfx,
+    'music': music,
+    if (locale != null) 'locale': locale!.languageCode,
+    'liveValues': showLiveValues,
+    'hints': showHints,
+    'tutorialDone': tutorialDone,
+    'latexOpen': latexOpen,
+    'lastLevel': lastLevel.name,
+    'haptics': haptics,
+    'reduceMotion': reduceMotion,
+    'lessonsDone': lessonsDone.toList(),
+  };
 
   factory AppSettings.fromJson(Map<String, dynamic> j) {
     T byName<T extends Enum>(List<T> values, Object? name, T fallback) =>
@@ -103,10 +120,17 @@ class AppSettings {
       themeMode: byName(ThemeMode.values, j['themeMode'], ThemeMode.system),
       seed: Color(j['seed'] as int? ?? 0xFF2460B7),
       fontScale: (j['fontScale'] as num?)?.toDouble() ?? 1.0,
-      font: byName(AppFont.values, j['font'], AppFont.plexMono),
       sfx: j['sfx'] as bool? ?? false,
       music: j['music'] as bool? ?? false,
       locale: j['locale'] == null ? null : Locale(j['locale'] as String),
+      showLiveValues: j['liveValues'] as bool? ?? true,
+      showHints: j['hints'] as bool? ?? true,
+      tutorialDone: j['tutorialDone'] as bool? ?? false,
+      latexOpen: j['latexOpen'] as bool? ?? false,
+      lastLevel: byName(Level.values, j['lastLevel'], Level.easy),
+      haptics: j['haptics'] as bool? ?? true,
+      reduceMotion: j['reduceMotion'] as bool? ?? false,
+      lessonsDone: {...(j['lessonsDone'] as List? ?? const []).cast<String>()},
     );
   }
 }
@@ -131,10 +155,27 @@ class SettingsController extends Notifier<AppSettings> {
   void setThemeMode(ThemeMode mode) => _set(state.copyWith(themeMode: mode));
   void setSeed(Color seed) => _set(state.copyWith(seed: seed));
   void setFontScale(double scale) => _set(state.copyWith(fontScale: scale));
-  void setFont(AppFont font) => _set(state.copyWith(font: font));
   void setSfx(bool on) => _set(state.copyWith(sfx: on));
   void setMusic(bool on) => _set(state.copyWith(music: on));
   void setLocale(Locale locale) => _set(state.copyWith(locale: locale));
+  void setShowLiveValues(bool on) => _set(state.copyWith(showLiveValues: on));
+  void toggleLiveValues() => setShowLiveValues(!state.showLiveValues);
+  void setLatexOpen(bool open) => _set(state.copyWith(latexOpen: open));
+  void setHaptics(bool on) => _set(state.copyWith(haptics: on));
+  void setReduceMotion(bool on) => _set(state.copyWith(reduceMotion: on));
+  void markLessonDone(String op) {
+    if (!state.lessonsDone.contains(op)) _set(state.copyWith(lessonsDone: {...state.lessonsDone, op}));
+  }
+
+  void setLastLevel(Level level) {
+    if (state.lastLevel != level) _set(state.copyWith(lastLevel: level));
+  }
+
+  void setShowHints(bool on) => _set(state.copyWith(showHints: on, tutorialDone: on ? false : null));
+
+  void markTutorialDone() {
+    if (!state.tutorialDone) _set(state.copyWith(tutorialDone: true));
+  }
 
   void toggleSound() {
     if (state.anySound) {

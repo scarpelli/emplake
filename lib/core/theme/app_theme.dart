@@ -4,13 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../features/settings/settings_controller.dart';
 import 'blueprint.dart';
 
-String? fontFamilyOf(AppFont font) => switch (font) {
-      AppFont.plexMono => GoogleFonts.ibmPlexMono().fontFamily,
-      AppFont.roboto => GoogleFonts.roboto().fontFamily,
-      AppFont.garamond => GoogleFonts.ebGaramond().fontFamily,
-      AppFont.helvetica => GoogleFonts.arimo().fontFamily,
-    };
-
 ThemeData buildTheme(AppSettings s, Brightness brightness) {
   final bp = Blueprint.fromSeed(s.seed, brightness);
   final base = ColorScheme.fromSeed(seedColor: s.seed, brightness: brightness);
@@ -30,7 +23,7 @@ ThemeData buildTheme(AppSettings s, Brightness brightness) {
   );
   final typography = Typography.material2021(platform: TargetPlatform.android);
   final baseText = brightness == Brightness.dark ? typography.white : typography.black;
-  final family = fontFamilyOf(s.font);
+  final family = GoogleFonts.ibmPlexMono().fontFamily;
   final text = baseText.apply(fontFamily: family, bodyColor: bp.ink, displayColor: bp.ink);
   const square = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
 
@@ -73,9 +66,18 @@ ThemeData buildTheme(AppSettings s, Brightness brightness) {
     ),
     textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: bp.ink)),
     inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: bp.line)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: bp.line)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: bp.ink, width: 2)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: bp.line),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: bp.line),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: bp.ink, width: 2),
+      ),
       labelStyle: TextStyle(color: bp.muted),
       floatingLabelStyle: TextStyle(color: bp.ink),
     ),
@@ -93,12 +95,14 @@ ThemeData buildTheme(AppSettings s, Brightness brightness) {
     sliderTheme: SliderThemeData(
       activeTrackColor: bp.ink,
       inactiveTrackColor: bp.lineSoft,
-      thumbColor: bp.accent,
-      overlayColor: bp.accent.withValues(alpha: 0.2),
+      thumbColor: bp.ink,
+      overlayColor: bp.ink.withValues(alpha: 0.15),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? bp.onInk : bp.ink),
-      trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? bp.ink : Colors.transparent),
+      trackColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.selected) ? bp.ink : Colors.transparent,
+      ),
       trackOutlineColor: WidgetStatePropertyAll(bp.ink),
     ),
     tooltipTheme: TooltipThemeData(

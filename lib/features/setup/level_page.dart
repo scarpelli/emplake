@@ -1,27 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n_helpers.dart';
 import '../../core/router.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
+import '../../data/firestore_repository.dart';
+import '../game/application/catalog_provider.dart';
 import '../game/application/game_controller.dart';
 import '../game/domain/level.dart';
+import '../game/domain/solver.dart';
+import '../settings/settings_controller.dart';
 
-class LevelPage extends StatefulWidget {
-  const LevelPage({super.key, required this.mode});
+class LevelPage extends ConsumerStatefulWidget {
+  const LevelPage({super.key, required this.mode, this.number, this.level});
 
   final GameMode mode;
 
+  final String? number;
+
+  final Level? level;
+
   @override
-  State<LevelPage> createState() => _LevelPageState();
+  ConsumerState<LevelPage> createState() => _LevelPageState();
 }
 
-class _LevelPageState extends State<LevelPage> {
-  Level _level = Level.intermediate;
+class _LevelPageState extends ConsumerState<LevelPage> {
+  late Level _level = widget.level ?? ref.read(settingsProvider).lastLevel;
   final _digits = TextEditingController();
+  bool _practice = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.number != null) _digits.text = widget.number!;
+  }
 
   @override
   void dispose() {
@@ -30,12 +46,31 @@ class _LevelPageState extends State<LevelPage> {
   }
 
   void _start() {
+    final l = context.l10n;
     final specific = widget.mode == GameMode.specific;
-    if (specific && _digits.text.length != 4) {
-      setState(() => _error = context.l10n.typeFourDigits);
-      return;
+    if (specific) {
+      final number = _digits.text;
+      if (number.length != 4) {
+        setState(() => _error = l.typeFourDigits);
+        return;
+      }
+      if (!Solver(_level).solve(number).solvable) {
+        final others = [
+          for (final level in Level.values)
+            if (level != _level && Solver(level).solve(number).solvable) level.label(l),
+        ];
+        setState(
+          () => _error = others.isEmpty
+              ? l.noSolutionAnyLevel(number)
+              : l.noSolutionOnLevel(number, _level.label(l), others.join(', ')),
+        );
+        return;
+      }
     }
-    context.go(newGameLocation(mode: widget.mode, level: _level, number: specific ? _digits.text : null));
+    ref.read(settingsProvider.notifier).setLastLevel(_level);
+    context.go(
+      newGameLocation(mode: widget.mode, level: _level, number: specific ? _digits.text : null, practice: _practice),
+    );
   }
 
   @override
@@ -43,6 +78,8 @@ class _LevelPageState extends State<LevelPage> {
     final l = context.l10n;
     final t = Theme.of(context).textTheme;
     final bp = context.bp;
+    final solvedByLevel = ref.watch(profileProvider).value?.solvedByLevel ?? const {};
+    final catalog = ref.watch(catalogProvider).value;
 
     return ContentWidth(
       child: ListView(
@@ -54,14 +91,18 @@ class _LevelPageState extends State<LevelPage> {
                 onTap: () => context.go('/play'),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(children: [
-                    Icon(Icons.arrow_back, size: 18, semanticLabel: l.back),
-                    const SizedBox(width: 6),
-                    Eyebrow(l.modeLabel(widget.mode.label(l).toUpperCase())),
-                  ]),
+                  child: Row(
+                    children: [
+                      Icon(Icons.arrow_back, size: 18, semanticLabel: l.back),
+                      const SizedBox(width: 6),
+                      Eyebrow(l.modeLabel(widget.mode.label(l).toUpperCase())),
+                    ],
+                  ),
                 ),
               ),
               const Spacer(),
+              const HelpButton(),
+              const SizedBox(width: 8),
               const SoundToggle(),
             ],
           ),
@@ -71,43 +112,68 @@ class _LevelPageState extends State<LevelPage> {
           for (final level in Level.values) ...[
             SelectTile(
               selected: level == _level,
-              onTap: () => setState(() => _level = level),
-              child: Builder(builder: (context) {
-                final on = level == _level;
-                final fg = on ? bp.onInk : bp.ink;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 12,
-                      crossAxisAlignment: WrapCrossAlignment.end,
-                      children: [
-                        Text(level.label(l), style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600, color: fg)),
-                        Text(
-                          '${l.operatorCount(level.operatorLabels.length)} · ${l.secondsPerNumber(level.seconds)}',
-                          style: t.labelSmall?.copyWith(color: fg.withValues(alpha: 0.75)),
+              onTap: () => setState(() {
+                _level = level;
+                _error = null;
+              }),
+              child: Builder(
+                builder: (context) {
+                  final on = level == _level;
+                  final fg = on ? bp.onInk : bp.ink;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 12,
+                        crossAxisAlignment: WrapCrossAlignment.end,
+                        children: [
+                          Text(
+                            level.label(l),
+                            style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600, color: fg),
+                          ),
+                          Text(
+                            '${l.operatorCount(level.operatorLabels.length)} · ${l.secondsPerNumber(level.seconds)}'
+                            ' · ${l.levelBasePoints(level.basePoints)}',
+                            style: t.labelSmall?.copyWith(color: fg.withValues(alpha: 0.75)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          for (final op in level.operatorLabels)
+                            Container(
+                              constraints: const BoxConstraints(minWidth: 28),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                              decoration: BoxDecoration(border: Border.all(color: fg.withValues(alpha: 0.5))),
+                              child: Text(
+                                op,
+                                textAlign: TextAlign.center,
+                                style: t.labelMedium?.copyWith(color: fg),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(level.note(l), style: t.bodySmall?.copyWith(color: fg.withValues(alpha: 0.8))),
+                      if (catalog != null) ...[
+                        const SizedBox(height: 8),
+                        _Progress(
+                          done: solvedByLevel[level] ?? 0,
+                          total: catalog.countFor(level),
+                          color: fg,
+                          label: l.levelProgress(
+                            (solvedByLevel[level] ?? 0).clamp(0, catalog.countFor(level)),
+                            catalog.countFor(level),
+                          ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 4,
-                      runSpacing: 4,
-                      children: [
-                        for (final op in level.operatorLabels)
-                          Container(
-                            constraints: const BoxConstraints(minWidth: 28),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                            decoration: BoxDecoration(border: Border.all(color: fg.withValues(alpha: 0.5))),
-                            child: Text(op, textAlign: TextAlign.center, style: t.labelMedium?.copyWith(color: fg)),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(level.note(l), style: t.bodySmall?.copyWith(color: fg.withValues(alpha: 0.8))),
-                  ],
-                );
-              }),
+                    ],
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 8),
           ],
@@ -122,6 +188,17 @@ class _LevelPageState extends State<LevelPage> {
               onSubmitted: _start,
             ),
           ],
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(border: Border.all(color: bp.lineSoft)),
+            child: SwitchListTile(
+              value: _practice,
+              onChanged: (v) => setState(() => _practice = v),
+              secondary: const Icon(Icons.all_inclusive),
+              title: Text(l.practiceMode),
+              subtitle: Text(l.practiceModeHint, style: t.bodySmall?.copyWith(color: bp.muted)),
+            ),
+          ),
           const SizedBox(height: 16),
           FilledButton.icon(
             iconAlignment: IconAlignment.end,
@@ -210,4 +287,36 @@ class _DigitsField extends StatelessWidget {
       ],
     );
   }
+}
+
+class _Progress extends StatelessWidget {
+  const _Progress({required this.done, required this.total, required this.color, required this.label});
+  final int done;
+  final int total;
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: label,
+    child: Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 4,
+            color: color.withValues(alpha: 0.2),
+            alignment: Alignment.centerLeft,
+            child: FractionallySizedBox(
+              widthFactor: total == 0 ? 0 : (done / total).clamp(0.0, 1.0),
+              child: Container(color: color),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        ExcludeSemantics(
+          child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color)),
+        ),
+      ],
+    ),
+  );
 }

@@ -92,6 +92,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get language => 'Idioma';
 
   @override
+  String get loginOr => 'O';
+
+  @override
+  String get loginGoogle => 'Entrar con Google';
+
+  @override
+  String get loginGoogleError =>
+      'No se pudo entrar con Google. Inténtalo de nuevo.';
+
+  @override
   String greeting(String name, int points) {
     return 'HOLA, $name · $points PTS';
   }
@@ -138,6 +148,40 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get modeAdventureDesc =>
       'Una placa por ciudad, en un viaje por Brasil.';
+
+  @override
+  String get modeDaily => 'Placa del día';
+
+  @override
+  String get modeDailyDesc =>
+      'El mismo número para todos hoy. Un intento; comparte tu resultado.';
+
+  @override
+  String get dailyAlreadyPlayed =>
+      'Ya jugaste la placa de hoy. ¡Vuelve mañana por una nueva!';
+
+  @override
+  String get dailyCopy => 'COPIAR RESULTADO';
+
+  @override
+  String get blindShort => 'a ciegas';
+
+  @override
+  String hintsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pistas',
+      one: '1 pista',
+      zero: 'sin pistas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String streakShort(int count) {
+    return '🔥 $count';
+  }
 
   @override
   String get comingSoon => 'PRÓXIMAMENTE';
@@ -208,13 +252,49 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String levelBasePoints(int points) {
+    return '$points pts base';
+  }
+
+  @override
   String get fourDigitNumber => 'NÚMERO DE 4 DÍGITOS';
 
   @override
   String get typeFourDigits => 'Escribe los 4 dígitos.';
 
   @override
+  String noSolutionOnLevel(String number, String level, String others) {
+    return '$number no tiene solución en $level. Prueba en: $others.';
+  }
+
+  @override
+  String noSolutionAnyLevel(String number) {
+    return '$number no tiene solución en ningún nivel. Elige otro número.';
+  }
+
+  @override
   String get start => 'EMPEZAR';
+
+  @override
+  String levelProgress(int done, int total) {
+    return '$done / $total resueltos';
+  }
+
+  @override
+  String get practiceMode => 'Práctica (sin reloj)';
+
+  @override
+  String get practiceModeHint =>
+      'Juega a tu ritmo. No suma puntos ni se guarda en tu historial.';
+
+  @override
+  String get practiceShort => 'práctica';
+
+  @override
+  String get practiceTimer => 'sin reloj';
+
+  @override
+  String get practiceNoPoints => 'Práctica: sin puntos, a tu ritmo.';
 
   @override
   String pointsShort(int points) {
@@ -227,7 +307,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get hintStart =>
-      'Toca entre dos números y elige un operador para unirlos. El = entra igual, una sola vez.';
+      'Toca entre dos números y elige un operador, o arrastra el signo al hueco. El = entra igual, una sola vez. Arrastra un signo a otro hueco para moverlo, o fuera del árbol para quitarlo.';
 
   @override
   String get paletteBetween => 'ENTRE NÚMEROS';
@@ -255,7 +335,78 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get removeOperator => 'Quitar operador';
+  String get removeOperator => 'Quitar signo';
+
+  @override
+  String hintTitle(int n) {
+    return 'PISTA $n DE 3';
+  }
+
+  @override
+  String hintEquals(int a, int b) {
+    return 'El = va entre $a y $b.';
+  }
+
+  @override
+  String hintLink(int a, int b, String op) {
+    return 'Empieza uniendo $a y $b con $op.';
+  }
+
+  @override
+  String hintTooltip(int n) {
+    return 'Pista $n (cuesta 1/3 de los puntos)';
+  }
+
+  @override
+  String get hintTooltipReveal => 'Revelar la solución (sin puntos)';
+
+  @override
+  String get hintRevealTitle => '¿REVELAR LA SOLUCIÓN?';
+
+  @override
+  String get hintRevealBody =>
+      'Este número termina sin puntos y vuelve al sorteo para que lo intentes otro día.';
+
+  @override
+  String secondsLeftA11y(int seconds) {
+    return 'quedan $seconds segundos';
+  }
+
+  @override
+  String tutorialTapGap(int a, int b) {
+    return 'Toca el hueco entre $a y $b (el cuadrito punteado).';
+  }
+
+  @override
+  String get tutorialPickTimes =>
+      'Ahora elige × para unirlos. También puedes arrastrar el signo al hueco.';
+
+  @override
+  String get tutorialLinkThree =>
+      '¡El árbol creció! Une el resultado con el 3: toca el siguiente hueco.';
+
+  @override
+  String get tutorialEqualsGap =>
+      '1 × 2 × 3 vale 6. Toca el último hueco para poner el =.';
+
+  @override
+  String get tutorialPickEquals => 'Elige =.';
+
+  @override
+  String get tutorialVerify => '¡6 = 6! Toca Verificar para comprobar.';
+
+  @override
+  String get tutorialOffScript =>
+      '¡Está bien experimentar! Para seguir el tutorial, usa ↶ deshacer para volver al paso anterior.';
+
+  @override
+  String get tutorialSkip => 'SALTAR TUTORIAL';
+
+  @override
+  String get liveValuesShow => 'Mostrar valores en tiempo real';
+
+  @override
+  String get liveValuesHide => 'Ocultar valores en tiempo real';
 
   @override
   String get toggleParens => 'Paréntesis';
@@ -265,6 +416,22 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get skip => 'SALTAR';
+
+  @override
+  String get skipTitle => '¿SALTAR ESTE NÚMERO?';
+
+  @override
+  String get skipBody =>
+      '¿Quieres ver una solución? Si prefieres, no revelamos nada: el número vuelve al sorteo para que lo intentes otro día.';
+
+  @override
+  String get skipYes => 'SÍ, MOSTRAR';
+
+  @override
+  String get skipNo => 'NO, SALTAR';
+
+  @override
+  String get seeSolution => 'Ver una solución';
 
   @override
   String get verify => 'VERIFICAR';
@@ -328,6 +495,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get allSolved => '¡Ya resolviste todos los números de este nivel!';
+
+  @override
+  String get allSolvedCatalog =>
+      '¡Resolviste todos los números de este nivel por ahora! Prueba otro nivel o escribe un número en el modo Específico.';
 
   @override
   String get alreadySolved =>
@@ -448,10 +619,51 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get revealedTitle => 'UNA SOLUCIÓN POSIBLE';
+
+  @override
+  String revealedDetail(String number) {
+    return 'Sin puntos esta vez. $number sigue en el sorteo para que lo intentes de nuevo.';
+  }
+
+  @override
   String get points => 'PUNTOS';
 
   @override
   String get total => 'TOTAL';
+
+  @override
+  String pointsBreakdown(int base, int bonus) {
+    return '$base base + $bonus por tiempo';
+  }
+
+  @override
+  String get pointsLateZero => 'Fuera de tiempo no suma puntos.';
+
+  @override
+  String get pointsReplayZero =>
+      'Número ya resuelto en este nivel: sin puntos.';
+
+  @override
+  String get howScoringWorks => '¿Cómo funciona?';
+
+  @override
+  String scoreHints(int count, int percent) {
+    return 'pistas ×$percent%';
+  }
+
+  @override
+  String get scoreBlind => 'a ciegas ×1,25';
+
+  @override
+  String scoreStreak(int count, int percent) {
+    return 'racha $count: +$percent%';
+  }
+
+  @override
+  String achievementUnlocked(String title) {
+    return 'Logro: $title';
+  }
 
   @override
   String savedSolved(String number) {
@@ -517,6 +729,87 @@ class AppLocalizationsEs extends AppLocalizations {
   String get lateTag => 'FUERA DE TIEMPO';
 
   @override
+  String get skippedEmpty =>
+      'Ningún número saltado. Cuando saltes uno, aparecerá aquí para que lo intentes de nuevo.';
+
+  @override
+  String skippedTimes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'saltado $count veces',
+      one: 'saltado 1 vez',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get skippedRevealed => 'solución vista';
+
+  @override
+  String get tryAgain => 'INTENTAR';
+
+  @override
+  String achievementsTitle(int count, int total) {
+    return 'LOGROS · $count/$total';
+  }
+
+  @override
+  String get achievementUnlockedShort => 'desbloqueado';
+
+  @override
+  String get achievementLocked => 'bloqueado';
+
+  @override
+  String get achFirstSolve => 'Primera placa';
+
+  @override
+  String get achFirstSolveDesc => 'Resuelve tu primer número.';
+
+  @override
+  String get achTenInTime => 'Contra el reloj';
+
+  @override
+  String get achTenInTimeDesc => 'Resuelve 10 números a tiempo.';
+
+  @override
+  String get achBlind => 'A ciegas';
+
+  @override
+  String get achBlindDesc =>
+      'Resuelve un número sin los valores en tiempo real.';
+
+  @override
+  String get achThreeStars => 'Hueso duro';
+
+  @override
+  String get achThreeStarsDesc => 'Resuelve un número ★3.';
+
+  @override
+  String get achAllLevels => 'Escalera completa';
+
+  @override
+  String get achAllLevelsDesc => 'Resuelve un número en cada nivel.';
+
+  @override
+  String get achStreak5 => 'En racha';
+
+  @override
+  String get achStreak5Desc => 'Acierta 5 seguidos, a tiempo y sin pistas.';
+
+  @override
+  String get achDaily7 => 'Semana completa';
+
+  @override
+  String get achDaily7Desc => 'Resuelve la placa del día 7 días seguidos.';
+
+  @override
+  String get achHundred => 'Centena';
+
+  @override
+  String get achHundredDesc => 'Resuelve 100 números.';
+
+  @override
   String get settingsEyebrow => 'PREFERENCIAS';
 
   @override
@@ -539,19 +832,31 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sigue el tema del dispositivo hasta que elijas otro.';
 
   @override
-  String get presets => 'TEMAS LISTOS';
+  String get settingsGame => 'JUEGO';
 
   @override
-  String get presetBlueprint => 'Plano';
+  String get settingsLiveValues => 'Valores en tiempo real';
 
   @override
-  String get presetGraphite => 'Grafito';
+  String get settingsLiveValuesHint =>
+      'Muestra cuánto vale cada rama y cada lado del = mientras armas.';
 
   @override
-  String get presetSepia => 'Sepia';
+  String get settingsHaptics => 'Vibración';
 
   @override
-  String get presetForest => 'Bosque';
+  String get settingsReduceMotion => 'Reducir animaciones';
+
+  @override
+  String get settingsReduceMotionHint =>
+      'Desactiva las animaciones del árbol, la celebración y las pistas.';
+
+  @override
+  String get settingsHints => 'Tutorial de la primera partida';
+
+  @override
+  String get settingsHintsHint =>
+      'Actívalo para repetir el paso a paso (1 × 2 × 3 = 6) en tu próxima partida.';
 
   @override
   String get seedColor => 'COLOR SEMILLA';
@@ -564,9 +869,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get fontSample => 'Usa los cuatro dígitos en orden.';
-
-  @override
-  String get fontFamily => 'TIPO DE FUENTE';
 
   @override
   String get sound => 'SONIDO';
@@ -599,6 +901,120 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpTitle => 'CÓMO JUGAR';
 
   @override
+  String get helpTabPlay => 'JUGAR';
+
+  @override
+  String get helpTabOperators => 'OPERADORES';
+
+  @override
+  String get helpTabScoring => 'PUNTOS';
+
+  @override
+  String get helpExample => 'EJEMPLO';
+
+  @override
+  String get helpExampleCaption =>
+      '1236 → 1 × 2 × 3 = 6. Cada unión sube un piso en el árbol.';
+
+  @override
+  String get helpKeys => 'TECLADO';
+
+  @override
+  String get helpKeysList =>
+      'Enter verificar · Esc saltar · Tab selección · Ctrl+Z deshacer · ⌫ quitar · H pista\n+ − * / ^ = ( ) operadores · ! factorial · r √ · c ∛ · a |x| · n −x · f ⌊x⌋ · F ⌈x⌉';
+
+  @override
+  String get helpOperatorsIntro =>
+      'Los binarios (+ − × ÷ xʸ) unen dos bloques en un hueco. Los demás actúan sobre un tramo: toca un número o rama y elige.';
+
+  @override
+  String get opAdd => 'Suma';
+
+  @override
+  String get opSub => 'Resta';
+
+  @override
+  String get opMul => 'Multiplicación';
+
+  @override
+  String get opDiv => 'División';
+
+  @override
+  String get opPow => 'Potencia';
+
+  @override
+  String get opNeg => 'Opuesto (cambia el signo)';
+
+  @override
+  String get opSqrt => 'Raíz cuadrada';
+
+  @override
+  String get opCbrt => 'Raíz cúbica';
+
+  @override
+  String get opFact => 'Factorial';
+
+  @override
+  String get opAbs => 'Valor absoluto';
+
+  @override
+  String get opFloor => 'Piso (redondea hacia abajo)';
+
+  @override
+  String get opCeil => 'Techo (redondea hacia arriba)';
+
+  @override
+  String get lessonsTitle => 'Aprender los operadores';
+
+  @override
+  String lessonsEyebrow(int done, int total) {
+    return '$done DE $total LECCIONES';
+  }
+
+  @override
+  String get lessonsIntro =>
+      'Cada lección muestra una placa resuelta paso a paso con un operador. Después es tu turno, sin reloj.';
+
+  @override
+  String get lessonDone => 'lección completada';
+
+  @override
+  String get lessonPrev => 'Paso anterior';
+
+  @override
+  String get lessonNext => 'Paso siguiente';
+
+  @override
+  String get lessonPlay => 'Reproducir';
+
+  @override
+  String get lessonNowYou => 'AHORA TÚ';
+
+  @override
+  String get lessonNowYouHint =>
+      'Juegas otra placa que también usa este operador, sin reloj y sin puntos.';
+
+  @override
+  String lessonStepStart(String number) {
+    return 'La placa $number: cuatro dígitos, en orden.';
+  }
+
+  @override
+  String lessonStepLink(int a, int b, String op, String name) {
+    return 'Unimos $a y $b con $op ($name).';
+  }
+
+  @override
+  String lessonStepUnary(String op, String name) {
+    return 'Aplicamos $op ($name) sobre el tramo.';
+  }
+
+  @override
+  String lessonStepEquals(int a, int b) {
+    return 'Por último, el = entre $a y $b: ambos lados valen lo mismo.';
+  }
+
+  @override
   String get help1 =>
       'Usa los cuatro dígitos de la placa en el orden en que aparecen.';
 
@@ -608,11 +1024,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get help3 =>
-      'Toca un hueco para unir dos bloques con + − × ÷ xʸ. Toca un nodo para cambiar el operador o aplicar √, !, |x| y otros sobre ese tramo; ( ) agrupa el tramo.';
+      'Toca un hueco (o arrastra un signo hasta él) para unir dos bloques con + − × ÷ xʸ. Toca un nodo para cambiar el operador o aplicar √, !, |x| y otros sobre ese tramo; ( ) agrupa el tramo. Arrastra un signo o el = a otro hueco para moverlo; arrástralo fuera del árbol, o usa ⌫, para quitarlo.';
 
   @override
   String get help4 =>
-      'Justo debajo de tu fórmula aparece la misma fórmula en LaTeX. Verificar comprueba si ambos lados son iguales; Saltar cambia a otro número sin resolver.';
+      'Abre LATEX ▾ junto a la fórmula para verla en LaTeX y copiar el código. Verificar comprueba si ambos lados son iguales. Saltar pregunta si quieres ver una solución; si no, el número vuelve otro día.';
 
   @override
   String get helpEasyOps => 'todos, incluso ⌊x⌋ ⌈x⌉';
@@ -620,6 +1036,57 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get helpFraction =>
       'La división con resultado no entero (como 5 ÷ 2) solo vale en Fácil.';
+
+  @override
+  String get helpScoringTitle => 'PUNTUACIÓN';
+
+  @override
+  String get helpScoringTime => 'TIEMPO';
+
+  @override
+  String get helpScoringBaseCol => 'BASE';
+
+  @override
+  String get helpScoringBase =>
+      'Cada número resuelto vale los puntos base del nivel.';
+
+  @override
+  String get helpScoringBonus =>
+      'Bono de tiempo: +1 punto por cada 5 segundos que quedan en el reloj al verificar.';
+
+  @override
+  String helpScoringExample(int base, int seconds, int total) {
+    return 'Ejemplo: en Intermedio ($base base), verificar con ${seconds}s restantes da $total puntos.';
+  }
+
+  @override
+  String get helpScoringLate =>
+      'Si se acaba el tiempo, aún puedes terminar y el número cuenta como resuelto, pero vale 0 puntos.';
+
+  @override
+  String get helpScoringReplay =>
+      'Repetir un número que ya resolviste en el mismo nivel no da puntos otra vez.';
+
+  @override
+  String get helpScoringHints =>
+      'Pistas: la 1ª muestra dónde va el = (conservas 2/3 de los puntos), la 2ª una primera unión (1/3), la 3ª revela la solución (0 puntos; el número vuelve al sorteo).';
+
+  @override
+  String get helpScoringBlind =>
+      'A ciegas: jugando todo el número con los valores en tiempo real apagados, los puntos valen ×1,25.';
+
+  @override
+  String get helpScoringStreak =>
+      'Racha: cada acierto seguido, a tiempo y sin pistas, suma +10% (hasta +50%). Saltar la reinicia.';
+
+  @override
+  String get helpScoringPractice =>
+      'La práctica y las lecciones no dan puntos.';
+
+  @override
+  String helpScoringPause(int seconds) {
+    return 'Tienes una pausa de ${seconds}s por número; durante la pausa el reloj se detiene y el árbol se oculta.';
+  }
 
   @override
   String get helpGotIt => 'ENTENDIDO';
