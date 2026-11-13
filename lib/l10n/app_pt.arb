@@ -349,7 +349,9 @@
   "skipNo": "NÃO, PULAR",
   "seeSolution": "Ver uma solução",
   "seeSolutionShort": "SOLUÇÃO",
-  "@seeSolutionShort": {"description": "Ação curta no lugar de Pular quando o tempo acaba: ver uma solução."},
+  "@seeSolutionShort": {
+    "description": "Ação curta no lugar de Pular quando o tempo acaba: ver uma solução."
+  },
   "verify": "VERIFICAR",
   "linksLeft": "{count, plural, =1{FALTA 1 LIGAÇÃO} other{FALTAM {count} LIGAÇÕES}}",
   "@linksLeft": {
@@ -748,9 +750,21 @@
   "homePage": "Página inicial",
   "adventureCurrent": "atual",
   "adventureCollapse": "Recolher {level}",
-  "@adventureCollapse": {"placeholders": {"level": {"type": "String"}}},
+  "@adventureCollapse": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
   "adventureExpand": "Mostrar {level}",
-  "@adventureExpand": {"placeholders": {"level": {"type": "String"}}},
+  "@adventureExpand": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
   "adventureStage": "Fase {number}",
   "@adventureStage": {
     "placeholders": {
@@ -950,5 +964,41 @@
   },
   "runPlayAgain": "JOGAR DE NOVO",
   "runNextPlate": "PRÓXIMA PLACA",
-  "runLastSolution": "Uma solução da última placa:"
+  "runLastSolution": "Uma solução da última placa:",
+  "coverHaveAccount": "Já tem conta?",
+  "coverSignIn": "Entrar",
+  "loginGuest": "Continuar como convidado",
+  "guestError": "Não foi possível entrar como convidado. Tente de novo.",
+  "guest": "Convidado",
+  "guestSubtitle": "Progresso salvo só neste aparelho",
+  "guestCreateAccount": "Criar conta",
+  "guestSignOutTitle": "Sair do modo convidado?",
+  "guestSignOutBody": "O progresso de convidado será perdido. Crie uma conta antes para guardá-lo.",
+  "guestSignOutConfirm": "Sair e perder o progresso",
+  "remindTitle": "Salve seu progresso",
+  "remindFirstGame": "Gostou? Crie uma conta para guardar seus números resolvidos e jogar em qualquer aparelho.",
+  "remindFirstAchievement": "Primeira conquista! Como convidado, ela fica só neste aparelho. Crie uma conta para não perdê-la.",
+  "remindSolved": "Você já resolveu {n} placas! Crie uma conta para não perder esse progresso.",
+  "@remindSolved": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "remindLater": "Agora não",
+  "linkTitle": "Criar conta",
+  "linkBody": "Tudo o que você fez como convidado vai junto para a conta nova.",
+  "linkGoogle": "Continuar com Google",
+  "linkEmail": "E-mail",
+  "linkPassword": "Senha",
+  "linkSubmit": "Criar conta com e-mail",
+  "linkDone": "Conta criada! Seu progresso está salvo.",
+  "linkExistsTitle": "Essa conta já existe",
+  "linkExistsBody": "Entrar nela descarta o progresso de convidado deste aparelho.",
+  "linkExistsConfirm": "Entrar mesmo assim",
+  "linkWeakPassword": "A senha precisa ter pelo menos 6 caracteres.",
+  "linkInvalidEmail": "E-mail inválido.",
+  "linkWrongPassword": "Senha incorreta para essa conta.",
+  "linkError": "Não foi possível criar a conta. Tente de novo."
 }

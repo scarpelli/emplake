@@ -18,6 +18,7 @@ import '../../achievements/achievement_toast.dart';
 import '../../adventure/adventure_store.dart';
 import '../../challenges/challenge_store.dart';
 import '../../achievements/achievements.dart';
+import '../../auth/guest.dart';
 import '../../daily/daily.dart';
 import '../../daily/daily_share.dart';
 import '../../help/help_page.dart';
@@ -132,6 +133,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         _flying = false;
         if (mounted) setState(() => _sheetVisible = true);
         await save;
+        if (mounted) await maybeRemindGuest(context, ref);
     }
   }
 
@@ -209,7 +211,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       await repo.unlockAchievements(unlocked.map((a) => a.name));
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      unawaited(showAchievementToasts(context, unlocked));
+      await showAchievementToasts(context, unlocked);
     } catch (_) {}
   }
 
@@ -283,6 +285,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: true).catchError((_) {});
       _failDaily(s);
       setState(() => _sheetVisible = true);
+      await maybeRemindGuest(context, ref);
     }
   }
 
@@ -322,6 +325,7 @@ class _GamePageState extends ConsumerState<GamePage> {
     if (!mounted || solution == null) return;
     _ctrl.reveal(solution);
     setState(() => _sheetVisible = true);
+    await maybeRemindGuest(context, ref);
   }
 
   Future<void> _revealAfterTimeUp() async {

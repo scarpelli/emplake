@@ -1551,4 +1551,100 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get runLastSolution => 'Una solución de la última placa:';
+
+  @override
+  String get coverHaveAccount => '¿Ya tienes cuenta?';
+
+  @override
+  String get coverSignIn => 'Entrar';
+
+  @override
+  String get loginGuest => 'Continuar como invitado';
+
+  @override
+  String get guestError =>
+      'No se pudo entrar como invitado. Inténtalo de nuevo.';
+
+  @override
+  String get guest => 'Invitado';
+
+  @override
+  String get guestSubtitle => 'Progreso guardado solo en este dispositivo';
+
+  @override
+  String get guestCreateAccount => 'Crear cuenta';
+
+  @override
+  String get guestSignOutTitle => '¿Salir del modo invitado?';
+
+  @override
+  String get guestSignOutBody =>
+      'Perderás el progreso de invitado. Crea una cuenta antes para conservarlo.';
+
+  @override
+  String get guestSignOutConfirm => 'Salir y perder el progreso';
+
+  @override
+  String get remindTitle => 'Guarda tu progreso';
+
+  @override
+  String get remindFirstGame =>
+      '¿Te gusta? Crea una cuenta para guardar tus números resueltos y jugar en cualquier dispositivo.';
+
+  @override
+  String get remindFirstAchievement =>
+      '¡Primer logro! Como invitado, solo queda en este dispositivo. Crea una cuenta para no perderlo.';
+
+  @override
+  String remindSolved(int n) {
+    return '¡Ya resolviste $n placas! Crea una cuenta para no perder este progreso.';
+  }
+
+  @override
+  String get remindLater => 'Ahora no';
+
+  @override
+  String get linkTitle => 'Crear cuenta';
+
+  @override
+  String get linkBody =>
+      'Todo lo que hiciste como invitado pasa a la cuenta nueva.';
+
+  @override
+  String get linkGoogle => 'Continuar con Google';
+
+  @override
+  String get linkEmail => 'Correo';
+
+  @override
+  String get linkPassword => 'Contraseña';
+
+  @override
+  String get linkSubmit => 'Crear cuenta con correo';
+
+  @override
+  String get linkDone => '¡Cuenta creada! Tu progreso está guardado.';
+
+  @override
+  String get linkExistsTitle => 'Esta cuenta ya existe';
+
+  @override
+  String get linkExistsBody =>
+      'Entrar en ella descarta el progreso de invitado de este dispositivo.';
+
+  @override
+  String get linkExistsConfirm => 'Entrar de todos modos';
+
+  @override
+  String get linkWeakPassword =>
+      'La contraseña necesita al menos 6 caracteres.';
+
+  @override
+  String get linkInvalidEmail => 'Correo no válido.';
+
+  @override
+  String get linkWrongPassword => 'Contraseña incorrecta para esta cuenta.';
+
+  @override
+  String get linkError => 'No se pudo crear la cuenta. Inténtalo de nuevo.';
 }

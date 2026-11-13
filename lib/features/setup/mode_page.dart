@@ -74,7 +74,11 @@ class _ModePageState extends ConsumerState<ModePage> {
     final bp = context.bp;
     final user = ref.watch(authStateProvider).value;
     final narrow = MediaQuery.sizeOf(context).width < 600;
-    final fallbackName = (user?.displayName?.split(' ').first ?? l.player).toUpperCase();
+    final fallbackName = switch (user?.displayName) {
+      _ when user?.isAnonymous ?? false => l.guest,
+      final name? when name.isNotEmpty => name.split(' ').first,
+      _ => l.player,
+    }.toUpperCase();
 
     return ContentWidth(
       child: CustomScrollView(

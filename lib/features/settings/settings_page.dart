@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n_helpers.dart';
-import '../../core/prefs.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
+import '../auth/guest.dart';
 import '../avatar/avatar_page.dart';
 import '../avatar/robot_avatar.dart';
-import '../game/application/game_controller.dart';
+import '../game/presentation/skip_dialog.dart';
 import 'seed_color_dialog.dart';
 import 'settings_controller.dart';
 
@@ -297,10 +297,30 @@ class _PlayerCard extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final user = ref.watch(authStateProvider).value;
     final profile = ref.watch(profileProvider).value;
+    final guest = isGuest(user);
     final isGoogle = user?.providerData.any((p) => p.providerId == 'google.com') ?? false;
-    final name = user?.displayName?.isNotEmpty == true ? user!.displayName! : l.player;
+    final name = guest ? l.guest : (user?.displayName?.isNotEmpty == true ? user!.displayName! : l.player);
     final email = user?.email ?? '';
+    final subtitle = guest
+        ? l.guestSubtitle
+        : [if (email.isNotEmpty) email, isGoogle ? l.providerGoogle : l.providerEmail].join(' · ');
     void openCreator() => context.go('/settings/avatar');
+
+    Future<void> signOut() async {
+      if (guest) {
+        final ok = await showChoiceDialog(
+          context,
+          title: l.guestSignOutTitle,
+          body: l.guestSignOutBody,
+          primary: l.guestCreateAccount,
+          secondary: l.guestSignOutConfirm,
+        );
+        if (ok == null || !context.mounted) return;
+        if (ok) return showLinkAccountDialog(context);
+      }
+      await resetLocalSession(ref);
+      await ref.read(firebaseAuthProvider).signOut();
+    }
 
     Widget stat(String label, int? value) => Expanded(
       child: Container(
@@ -323,38 +343,43 @@ class _PlayerCard extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(border: Border.all(color: bp.line)),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              InkWell(
-                onTap: openCreator,
-                customBorder: const CircleBorder(),
-                child: RobotAvatarView(ref.watch(playerAvatarProvider), size: 44, semanticLabel: l.avatarYours),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-                    Text(
-                      [if (email.isNotEmpty) email, isGoogle ? l.providerGoogle : l.providerEmail].join(' · '),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: t.bodySmall?.copyWith(color: bp.muted),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: openCreator,
+                    customBorder: const CircleBorder(),
+                    child: RobotAvatarView(ref.watch(playerAvatarProvider), size: 44, semanticLabel: l.avatarYours),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                        Text(
+                          subtitle,
+                          maxLines: guest ? 2 : 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: t.bodySmall?.copyWith(color: bp.muted),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    onPressed: signOut,
+                    icon: const Icon(Icons.logout, size: 18),
+                    label: Text(l.signOut),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  ref.read(gameControllerProvider.notifier).clear();
-                  await ref.read(sharedPreferencesProvider).remove(PrefKeys.lastLocation);
-                  await ref.read(firebaseAuthProvider).signOut();
-                },
-                icon: const Icon(Icons.logout, size: 18),
-                label: Text(l.signOut),
-              ),
+              if (guest) ...[
+                const SizedBox(height: 12),
+                FilledButton(onPressed: () => showLinkAccountDialog(context), child: Text(l.guestCreateAccount)),
+              ],
             ],
           ),
         ),
