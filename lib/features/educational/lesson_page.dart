@@ -256,8 +256,6 @@ class _LessonPlayerPageState extends ConsumerState<LessonPlayerPage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(l.lessonNowYouHint, style: t.bodySmall?.copyWith(color: bp.muted)),
         ],
       ),
     );

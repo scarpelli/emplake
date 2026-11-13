@@ -13,4 +13,6 @@ abstract final class PrefKeys {
 
   static const adventure = 'adventure.v1';
   static const challenges = 'challenges.v1';
+
+  static const adventureCollapsed = 'adventure.collapsed.v1';
 }

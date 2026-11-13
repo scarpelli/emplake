@@ -754,6 +754,30 @@ abstract class AppLocalizations {
   /// **'Quer ver uma solução? Se preferir, não revelamos nada: o número volta ao sorteio para você tentar outro dia.'**
   String get skipBody;
 
+  /// No description provided for @skipBodyAdventure.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quer ver uma solução? Se preferir, não revelamos nada: a fase continua aberta na trilha para você tentar depois.'**
+  String get skipBodyAdventure;
+
+  /// No description provided for @skipBodyDaily.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quer ver uma solução? Pulando, a tentativa de hoje termina; amanhã tem outra placa.'**
+  String get skipBodyDaily;
+
+  /// No description provided for @skipBodyRetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quer ver uma solução? Se preferir, não revelamos nada e você pode tentar de novo quando quiser.'**
+  String get skipBodyRetry;
+
+  /// No description provided for @close.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar'**
+  String get close;
+
   /// No description provided for @skipYes.
   ///
   /// In pt, this message translates to:
@@ -1095,6 +1119,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Sem pontos desta vez. {number} continua no sorteio para você tentar de novo.'**
   String revealedDetail(String number);
+
+  /// No description provided for @revealedDetailAdventure.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem estrelas desta vez. A fase continua aberta na trilha para você tentar de novo.'**
+  String get revealedDetailAdventure;
+
+  /// No description provided for @revealedDetailDaily.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem pontos desta vez. Amanhã tem outra placa.'**
+  String get revealedDetailDaily;
+
+  /// No description provided for @revealedDetailRetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem pontos desta vez. Você pode tentar de novo quando quiser.'**
+  String get revealedDetailRetry;
 
   /// No description provided for @points.
   ///
@@ -1720,12 +1762,6 @@ abstract class AppLocalizations {
   /// **'AGORA VOCÊ'**
   String get lessonNowYou;
 
-  /// No description provided for @lessonNowYouHint.
-  ///
-  /// In pt, this message translates to:
-  /// **'Você joga outra placa que também usa este operador, sem relógio e sem pontos.'**
-  String get lessonNowYouHint;
-
   /// No description provided for @lessonStepStart.
   ///
   /// In pt, this message translates to:
@@ -1881,6 +1917,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'atual'**
   String get adventureCurrent;
+
+  /// No description provided for @adventureCollapse.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recolher {level}'**
+  String adventureCollapse(String level);
+
+  /// No description provided for @adventureExpand.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar {level}'**
+  String adventureExpand(String level);
 
   /// No description provided for @adventureStage.
   ///

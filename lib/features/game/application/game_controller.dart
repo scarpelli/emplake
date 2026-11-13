@@ -438,7 +438,7 @@ class GameController extends Notifier<GameState?> {
     final s = state;
     if (s == null || !s.canHint) return;
     final next = s.hintsUsed + 1;
-    state = s.copyWith(hintsUsed: next, solution: solution);
+    state = s.copyWith(hintsUsed: next, solution: solution, wrongAttempt: false);
     if (next >= 3) reveal(solution);
   }
 

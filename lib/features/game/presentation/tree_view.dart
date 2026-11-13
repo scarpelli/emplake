@@ -534,19 +534,21 @@ class _NodeChip extends StatelessWidget {
     switch (node.kind) {
       case TreeNodeKind.leaf:
         shape = Container(
-          constraints: const BoxConstraints(minWidth: 34),
-          height: 34,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          constraints: const BoxConstraints(minWidth: 38),
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
           decoration: BoxDecoration(
             color: fill,
             border: Border.all(color: border, width: 1.4),
           ),
-          alignment: Alignment.center,
-          child: Text(
-            node.label,
-            maxLines: 1,
-            softWrap: false,
-            style: t.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600),
+          child: Align(
+            widthFactor: 1,
+            child: Text(
+              node.label,
+              maxLines: 1,
+              softWrap: false,
+              style: t.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w600),
+            ),
           ),
         );
       case TreeNodeKind.op:
@@ -562,12 +564,14 @@ class _NodeChip extends StatelessWidget {
             border: Border.all(color: border, width: 1.4),
             borderRadius: BorderRadius.circular(18),
           ),
-          alignment: Alignment.center,
-          child: Text(
-            node.label,
-            maxLines: 1,
-            softWrap: false,
-            style: (long ? t.labelMedium : t.titleMedium)?.copyWith(color: fg, fontWeight: FontWeight.w600),
+          child: Align(
+            widthFactor: long ? 1 : null,
+            child: Text(
+              node.label,
+              maxLines: 1,
+              softWrap: false,
+              style: (long ? t.labelMedium : t.titleMedium)?.copyWith(color: fg, fontWeight: FontWeight.w600),
+            ),
           ),
         );
       case TreeNodeKind.gap:

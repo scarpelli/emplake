@@ -290,6 +290,10 @@
   "skip": "PULAR",
   "skipTitle": "PULAR ESTE NÚMERO?",
   "skipBody": "Quer ver uma solução? Se preferir, não revelamos nada: o número volta ao sorteio para você tentar outro dia.",
+  "skipBodyAdventure": "Quer ver uma solução? Se preferir, não revelamos nada: a fase continua aberta na trilha para você tentar depois.",
+  "skipBodyDaily": "Quer ver uma solução? Pulando, a tentativa de hoje termina; amanhã tem outra placa.",
+  "skipBodyRetry": "Quer ver uma solução? Se preferir, não revelamos nada e você pode tentar de novo quando quiser.",
+  "close": "Fechar",
   "skipYes": "SIM, MOSTRAR",
   "skipNo": "NÃO, PULAR",
   "seeSolution": "Ver uma solução",
@@ -423,6 +427,9 @@
       }
     }
   },
+  "revealedDetailAdventure": "Sem estrelas desta vez. A fase continua aberta na trilha para você tentar de novo.",
+  "revealedDetailDaily": "Sem pontos desta vez. Amanhã tem outra placa.",
+  "revealedDetailRetry": "Sem pontos desta vez. Você pode tentar de novo quando quiser.",
   "points": "PONTOS",
   "total": "TOTAL",
   "achievementUnlocked": "Conquista: {title}",
@@ -568,7 +575,6 @@
   "lessonNext": "Próximo passo",
   "lessonPlay": "Reproduzir",
   "lessonNowYou": "AGORA VOCÊ",
-  "lessonNowYouHint": "Você joga outra placa que também usa este operador, sem relógio e sem pontos.",
   "lessonStepStart": "A placa {number}: quatro dígitos, na ordem.",
   "@lessonStepStart": {
     "placeholders": {
@@ -658,6 +664,10 @@
   "helpGotIt": "ENTENDI",
   "homePage": "Página inicial",
   "adventureCurrent": "atual",
+  "adventureCollapse": "Recolher {level}",
+  "@adventureCollapse": {"placeholders": {"level": {"type": "String"}}},
+  "adventureExpand": "Mostrar {level}",
+  "@adventureExpand": {"placeholders": {"level": {"type": "String"}}},
   "adventureStage": "Fase {number}",
   "@adventureStage": {
     "placeholders": {

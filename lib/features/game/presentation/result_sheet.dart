@@ -86,7 +86,12 @@ class ResultSheet extends StatelessWidget {
                       ),
                       Text(
                         revealed
-                            ? l.revealedDetail(state.number)
+                            ? switch (state.mode) {
+                                GameMode.adventure => l.revealedDetailAdventure,
+                                GameMode.daily => l.revealedDetailDaily,
+                                GameMode.random => l.revealedDetail(state.number),
+                                _ => l.revealedDetailRetry,
+                              }
                             : (inTime ? l.resultTrueDetail(value, state.elapsed) : l.resultLateDetail(value)),
                         style: t.bodySmall?.copyWith(color: bp.muted),
                       ),

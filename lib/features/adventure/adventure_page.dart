@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n_helpers.dart';
+import '../../core/prefs.dart';
 import '../../core/router.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../core/widgets/brand_home.dart';
 import '../game/application/game_controller.dart';
 import '../game/domain/adventure.dart';
+import '../game/domain/level.dart';
 import 'adventure_store.dart';
 
 class AdventurePage extends ConsumerStatefulWidget {
@@ -21,6 +23,15 @@ class AdventurePage extends ConsumerStatefulWidget {
 class _AdventurePageState extends ConsumerState<AdventurePage> {
   final _focusKey = GlobalKey(debugLabel: 'adventure-focus');
   bool _scrolled = false;
+
+  late final Set<String> _collapsed = {
+    ...?ref.read(sharedPreferencesProvider).getStringList(PrefKeys.adventureCollapsed),
+  };
+
+  void _toggle(Level level) {
+    setState(() => _collapsed.contains(level.name) ? _collapsed.remove(level.name) : _collapsed.add(level.name));
+    ref.read(sharedPreferencesProvider).setStringList(PrefKeys.adventureCollapsed, _collapsed.toList());
+  }
 
   void _play(Stage s) {
     if (!s.playable) {
@@ -157,6 +168,8 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
                         onTap: _play,
                         scrollable: false,
                         perRow: perRow,
+                        collapsed: _collapsed.contains(col.level.name),
+                        onToggle: () => _toggle(col.level),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -179,6 +192,8 @@ class _ColumnPanel extends StatelessWidget {
     required this.onTap,
     required this.scrollable,
     required this.perRow,
+    this.collapsed = false,
+    this.onToggle,
   });
 
   final AdventureColumn column;
@@ -187,6 +202,9 @@ class _ColumnPanel extends StatelessWidget {
   final ValueChanged<Stage> onTap;
   final bool scrollable;
   final int perRow;
+
+  final bool collapsed;
+  final VoidCallback? onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -217,60 +235,86 @@ class _ColumnPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: scrollable ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: bp.line)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        level.label(l).toUpperCase(),
-                        style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1),
+          _foldable(
+            context,
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+              decoration: BoxDecoration(
+                border: collapsed ? null : Border(bottom: BorderSide(color: bp.line)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          level.label(l).toUpperCase(),
+                          style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1),
+                        ),
+                      ),
+                      Text(
+                        '${column.done}/${column.total}',
+                        style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      if (onToggle != null) ...[
+                        const SizedBox(width: 8),
+                        Icon(collapsed ? Icons.expand_more : Icons.expand_less, size: 22, color: bp.muted),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Semantics(
+                    label: l.adventureOps,
+                    child: Text(
+                      level.operatorLabels.join(' '),
+                      style: t.bodySmall?.copyWith(color: bp.muted, letterSpacing: 1),
+                    ),
+                  ),
+                  if (!column.unlocked || scrollable) ...[
+                    const SizedBox(height: 6),
+                    Visibility(
+                      visible: !column.unlocked,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: Row(
+                        children: [
+                          Icon(Icons.lock_outline, size: 14, color: bp.faint),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              l.adventureLockedColumn(AdventureProgress.checkpoint),
+                              maxLines: 2,
+                              style: t.bodySmall?.copyWith(color: bp.faint),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text('${column.done}/${column.total}', style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
                   ],
-                ),
-                const SizedBox(height: 6),
-                Semantics(
-                  label: l.adventureOps,
-                  child: Text(
-                    level.operatorLabels.join(' '),
-                    style: t.bodySmall?.copyWith(color: bp.muted, letterSpacing: 1),
-                  ),
-                ),
-                if (!column.unlocked || scrollable) ...[
-                  const SizedBox(height: 6),
-                  Visibility(
-                    visible: !column.unlocked,
-                    maintainSize: true,
-                    maintainAnimation: true,
-                    maintainState: true,
-                    child: Row(
-                      children: [
-                        Icon(Icons.lock_outline, size: 14, color: bp.faint),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            l.adventureLockedColumn(AdventureProgress.checkpoint),
-                            maxLines: 2,
-                            style: t.bodySmall?.copyWith(color: bp.faint),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
-              ],
+              ),
             ),
           ),
-          if (scrollable) Expanded(child: grid) else grid,
+          if (scrollable) Expanded(child: grid) else if (!collapsed) grid,
         ],
+      ),
+    );
+  }
+
+  Widget _foldable(BuildContext context, Widget header) {
+    if (onToggle == null) return header;
+    final l = context.l10n;
+    final name = column.level.label(l);
+    return Semantics(
+      container: true,
+      button: true,
+      expanded: !collapsed,
+      label: collapsed ? l.adventureExpand(name) : l.adventureCollapse(name),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(onTap: onToggle, child: header),
       ),
     );
   }

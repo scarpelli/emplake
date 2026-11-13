@@ -412,6 +412,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Do you want to see a solution? If you prefer, we reveal nothing: the number goes back to the draw so you can try another day.';
 
   @override
+  String get skipBodyAdventure =>
+      'Do you want to see a solution? If you prefer, we reveal nothing: the stage stays open on the trail so you can try later.';
+
+  @override
+  String get skipBodyDaily =>
+      'Do you want to see a solution? Skipping ends today\'s attempt; there is a new plate tomorrow.';
+
+  @override
+  String get skipBodyRetry =>
+      'Do you want to see a solution? If you prefer, we reveal nothing and you can try again whenever you like.';
+
+  @override
+  String get close => 'Close';
+
+  @override
   String get skipYes => 'YES, SHOW ME';
 
   @override
@@ -614,6 +629,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String revealedDetail(String number) {
     return 'No points this time. $number stays in the draw so you can try again.';
   }
+
+  @override
+  String get revealedDetailAdventure =>
+      'No stars this time. The stage stays open on the trail so you can try again.';
+
+  @override
+  String get revealedDetailDaily =>
+      'No points this time. There is a new plate tomorrow.';
+
+  @override
+  String get revealedDetailRetry =>
+      'No points this time. You can try again whenever you like.';
 
   @override
   String get points => 'POINTS';
@@ -953,10 +980,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lessonNowYou => 'NOW YOU';
 
   @override
-  String get lessonNowYouHint =>
-      'You play another plate that also uses this operator, with no clock and no points.';
-
-  @override
   String lessonStepStart(String number) {
     return 'Plate $number: four digits, in order.';
   }
@@ -1057,6 +1080,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adventureCurrent => 'current';
+
+  @override
+  String adventureCollapse(String level) {
+    return 'Collapse $level';
+  }
+
+  @override
+  String adventureExpand(String level) {
+    return 'Show $level';
+  }
 
   @override
   String adventureStage(int number) {

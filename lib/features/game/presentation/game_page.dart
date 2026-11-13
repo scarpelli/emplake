@@ -256,20 +256,8 @@ class _GamePageState extends ConsumerState<GamePage> {
     final s = ref.read(gameControllerProvider);
     if (s == null || !s.canHint) return;
     if (s.hintsUsed == 2) {
-      final ok = await showDialog<bool>(
-        context: context,
-        builder: (context) {
-          final l = context.l10n;
-          return AlertDialog(
-            title: Text(l.hintRevealTitle),
-            content: Text(l.hintRevealBody),
-            actions: [
-              TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l.cancel)),
-              FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l.skipYes)),
-            ],
-          );
-        },
-      );
+      final l = context.l10n;
+      final ok = await showChoiceDialog(context, title: l.hintRevealTitle, body: l.hintRevealBody, primary: l.skipYes);
       if (ok != true || !mounted) return;
     }
     final solution = s.solution ?? await ref.read(solutionProvider((s.level, s.number)).future);
@@ -302,7 +290,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       }
       return;
     }
-    final show = await showSkipDialog(context);
+    final show = await showSkipDialog(context, s.mode);
     if (show == null || !mounted) return;
     ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: show).catchError((_) {});
     _failDaily(s);

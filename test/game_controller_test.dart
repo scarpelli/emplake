@@ -64,6 +64,24 @@ void main() {
     expect(container.read(gameControllerProvider)!.wrongAttempt, isFalse);
   });
 
+  test('a hint after a false equation replaces its banner', () async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    final c = container.read(gameControllerProvider.notifier);
+    c.start(mode: GameMode.random, level: Level.hard, number: '8796');
+    c.selectGap(0);
+    c.applyBinary(BinOp.add);
+    c.selectGap(0);
+    c.placeEquals();
+    c.selectGap(1);
+    c.applyBinary(BinOp.sub);
+    expect(c.check(), CheckResult.wrong);
+    c.useHint('=(+(8,7),*(9,6))');
+    final s = container.read(gameControllerProvider)!;
+    expect(s.hintsUsed, 1);
+    expect(s.wrongAttempt, isFalse);
+  });
+
   test('only one pause per number', () async {
     final container = await makeContainer();
     addTearDown(container.dispose);
