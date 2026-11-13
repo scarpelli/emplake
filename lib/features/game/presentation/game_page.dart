@@ -8,23 +8,30 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/audio/sound_service.dart';
 import '../../../core/l10n_helpers.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/blueprint.dart';
 import '../../../core/widgets/bp_widgets.dart';
-import '../../../core/widgets/emplake_logo.dart';
+import '../../../core/widgets/brand_home.dart';
 import '../../../data/firestore_repository.dart';
 import '../../achievements/achievement_toast.dart';
+import '../../adventure/adventure_store.dart';
+import '../../challenges/challenge_store.dart';
 import '../../achievements/achievements.dart';
 import '../../daily/daily.dart';
 import '../../help/help_dialog.dart';
 import '../../settings/settings_controller.dart';
 import '../application/catalog_provider.dart';
 import '../application/game_controller.dart';
+import '../domain/adventure.dart';
+import '../domain/challenge.dart';
+import '../domain/evaluator.dart';
 import '../domain/expr.dart';
 import '../domain/format.dart';
 import '../domain/hints.dart';
 import '../domain/level.dart';
 import '../domain/board.dart';
+import '../domain/rules.dart';
 import 'fly_back_overlay.dart';
 import 'coach_overlay.dart';
 import 'formula_panel.dart';
@@ -49,6 +56,13 @@ class _GamePageState extends ConsumerState<GamePage> {
   bool _sheetVisible = false;
   bool _flying = false;
 
+  int? _stars;
+
+  bool? _runRecord;
+  int? _runBest;
+
+  Timer? _autoNext;
+
   GameController get _ctrl => ref.read(gameControllerProvider.notifier);
   SoundService get _sound => ref.read(soundProvider);
 
@@ -57,7 +71,12 @@ class _GamePageState extends ConsumerState<GamePage> {
     super.initState();
     final s = ref.read(gameControllerProvider);
     if (s?.phase == GamePhase.revealed) _sheetVisible = true;
-    if (s?.phase == GamePhase.solved) {
+    if (s?.run case final run? when run.over && !run.recorded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _finishRun());
+    }
+    if (s?.phase == GamePhase.solved && s?.run != null) {
+      _sheetVisible = true;
+    } else if (s?.phase == GamePhase.solved) {
       _sheetVisible = true;
       if (s!.saveStatus == SaveStatus.failed) WidgetsBinding.instance.addPostFrameCallback((_) => _save());
     }
@@ -65,6 +84,7 @@ class _GamePageState extends ConsumerState<GamePage> {
 
   @override
   void dispose() {
+    _autoNext?.cancel();
     _focus.dispose();
     super.dispose();
   }
@@ -91,8 +111,17 @@ class _GamePageState extends ConsumerState<GamePage> {
         return;
       case CheckResult.error:
       case CheckResult.wrong:
+      case CheckResult.ruleBroken:
         _sound.play(Sfx.error);
         _buzz(strong: true);
+      case CheckResult.right when s0?.run != null:
+        _sound.play(Sfx.success);
+        setState(() => _sheetVisible = true);
+        _autoNext?.cancel();
+        _autoNext = Timer(const Duration(milliseconds: 1100), () {
+          final now = ref.read(gameControllerProvider);
+          if (mounted && now?.run != null && now!.phase == GamePhase.solved) _goNext(now);
+        });
       case CheckResult.right:
         _sound.play(Sfx.success);
         _flying = true;
@@ -115,6 +144,16 @@ class _GamePageState extends ConsumerState<GamePage> {
     if (s.practice) {
       _ctrl.setSaveResult(SaveStatus.none);
       return;
+    }
+    if (s.mode == GameMode.adventure) {
+      final stars = AdventureStars.of(
+        inTime: s.solvedInTime,
+        hints: s.hintsUsed,
+        secondsLeft: s.secondsLeft,
+        levelSeconds: s.level.seconds,
+      );
+      if (mounted) setState(() => _stars = stars);
+      unawaited(recordAdventureStars(ref, '${s.level.name}_${s.number}', stars));
     }
     final repo = ref.read(repositoryProvider);
     if (repo == null) {
@@ -149,6 +188,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         );
       }
       ref.invalidate(profileProvider);
+      if (out.isNew) ref.invalidate(adventureStarsProvider);
       if (out.isNew || s.mode == GameMode.daily) await _checkAchievements(repo, s);
     } catch (_) {
       _ctrl.setSaveResult(SaveStatus.failed);
@@ -169,6 +209,19 @@ class _GamePageState extends ConsumerState<GamePage> {
       unawaited(showAchievementToasts(context, unlocked));
     } catch (_) {
     }
+  }
+
+  Future<void> _finishRun() async {
+    final run = ref.read(gameControllerProvider)?.run;
+    if (run == null || !run.over || run.recorded) return;
+    _ctrl.markRunRecorded();
+    final record = await recordChallengeRun(ref, run);
+    final stats = await ref.read(challengeStatsProvider.future);
+    if (!mounted) return;
+    setState(() {
+      _runRecord = record;
+      _runBest = stats[run.kind]?.best;
+    });
   }
 
   void _failDaily(GameState s) {
@@ -239,6 +292,16 @@ class _GamePageState extends ConsumerState<GamePage> {
       _goNext(s);
       return;
     }
+    if (s.run != null) {
+      _ctrl.skipChallenge();
+      final now = ref.read(gameControllerProvider);
+      if (now?.run?.kind == ChallengeKind.clock && !(now?.run?.over ?? true)) {
+        _goNext(now!);
+      } else {
+        setState(() => _sheetVisible = true);
+      }
+      return;
+    }
     final show = await showSkipDialog(context);
     if (show == null || !mounted) return;
     ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: show).catchError((_) {});
@@ -268,6 +331,24 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 
   void _goNext(GameState s) {
+    _autoNext?.cancel();
+    if (s.run case final run?) {
+      setState(() {
+        _sheetVisible = false;
+        _runRecord = null;
+        _runBest = null;
+      });
+      context.go(challengeLocation(run.kind, nextPlate: !run.over));
+      return;
+    }
+    if (s.mode == GameMode.adventure) {
+      setState(() {
+        _sheetVisible = false;
+        _stars = null;
+      });
+      unawaited(_nextStage(s));
+      return;
+    }
     if (s.mode == GameMode.daily) {
       _menu();
       return;
@@ -287,10 +368,36 @@ class _GamePageState extends ConsumerState<GamePage> {
     context.go(newGameLocation(mode: s.mode, level: s.level, exclude: s.number, practice: s.practice));
   }
 
+  Future<void> _nextStage(GameState s) async {
+    final progress = await ref.read(adventureProgressProvider.future);
+    if (!mounted) return;
+    final next = s.stage == null ? null : progress.nextAfter(s.stage!);
+    if (next == null) {
+      _ctrl.clear();
+      context.go('/play/adventure');
+      return;
+    }
+    context.go(
+      newGameLocation(mode: GameMode.adventure, level: next.entry.level, number: next.entry.number, stage: next.number),
+    );
+  }
+
   void _menu() {
-    setState(() => _sheetVisible = false);
+    _autoNext?.cancel();
+    final s = ref.read(gameControllerProvider);
+    if (s?.run case final run? when !run.recorded) {
+      unawaited(recordChallengeRun(ref, run.abandon()));
+    }
+    setState(() {
+      _sheetVisible = false;
+      _stars = null;
+    });
     _ctrl.clear();
-    context.go('/play');
+    context.go(switch (s?.mode) {
+      GameMode.adventure => '/play/adventure',
+      GameMode.challenges => '/play/challenges',
+      _ => '/play',
+    });
   }
 
   void _act(VoidCallback action) {
@@ -340,21 +447,20 @@ class _GamePageState extends ConsumerState<GamePage> {
     final s = ref.read(gameControllerProvider);
     if (s == null) return;
     switch (ch) {
-      case '+':
-        _binary(BinOp.add);
-      case '-':
-        _binary(BinOp.sub);
-      case '*' || 'x':
-        _binary(BinOp.mul);
-      case '/':
-        _binary(BinOp.div);
-      case '^':
-        if (s.level.binary.contains(BinOp.pow)) _binary(BinOp.pow);
+      case '+' || '-' || '*' || 'x' || '/' || '^':
+        final op = switch (ch) {
+          '+' => BinOp.add,
+          '-' => BinOp.sub,
+          '/' => BinOp.div,
+          '^' => BinOp.pow,
+          _ => BinOp.mul,
+        };
+        if (s.rules.binary.contains(op)) _binary(op);
       case '=':
         _equals();
       case '!' || 'r' || 'c' || 'a' || 'n' || 'f' || 'F':
         final op = _unaryKeys[ch]!;
-        if (s.level.unary.contains(op)) _unary(op);
+        if (s.rules.unary.contains(op)) _unary(op);
       case '(' || ')':
         _ctrl.toggleParens();
     }
@@ -369,6 +475,12 @@ class _GamePageState extends ConsumerState<GamePage> {
     });
     ref.listen(settingsProvider.select((s) => s.showLiveValues), (_, on) {
       if (on) _ctrl.noteLiveValuesShown();
+    });
+    ref.listen(gameControllerProvider.select((s) => (s?.phase, s?.run?.over)), (prev, next) {
+      final s = ref.read(gameControllerProvider);
+      if (s?.run == null) return;
+      if (next.$1 == GamePhase.revealed && prev?.$1 == GamePhase.playing) setState(() => _sheetVisible = true);
+      if (next.$2 == true && prev?.$2 != true) _finishRun();
     });
     ref.listen(gameControllerProvider.select((s) => s?.phase), (_, phase) {
       if (phase != null && phase != GamePhase.playing && _inTutorial) {
@@ -489,6 +601,10 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 
   Set<int> _hintGaps(GameState state) {
+    final rule = state.restriction;
+    if (state.phase == GamePhase.playing && rule != null && rule.kind == RestrictionKind.equalsAt) {
+      return {rule.gap!};
+    }
     if (state.phase != GamePhase.playing || state.hintsUsed == 0 || state.solution == null) return const {};
     final h = HintInfo.from(state.number, state.solution!);
     return {h.equalsGap, if (state.hintsUsed >= 2) h.linkGap};
@@ -562,6 +678,9 @@ class _GamePageState extends ConsumerState<GamePage> {
                 onMenu: _menu,
                 onNext: () => _goNext(state),
                 onShare: state.mode == GameMode.daily ? _shareDaily : null,
+                stars: state.mode == GameMode.adventure && state.phase == GamePhase.solved ? _stars : null,
+                runRecord: _runRecord,
+                runBest: _runBest,
               )
             : const SizedBox.shrink(),
       ),
@@ -708,12 +827,32 @@ String _subtitle(BuildContext context, GameState s, int? points, {int streak = 0
   final l = context.l10n;
   final parts = [
     if (s.practice) l.practiceShort else s.mode.label(l).toLowerCase(),
+    if (s.stage != null) l.adventureStage(s.stage!).toLowerCase(),
     s.level.label(l).toLowerCase(),
-    if (points != null) l.pointsShort(points),
-    if (streak > 0 && !s.practice) l.streakShort(streak),
+    if (s.run case final run?) ...[
+      l.runPlates(run.solved),
+      if (run.kind == ChallengeKind.clock) l.runStep(run.step + 1) else _hearts(run.lives),
+    ] else ...[
+      if (points != null) l.pointsShort(points),
+      if (streak > 0 && !s.practice) l.streakShort(streak),
+    ],
   ];
   return parts.join(' · ');
 }
+
+String _hearts(int lives) => '${'♥' * lives}${'♡' * (ChallengeRun.startLives - lives).clamp(0, 3)}';
+
+String ruleText(Restriction r, List<int> digits, AppLocalizations l) => switch (r.kind) {
+  RestrictionKind.forbid => l.ruleForbid(_opLabel(r.op!)),
+  RestrictionKind.require => l.ruleRequire(_opLabel(r.op!)),
+  RestrictionKind.equalsAt => l.ruleEqualsAt(digits[r.gap!], digits[r.gap! + 1]),
+};
+
+String _opLabel(Enum op) => switch (op) {
+  BinOp() => op.label,
+  UnOp() => op.label,
+  _ => op.name,
+};
 
 class _GameHeader extends ConsumerWidget {
   const _GameHeader({required this.state});
@@ -726,6 +865,8 @@ class _GameHeader extends ConsumerWidget {
     final points = profile?.totalPoints;
     return Row(
       children: [
+        const BrandHome(logoSize: 30, wordmark: false),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -780,20 +921,24 @@ class _DesktopHeader extends ConsumerWidget {
     );
     return Row(
       children: [
-        const EmplakeLogo(size: 36),
-        const SizedBox(width: 10),
-        Text('EMPLAKE', style: t.titleLarge?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 4)),
+        const BrandHome(),
         const SizedBox(width: 16),
         cell(l.infoNumber, state.number),
         cell(l.infoDigits, state.board.digits.join(' · ')),
         cell(l.infoMode, state.mode.label(l).toUpperCase()),
         cell(l.infoLevel, state.level.label(l).toUpperCase()),
+        if (state.stage != null) cell(l.adventureTrail, l.adventureStage(state.stage!).toUpperCase()),
+        if (state.run case final run?)
+          cell(
+            l.runPlates(run.solved).toUpperCase(),
+            run.kind == ChallengeKind.clock ? l.runStep(run.step + 1) : _hearts(run.lives),
+          ),
         const SizedBox(width: 16),
         Expanded(
           child: _TimerBar(state: state, onPause: onPause),
         ),
         const SizedBox(width: 16),
-        if (points != null)
+        if (points != null && state.run == null)
           Tooltip(
             message: l.helpScoringTitle,
             child: InkWell(
@@ -825,7 +970,7 @@ class _TimerBar extends StatelessWidget {
     final l = context.l10n;
     final bp = context.bp;
     final t = Theme.of(context).textTheme;
-    final frac = (state.secondsLeft / state.level.seconds).clamp(0.0, 1.0);
+    final frac = (state.secondsLeft / state.clockLength).clamp(0.0, 1.0);
     if (state.practice) {
       return Row(
         children: [
@@ -840,7 +985,7 @@ class _TimerBar extends StatelessWidget {
     }
     final low = state.secondsLeft <= 10;
     final last = !state.timeUp && state.secondsLeft <= 5;
-    final canPause = !state.pauseUsed && state.phase == GamePhase.playing && !state.timeUp;
+    final canPause = state.canPause && !state.pauseUsed && state.phase == GamePhase.playing && !state.timeUp;
     final announce = state.secondsLeft == 10 || state.secondsLeft == 5 || state.timeUp;
     return Row(
       children: [
@@ -871,7 +1016,13 @@ class _TimerBar extends StatelessWidget {
               scale: last && state.secondsLeft.isOdd ? 1.25 : 1,
               duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 250),
               child: Text(
-                state.timeUp ? l.timeUp : (last ? '${state.secondsLeft}…' : '${state.secondsLeft}s'),
+                state.timeUp
+                    ? l.timeUp
+                    : (last
+                          ? '${state.secondsLeft}…'
+                          : state.clockLength > 60
+                          ? '${state.secondsLeft ~/ 60}:${(state.secondsLeft % 60).toString().padLeft(2, '0')}'
+                          : '${state.secondsLeft}s'),
                 style: t.labelMedium?.copyWith(
                   color: state.timeUp || low ? bp.accent : bp.ink,
                   fontWeight: low ? FontWeight.w700 : null,
@@ -880,31 +1031,33 @@ class _TimerBar extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        Tooltip(
-          message: l.pause,
-          child: InkWell(
-            onTap: canPause ? onPause : null,
-            child: Opacity(
-              opacity: canPause || state.paused ? 1 : 0.4,
-              child: Container(
-                height: 32,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(border: Border.all(color: bp.line)),
-                child: Row(
-                  children: [
-                    Icon(Icons.pause, size: 16, semanticLabel: l.pause),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${state.paused ? (state.pauseLeft ?? Level.pauseSeconds) : Level.pauseSeconds}s',
-                      style: t.labelMedium,
-                    ),
-                  ],
+        if (state.canPause) ...[
+          const SizedBox(width: 8),
+          Tooltip(
+            message: l.pause,
+            child: InkWell(
+              onTap: canPause ? onPause : null,
+              child: Opacity(
+                opacity: canPause || state.paused ? 1 : 0.4,
+                child: Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(border: Border.all(color: bp.line)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.pause, size: 16, semanticLabel: l.pause),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${state.paused ? (state.pauseLeft ?? Level.pauseSeconds) : Level.pauseSeconds}s',
+                        style: t.labelMedium,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -953,7 +1106,6 @@ class _Feedback extends StatelessWidget {
     final bp = context.bp;
     final t = Theme.of(context).textTheme;
     final v = state.verdict;
-    final sep = context.decimalSeparator;
 
     Widget banner(IconData icon, String title, String body, Color color) => Semantics(
       liveRegion: true,
@@ -990,6 +1142,27 @@ class _Feedback extends StatelessWidget {
     );
 
     if (state.phase != GamePhase.playing) return const SizedBox.shrink();
+    final rule = state.restriction;
+    if (rule != null && state.ruleBroken) {
+      return _Shake(child: banner(Icons.rule, l.ruleBroken, ruleText(rule, state.board.digits, l), bp.danger));
+    }
+    final other = _other(context, state, v, banner);
+    if (rule == null) return other;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [banner(Icons.rule, l.ruleTitle, ruleText(rule, state.board.digits, l), bp.accent), other],
+    );
+  }
+
+  Widget _other(
+    BuildContext context,
+    GameState state,
+    Verdict v,
+    Widget Function(IconData, String, String, Color) banner,
+  ) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final sep = context.decimalSeparator;
     final error = v.result.error;
     if (error != null) {
       final (title, body) = evalErrorText(error, state.level, l, sep);
@@ -1066,14 +1239,22 @@ class _Actions extends StatelessWidget {
       children: [
         BoxIconButton(icon: Icons.undo, tooltip: l.undo, size: 48, onPressed: playing && state.canUndo ? onUndo : null),
         const SizedBox(width: 8),
-        _HintButton(state: state, onPressed: onHint, showKey: showKeys),
-        const SizedBox(width: 8),
+        if (!state.isChallenge) ...[
+          _HintButton(state: state, onPressed: onHint, showKey: showKeys),
+          const SizedBox(width: 8),
+        ],
         Expanded(
           flex: 2,
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
             onPressed: state.phase == GamePhase.playing ? onSkip : null,
-            child: FittedBox(child: Text(showKeys ? '${l.skip} · Esc' : l.skip)),
+            child: FittedBox(
+              child: Text(switch (state.run?.kind) {
+                ChallengeKind.clock => l.runSkip(ChallengeRun.skipPenalty),
+                ChallengeKind.restricted => l.runSkipLife,
+                null => showKeys ? '${l.skip} · Esc' : l.skip,
+              }),
+            ),
           ),
         ),
         const SizedBox(width: 8),

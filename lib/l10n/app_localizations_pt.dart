@@ -139,14 +139,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get modeChallengesDesc =>
-      'Conjunto de desafios com diferentes dificuldades.';
+      'Contra o relógio ou com uma regra extra em cada placa. Bata o seu recorde.';
 
   @override
   String get modeAdventure => 'Aventura';
 
   @override
   String get modeAdventureDesc =>
-      'Uma placa por cidade, numa viagem pelo Brasil.';
+      'Todas as placas numa trilha por nível. Ganhe até 3 estrelas em cada fase.';
 
   @override
   String get modeDaily => 'Placa do dia';
@@ -1094,4 +1094,244 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get helpGotIt => 'ENTENDI';
+
+  @override
+  String get homePage => 'Página inicial';
+
+  @override
+  String get adventureCurrent => 'atual';
+
+  @override
+  String adventureStage(int number) {
+    return 'Fase $number';
+  }
+
+  @override
+  String adventureLockedColumn(int count) {
+    return 'Abre com $count fases concluídas no nível anterior.';
+  }
+
+  @override
+  String get adventureLockedStage => 'Bloqueada: conclua as fases anteriores.';
+
+  @override
+  String get adventureStarsRule =>
+      '★ resolveu · ★★ no tempo e sem dica · ★★★ e com metade do tempo sobrando';
+
+  @override
+  String adventureContinue(int number) {
+    return 'CONTINUAR FASE $number';
+  }
+
+  @override
+  String get adventureAllDone => 'Trilha completa!';
+
+  @override
+  String adventureStarsEarned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count estrelas',
+      one: '1 estrela',
+      zero: 'Nenhuma estrela',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adventureNext => 'PRÓXIMA FASE';
+
+  @override
+  String get adventureTrail => 'TRILHA';
+
+  @override
+  String adventureStageA11y(int number, String plate, String state) {
+    return 'Fase $number, placa $plate, $state';
+  }
+
+  @override
+  String get adventureStateDone => 'concluída';
+
+  @override
+  String get adventureStateOpen => 'aberta';
+
+  @override
+  String get adventureStateLocked => 'bloqueada';
+
+  @override
+  String get adventureOps => 'operadores';
+
+  @override
+  String get challengeClockTitle => 'Contra o relógio';
+
+  @override
+  String get challengeClockTag => '3 MIN';
+
+  @override
+  String get challengeClockDesc =>
+      'Resolva o máximo de placas em 3 minutos. Pular custa 10 segundos. Subir de degrau dá +10 s.';
+
+  @override
+  String get challengeRestrictedTitle => 'Com restrição';
+
+  @override
+  String get challengeRestrictedTag => 'REGRA EXTRA';
+
+  @override
+  String get challengeRestrictedDesc =>
+      'Cada placa vem com uma regra: sem +, = fixo, operador obrigatório… Você tem 3 vidas.';
+
+  @override
+  String get challengeLadder =>
+      'Escada fixa: começa no Fácil e sobe de degrau a cada 3 acertos, até o Difícil. Sem dicas e sem pausa.';
+
+  @override
+  String get challengeRecord => 'RECORDE';
+
+  @override
+  String get challengeStreak => 'SEQUÊNCIA';
+
+  @override
+  String get challengePlays => 'PARTIDAS';
+
+  @override
+  String get challengePlay => 'JOGAR';
+
+  @override
+  String runPlates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count placas',
+      one: '1 placa',
+      zero: '0 placas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String runStep(int step) {
+    return 'degrau $step';
+  }
+
+  @override
+  String runLives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vidas',
+      one: '1 vida',
+      zero: 'sem vidas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String runSkip(int seconds) {
+    return 'PULAR −${seconds}s';
+  }
+
+  @override
+  String get runSkipLife => 'PULAR −♥';
+
+  @override
+  String get ruleTitle => 'REGRA DA PLACA';
+
+  @override
+  String ruleForbid(String op) {
+    return 'Sem $op: este operador não pode ser usado.';
+  }
+
+  @override
+  String ruleRequire(String op) {
+    return 'Use $op: a igualdade precisa ter este operador.';
+  }
+
+  @override
+  String ruleEqualsAt(int a, int b) {
+    return 'O = vai entre o $a e o $b.';
+  }
+
+  @override
+  String ruleShortForbid(String op) {
+    return 'sem $op';
+  }
+
+  @override
+  String ruleShortRequire(String op) {
+    return 'use $op';
+  }
+
+  @override
+  String ruleShortEquals(int a, int b) {
+    return '= entre $a e $b';
+  }
+
+  @override
+  String get ruleBroken => 'Verdadeira, mas fora da regra';
+
+  @override
+  String get runRight => 'CERTO!';
+
+  @override
+  String get runRightDetail => 'Próxima placa em instantes…';
+
+  @override
+  String runStepUp(int step, int seconds) {
+    return 'Degrau $step! +${seconds}s no relógio';
+  }
+
+  @override
+  String get runPlateLost => 'PLACA PERDIDA';
+
+  @override
+  String get runPlateLostDetail =>
+      'Você perdeu uma vida. Esta é uma solução que segue a regra.';
+
+  @override
+  String get runOverClock => 'FIM DO TEMPO';
+
+  @override
+  String get runOverLives => 'SEM VIDAS';
+
+  @override
+  String runScoreClock(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count placas resolvidas',
+      one: '1 placa resolvida',
+      zero: 'Nenhuma placa resolvida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String runScoreStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sequência de $count placas',
+      one: 'Sequência de 1 placa',
+      zero: 'Nenhuma placa na sequência',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get runNewRecord => 'NOVO RECORDE!';
+
+  @override
+  String runBest(int count) {
+    return 'Recorde: $count';
+  }
+
+  @override
+  String get runPlayAgain => 'JOGAR DE NOVO';
+
+  @override
+  String get runNextPlate => 'PRÓXIMA PLACA';
+
+  @override
+  String get runLastSolution => 'Uma solução da última placa:';
 }

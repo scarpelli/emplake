@@ -55,8 +55,7 @@ extension ModeL10n on GameMode {
   };
 
   bool get isAvailable => switch (this) {
-    GameMode.random || GameMode.specific || GameMode.educational || GameMode.daily => true,
-    GameMode.challenges || GameMode.adventure => false,
+    _ => true,
   };
 
   bool get listed => this != GameMode.daily;

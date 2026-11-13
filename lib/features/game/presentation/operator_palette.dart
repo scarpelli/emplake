@@ -60,6 +60,7 @@ class OperatorPalette extends StatelessWidget {
       NodeSelection() when node != null => l.paletteNodeSelected(TreeLayout.of(board).nodes[node.id]?.label ?? ''),
       _ => l.paletteTapGap,
     };
+    final rules = state.rules;
     final binaryOps = [
       for (final op in BinOp.values)
         if (state.level.binary.contains(op)) op,
@@ -82,14 +83,17 @@ class OperatorPalette extends StatelessWidget {
           children: [
             for (final op in binaryOps)
               _dragWhenPlaying(
-                playing,
+                playing && rules.binary.contains(op),
                 PaletteBinaryDrag(op),
                 op.label,
                 _OpButton(
                   key: keys.of(op),
                   label: op.label,
-                  tooltip: '${op.name(l)} · ${op.example(context.decimalSeparator)}',
-                  enabled: playing,
+                  tooltip: rules.binary.contains(op)
+                      ? '${op.name(l)} · ${op.example(context.decimalSeparator)}'
+                      : l.ruleShortForbid(op.label),
+                  enabled: playing && rules.binary.contains(op),
+                  struck: !rules.binary.contains(op),
                   active: binaryNode?.op == op || carried?.op == op,
                   onTap: () => onBinary(op),
                 ),
@@ -120,8 +124,11 @@ class OperatorPalette extends StatelessWidget {
               _OpButton(
                 key: keys.of(op),
                 label: op.label,
-                tooltip: '${op.name(l)} · ${op.example(context.decimalSeparator)}',
-                enabled: nodeSelected,
+                tooltip: rules.unary.contains(op)
+                    ? '${op.name(l)} · ${op.example(context.decimalSeparator)}'
+                    : l.ruleShortForbid(op.label),
+                enabled: nodeSelected && rules.unary.contains(op),
+                struck: !rules.unary.contains(op),
                 active: false,
                 dashed: true,
                 onTap: () => onUnary(op),
@@ -209,6 +216,7 @@ class _OpButton extends StatelessWidget {
     required this.active,
     required this.onTap,
     this.dashed = false,
+    this.struck = false,
   });
 
   final String? label;
@@ -217,6 +225,8 @@ class _OpButton extends StatelessWidget {
   final bool enabled;
   final bool active;
   final bool dashed;
+
+  final bool struck;
   final VoidCallback onTap;
 
   @override
@@ -244,8 +254,12 @@ class _OpButton extends StatelessWidget {
                     ? Icon(icon, size: 18, color: fg)
                     : Text(
                         label!,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(color: fg, fontWeight: FontWeight.w600),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: fg,
+                          fontWeight: FontWeight.w600,
+                          decoration: struck ? TextDecoration.lineThrough : null,
+                          decorationThickness: 2,
+                        ),
                       ),
               ),
             ),

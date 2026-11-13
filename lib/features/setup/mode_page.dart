@@ -45,6 +45,10 @@ class _ModePageState extends ConsumerState<ModePage> {
   void _continue() {
     if (_mode == GameMode.educational) {
       context.go('/play/learn');
+    } else if (_mode == GameMode.adventure) {
+      context.go('/play/adventure');
+    } else if (_mode == GameMode.challenges) {
+      context.go('/play/challenges');
     } else {
       context.go('/play/level?mode=${_mode.name}');
     }

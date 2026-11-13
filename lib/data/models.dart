@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../features/game/domain/challenge.dart';
 import '../features/game/domain/level.dart';
 
 class UserProfile {
@@ -17,6 +18,8 @@ class UserProfile {
     this.lastDaily,
     this.blindSolves = 0,
     this.inTimeSolves = 0,
+    this.adventure = const {},
+    this.challenges = const {},
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> m) => UserProfile(
@@ -36,6 +39,13 @@ class UserProfile {
     lastDaily: m['lastDaily'] as String?,
     blindSolves: (m['blindSolves'] as num?)?.toInt() ?? 0,
     inTimeSolves: (m['inTimeSolves'] as num?)?.toInt() ?? 0,
+    adventure: {
+      for (final e in ((m['adventure'] as Map?) ?? const {}).entries) e.key as String: (e.value as num).toInt(),
+    },
+    challenges: {
+      for (final e in ((m['challenges'] as Map?) ?? const {}).entries)
+        ?ChallengeKind.values.asNameMap()[e.key]: ChallengeStats.fromMap((e.value as Map).cast<String, dynamic>()),
+    },
   );
 
   final String displayName;
@@ -56,6 +66,27 @@ class UserProfile {
 
   final int blindSolves;
   final int inTimeSolves;
+
+  final Map<String, int> adventure;
+
+  final Map<ChallengeKind, ChallengeStats> challenges;
+}
+
+class ChallengeStats {
+  const ChallengeStats({this.best = 0, this.plays = 0});
+
+  factory ChallengeStats.fromMap(Map<String, dynamic> m) =>
+      ChallengeStats(best: (m['best'] as num?)?.toInt() ?? 0, plays: (m['plays'] as num?)?.toInt() ?? 0);
+
+  final int best;
+  final int plays;
+
+  Map<String, dynamic> toMap() => {'best': best, 'plays': plays};
+
+  ChallengeStats add(int score) => ChallengeStats(best: score > best ? score : best, plays: plays + 1);
+
+  ChallengeStats merge(ChallengeStats o) =>
+      ChallengeStats(best: o.best > best ? o.best : best, plays: o.plays > plays ? o.plays : plays);
 }
 
 class SolvedEntry {

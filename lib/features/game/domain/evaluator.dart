@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'board.dart';
 import 'expr.dart';
-import 'level.dart';
 import 'number_value.dart';
+import 'rules.dart';
 
 enum EvalErrorKind {
   divisionByZero,
@@ -44,9 +44,9 @@ class _Fail implements Exception {
 }
 
 class Evaluator {
-  const Evaluator(this.level);
+  const Evaluator(this.rules);
 
-  final Level level;
+  final OpRules rules;
 
   static const maxFactorial = 20;
   static const maxBits = 3400;
@@ -74,7 +74,7 @@ class Evaluator {
     }
   }
 
-  bool isSolution(Board board) => board.verdict(level).isTrue;
+  bool isSolution(Board board) => board.verdict(rules).isTrue;
 
   NumValue _eval(Node node, Map<int, NumValue> values) {
     final NumValue v;
@@ -95,13 +95,13 @@ class Evaluator {
           fail ??= f;
         }
         if (fail != null) throw fail;
-        if (!level.binary.contains(op)) {
+        if (!rules.binary.contains(op)) {
           throw _Fail(EvalError(EvalErrorKind.operatorNotAllowed, node.id));
         }
         v = _binary(node.id, op, a!, b!);
       case Unary(:final op, :final child):
         final c = _eval(child, values);
-        if (!level.unary.contains(op)) {
+        if (!rules.unary.contains(op)) {
           throw _Fail(EvalError(EvalErrorKind.operatorNotAllowed, node.id));
         }
         v = _unary(node.id, op, c);
@@ -132,7 +132,7 @@ class Evaluator {
       case BinOp.div:
         if (b.isZero()) throw _Fail(EvalError(EvalErrorKind.divisionByZero, id, left: a, right: b));
         final result = ea != null && eb != null ? NumValue.exact(ea / eb) : NumValue.approx(a.asDouble / b.asDouble);
-        if (!level.allowsFractionalDivision && !result.isIntegral) {
+        if (!rules.allowsFractionalDivision && !result.isIntegral) {
           throw _Fail(EvalError(EvalErrorKind.nonIntegerDivision, id, left: a, right: b, result: result));
         }
         return result;
@@ -241,8 +241,8 @@ class Verdict {
 }
 
 extension BoardVerdict on Board {
-  Verdict verdict(Level level) {
-    final result = Evaluator(level).evaluateBoard(this);
+  Verdict verdict(OpRules rules) {
+    final result = Evaluator(rules).evaluateBoard(this);
     if (!isComplete) return Verdict(result: result);
     return Verdict(result: result, left: result.values[blocks[0].id], right: result.values[blocks[1].id]);
   }

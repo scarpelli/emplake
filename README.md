@@ -2,7 +2,7 @@
 
 Engenharia reversa do jogo [Emplake](https://www.cyan-lang.org/emplake/), concebido pelo Prof. Walter A. Carnielli. O objetivo é usar os quatro dígitos da placa, na ordem, para montar uma igualdade verdadeira.
 
-Equipe: Bruna Scarpelli, Gustavo Kis e Ricardo Suzuki.
+Equipe: Bruna Scarpelli e Gustavo Sanches Martins Kis.
 
 ## Como se joga nesta versão
 
@@ -20,6 +20,8 @@ A expressão é montada como uma **árvore que cresce para cima**:
 | Avançado | + − × ÷ ( ) √ ! \|x\| |
 | Difícil | + − × ÷ ( ) \|x\| |
 
+Modos: Aleatório, Específico, Placa do dia, Educacional, **Aventura** (todas as placas numa trilha por nível, com até 3 estrelas por fase) e **Desafios** (Contra o relógio e Com restrição). As regras estão em [docs/modos.md](docs/modos.md), e cada placa do catálogo, com a solução, em [docs/catalogo/](docs/catalogo/README.md).
+
 No desktop: `Enter` verifica, `Esc` pula, `Tab` alterna a seleção, `Ctrl+Z` desfaz e `+ - * / ^ = ! ( )` aplicam operadores.
 
 ## Estrutura
@@ -33,11 +35,14 @@ lib/
     game/domain/               motor: árvore, avaliação exata, texto e LaTeX
     game/application/          GameController (Riverpod): seleção, desfazer, tempo, pausa
     game/presentation/         árvore animada, paleta, fórmula, resultado
+    adventure/ challenges/     trilha da Aventura e Desafios (telas e recordes)
     auth/ cover/ setup/ history/ settings/ help/ shell/
   l10n/                        textos em pt, en, es (ARB + gerados)
 test/                          testes do motor e do controlador
 dev/preview_main.dart          app sem Firebase, com usuário falso (só desenvolvimento)
 tool/gen_arb.py                gera os três ARB a partir de uma tabela
+tool/gen_catalog_test.dart     mantém assets/catalog.json e gera docs/catalogo/
+docs/                          game design dos modos e catálogo documentado
 ```
 
 ## Configurar o Firebase (plano Spark, gratuito)

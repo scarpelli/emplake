@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/daily/daily.dart';
 import '../features/game/application/catalog_provider.dart';
+import '../features/game/domain/adventure.dart';
 import '../features/game/domain/catalog.dart';
+import '../features/game/domain/challenge.dart';
 import '../features/game/domain/level.dart';
 import 'models.dart';
 
@@ -99,6 +101,44 @@ class FirestoreRepository {
       return SaveOutcome(isNew: true, pointsAwarded: points, totalPoints: total + points, streak: newStreak);
     });
   }
+
+  Future<Map<String, int>> solvedStars() async {
+    final q = await _solved.get();
+    final out = <String, int>{};
+    for (final d in q.docs) {
+      final m = d.data();
+      final level = Level.values.asNameMap()[m['level']];
+      if (level == null) continue;
+      out[d.id] = AdventureStars.ofSolved(
+        level: level,
+        inTime: m['inTime'] as bool? ?? true,
+        hints: (m['hints'] as num?)?.toInt() ?? 0,
+        seconds: (m['seconds'] as num?)?.toInt() ?? 0,
+      );
+    }
+    return out;
+  }
+
+  Future<void> saveAdventureStars(String id, int stars) => _db.runTransaction((tx) async {
+    final snap = await tx.get(_userDoc);
+    final old = ((snap.data()?['adventure'] as Map?)?[id] as num?)?.toInt() ?? 0;
+    if (stars <= old) return;
+    tx.set(_userDoc, {
+      'adventure': {id: stars},
+    }, SetOptions(merge: true));
+  });
+
+  Future<ChallengeStats> saveChallengeRun(ChallengeKind kind, int score) => _db.runTransaction((tx) async {
+    final snap = await tx.get(_userDoc);
+    final old = ChallengeStats.fromMap(
+      ((snap.data()?['challenges'] as Map?)?[kind.name] as Map?)?.cast<String, dynamic>() ?? const {},
+    );
+    final next = old.add(score);
+    tx.set(_userDoc, {
+      'challenges': {kind.name: next.toMap()},
+    }, SetOptions(merge: true));
+    return next;
+  });
 
   Future<void> recordSkip(Level level, String number, {bool revealed = false}) async {
     final batch = _db.batch();

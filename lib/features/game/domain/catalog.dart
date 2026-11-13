@@ -3,10 +3,31 @@ import 'dart:convert';
 import 'board.dart';
 import 'expr.dart';
 import 'level.dart';
+import 'rules.dart';
 import 'solution_codec.dart';
 
+class RestrictedVariant {
+  const RestrictedVariant(this.rule, this.solution);
+
+  final Restriction rule;
+
+  final String solution;
+
+  Map<String, dynamic> toJson() => {'r': rule.encode(), 'x': solution};
+
+  factory RestrictedVariant.fromJson(Map<String, dynamic> j) =>
+      RestrictedVariant(Restriction.decode(j['r'] as String), j['x'] as String);
+}
+
 class CatalogEntry {
-  const CatalogEntry({required this.number, required this.level, required this.stars, required this.solution});
+  const CatalogEntry({
+    required this.number,
+    required this.level,
+    required this.stars,
+    required this.solution,
+    this.trivial = false,
+    this.variants = const [],
+  });
 
   final String number;
   final Level level;
@@ -15,15 +36,41 @@ class CatalogEntry {
 
   final String solution;
 
+  final bool trivial;
+
+  final List<RestrictedVariant> variants;
+
+  String get id => '${level.name}_$number';
+
   Board board() => SolutionCodec.decode(number, solution);
 
-  Map<String, dynamic> toJson() => {'n': number, 'l': level.name, 's': stars, 'x': solution};
+  CatalogEntry copyWith({bool? trivial, List<RestrictedVariant>? variants}) => CatalogEntry(
+    number: number,
+    level: level,
+    stars: stars,
+    solution: solution,
+    trivial: trivial ?? this.trivial,
+    variants: variants ?? this.variants,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'n': number,
+    'l': level.name,
+    's': stars,
+    'x': solution,
+    if (trivial) 't': true,
+    if (variants.isNotEmpty) 'r': [for (final v in variants) v.toJson()],
+  };
 
   factory CatalogEntry.fromJson(Map<String, dynamic> j) => CatalogEntry(
     number: j['n'] as String,
     level: Level.values.byName(j['l'] as String),
     stars: j['s'] as int,
     solution: j['x'] as String,
+    trivial: j['t'] as bool? ?? false,
+    variants: [
+      for (final v in (j['r'] as List? ?? const [])) RestrictedVariant.fromJson((v as Map).cast<String, dynamic>()),
+    ],
   );
 }
 
@@ -87,14 +134,16 @@ class Catalog {
 
   List<CatalogEntry> entriesFor(Level level) => _byLevel[level]!;
 
+  Iterable<CatalogEntry> get all => Level.values.expand(entriesFor);
+
   int countFor(Level level) => _byLevel[level]!.length;
 
   int get length => _byLevel.values.fold(0, (a, l) => a + l.length);
 
   CatalogEntry? lookup(Level level, String number) => _byLevel[level]!.where((e) => e.number == number).firstOrNull;
 
-  String toJsonString() => const JsonEncoder.withIndent(' ').convert({
-    'version': 1,
+  String toJsonString({int version = 2}) => const JsonEncoder.withIndent(' ').convert({
+    'version': version,
     'entries': [
       for (final level in Level.values)
         for (final e in _byLevel[level]!) e.toJson(),

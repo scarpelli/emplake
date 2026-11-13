@@ -140,14 +140,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get modeChallengesDesc =>
-      'Un conjunto de desafíos con distintas dificultades.';
+      'Contra el reloj o con una regla extra en cada placa. Supera tu récord.';
 
   @override
   String get modeAdventure => 'Aventura';
 
   @override
   String get modeAdventureDesc =>
-      'Una placa por ciudad, en un viaje por Brasil.';
+      'Todas las placas en una ruta por nivel. Gana hasta 3 estrellas en cada fase.';
 
   @override
   String get modeDaily => 'Placa del día';
@@ -1098,4 +1098,245 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get helpGotIt => 'ENTENDIDO';
+
+  @override
+  String get homePage => 'Página de inicio';
+
+  @override
+  String get adventureCurrent => 'actual';
+
+  @override
+  String adventureStage(int number) {
+    return 'Fase $number';
+  }
+
+  @override
+  String adventureLockedColumn(int count) {
+    return 'Se abre con $count fases completadas en el nivel anterior.';
+  }
+
+  @override
+  String get adventureLockedStage =>
+      'Bloqueada: completa las fases anteriores.';
+
+  @override
+  String get adventureStarsRule =>
+      '★ resuelta · ★★ a tiempo y sin pistas · ★★★ y con la mitad del tiempo de sobra';
+
+  @override
+  String adventureContinue(int number) {
+    return 'CONTINUAR FASE $number';
+  }
+
+  @override
+  String get adventureAllDone => '¡Ruta completa!';
+
+  @override
+  String adventureStarsEarned(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count estrellas',
+      one: '1 estrella',
+      zero: 'Sin estrellas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adventureNext => 'SIGUIENTE FASE';
+
+  @override
+  String get adventureTrail => 'RUTA';
+
+  @override
+  String adventureStageA11y(int number, String plate, String state) {
+    return 'Fase $number, placa $plate, $state';
+  }
+
+  @override
+  String get adventureStateDone => 'completada';
+
+  @override
+  String get adventureStateOpen => 'abierta';
+
+  @override
+  String get adventureStateLocked => 'bloqueada';
+
+  @override
+  String get adventureOps => 'operadores';
+
+  @override
+  String get challengeClockTitle => 'Contra el reloj';
+
+  @override
+  String get challengeClockTag => '3 MIN';
+
+  @override
+  String get challengeClockDesc =>
+      'Resuelve todas las placas que puedas en 3 minutos. Saltar cuesta 10 segundos. Subir de escalón da +10 s.';
+
+  @override
+  String get challengeRestrictedTitle => 'Con restricción';
+
+  @override
+  String get challengeRestrictedTag => 'REGLA EXTRA';
+
+  @override
+  String get challengeRestrictedDesc =>
+      'Cada placa trae una regla: sin +, = fijo, operador obligatorio… Tienes 3 vidas.';
+
+  @override
+  String get challengeLadder =>
+      'Escalera fija: empieza en Fácil y sube un escalón cada 3 aciertos, hasta Difícil. Sin pistas ni pausa.';
+
+  @override
+  String get challengeRecord => 'RÉCORD';
+
+  @override
+  String get challengeStreak => 'RACHA';
+
+  @override
+  String get challengePlays => 'PARTIDAS';
+
+  @override
+  String get challengePlay => 'JUGAR';
+
+  @override
+  String runPlates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count placas',
+      one: '1 placa',
+      zero: '0 placas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String runStep(int step) {
+    return 'escalón $step';
+  }
+
+  @override
+  String runLives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vidas',
+      one: '1 vida',
+      zero: 'sin vidas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String runSkip(int seconds) {
+    return 'SALTAR −${seconds}s';
+  }
+
+  @override
+  String get runSkipLife => 'SALTAR −♥';
+
+  @override
+  String get ruleTitle => 'REGLA DE LA PLACA';
+
+  @override
+  String ruleForbid(String op) {
+    return 'Sin $op: no puedes usar este operador.';
+  }
+
+  @override
+  String ruleRequire(String op) {
+    return 'Usa $op: la igualdad debe incluir este operador.';
+  }
+
+  @override
+  String ruleEqualsAt(int a, int b) {
+    return 'El = va entre $a y $b.';
+  }
+
+  @override
+  String ruleShortForbid(String op) {
+    return 'sin $op';
+  }
+
+  @override
+  String ruleShortRequire(String op) {
+    return 'usa $op';
+  }
+
+  @override
+  String ruleShortEquals(int a, int b) {
+    return '= entre $a y $b';
+  }
+
+  @override
+  String get ruleBroken => 'Verdadera, pero rompe la regla';
+
+  @override
+  String get runRight => '¡BIEN!';
+
+  @override
+  String get runRightDetail => 'Siguiente placa enseguida…';
+
+  @override
+  String runStepUp(int step, int seconds) {
+    return '¡Escalón $step! +${seconds}s en el reloj';
+  }
+
+  @override
+  String get runPlateLost => 'PLACA PERDIDA';
+
+  @override
+  String get runPlateLostDetail =>
+      'Perdiste una vida. Esta es una solución que sigue la regla.';
+
+  @override
+  String get runOverClock => 'SE ACABÓ EL TIEMPO';
+
+  @override
+  String get runOverLives => 'SIN VIDAS';
+
+  @override
+  String runScoreClock(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count placas resueltas',
+      one: '1 placa resuelta',
+      zero: 'Ninguna placa resuelta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String runScoreStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Racha de $count placas',
+      one: 'Racha de 1 placa',
+      zero: 'Ninguna placa seguida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get runNewRecord => '¡NUEVO RÉCORD!';
+
+  @override
+  String runBest(int count) {
+    return 'Récord: $count';
+  }
+
+  @override
+  String get runPlayAgain => 'JUGAR OTRA VEZ';
+
+  @override
+  String get runNextPlate => 'SIGUIENTE PLACA';
+
+  @override
+  String get runLastSolution => 'Una solución de la última placa:';
 }

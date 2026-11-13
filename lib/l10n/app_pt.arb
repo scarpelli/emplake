@@ -66,9 +66,9 @@
   "modeSpecific": "Específico",
   "modeSpecificDesc": "Você digita o número de 4 dígitos que quer resolver.",
   "modeChallenges": "Desafios",
-  "modeChallengesDesc": "Conjunto de desafios com diferentes dificuldades.",
+  "modeChallengesDesc": "Contra o relógio ou com uma regra extra em cada placa. Bata o seu recorde.",
   "modeAdventure": "Aventura",
-  "modeAdventureDesc": "Uma placa por cidade, numa viagem pelo Brasil.",
+  "modeAdventureDesc": "Todas as placas numa trilha por nível. Ganhe até 3 estrelas em cada fase.",
   "modeDaily": "Placa do dia",
   "modeDailyDesc": "O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.",
   "dailyAlreadyPlayed": "Você já jogou a placa de hoje. Volte amanhã para uma nova!",
@@ -708,5 +708,207 @@
       }
     }
   },
-  "helpGotIt": "ENTENDI"
+  "helpGotIt": "ENTENDI",
+  "homePage": "Página inicial",
+  "adventureCurrent": "atual",
+  "adventureStage": "Fase {number}",
+  "@adventureStage": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "adventureLockedColumn": "Abre com {count} fases concluídas no nível anterior.",
+  "@adventureLockedColumn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adventureLockedStage": "Bloqueada: conclua as fases anteriores.",
+  "adventureStarsRule": "★ resolveu · ★★ no tempo e sem dica · ★★★ e com metade do tempo sobrando",
+  "adventureContinue": "CONTINUAR FASE {number}",
+  "@adventureContinue": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "adventureAllDone": "Trilha completa!",
+  "adventureStarsEarned": "{count, plural, =0{Nenhuma estrela} =1{1 estrela} other{{count} estrelas}}",
+  "@adventureStarsEarned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adventureNext": "PRÓXIMA FASE",
+  "adventureTrail": "TRILHA",
+  "adventureStageA11y": "Fase {number}, placa {plate}, {state}",
+  "@adventureStageA11y": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "plate": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "adventureStateDone": "concluída",
+  "adventureStateOpen": "aberta",
+  "adventureStateLocked": "bloqueada",
+  "adventureOps": "operadores",
+  "challengeClockTitle": "Contra o relógio",
+  "challengeClockTag": "3 MIN",
+  "challengeClockDesc": "Resolva o máximo de placas em 3 minutos. Pular custa 10 segundos. Subir de degrau dá +10 s.",
+  "challengeRestrictedTitle": "Com restrição",
+  "challengeRestrictedTag": "REGRA EXTRA",
+  "challengeRestrictedDesc": "Cada placa vem com uma regra: sem +, = fixo, operador obrigatório… Você tem 3 vidas.",
+  "challengeLadder": "Escada fixa: começa no Fácil e sobe de degrau a cada 3 acertos, até o Difícil. Sem dicas e sem pausa.",
+  "challengeRecord": "RECORDE",
+  "challengeStreak": "SEQUÊNCIA",
+  "challengePlays": "PARTIDAS",
+  "challengePlay": "JOGAR",
+  "runPlates": "{count, plural, =0{0 placas} =1{1 placa} other{{count} placas}}",
+  "@runPlates": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runStep": "degrau {step}",
+  "@runStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "runLives": "{count, plural, =0{sem vidas} =1{1 vida} other{{count} vidas}}",
+  "@runLives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runSkip": "PULAR −{seconds}s",
+  "@runSkip": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "runSkipLife": "PULAR −♥",
+  "ruleTitle": "REGRA DA PLACA",
+  "ruleForbid": "Sem {op}: este operador não pode ser usado.",
+  "@ruleForbid": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleRequire": "Use {op}: a igualdade precisa ter este operador.",
+  "@ruleRequire": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleEqualsAt": "O = vai entre o {a} e o {b}.",
+  "@ruleEqualsAt": {
+    "placeholders": {
+      "a": {
+        "type": "int"
+      },
+      "b": {
+        "type": "int"
+      }
+    }
+  },
+  "ruleShortForbid": "sem {op}",
+  "@ruleShortForbid": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleShortRequire": "use {op}",
+  "@ruleShortRequire": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleShortEquals": "= entre {a} e {b}",
+  "@ruleShortEquals": {
+    "placeholders": {
+      "a": {
+        "type": "int"
+      },
+      "b": {
+        "type": "int"
+      }
+    }
+  },
+  "ruleBroken": "Verdadeira, mas fora da regra",
+  "runRight": "CERTO!",
+  "runRightDetail": "Próxima placa em instantes…",
+  "runStepUp": "Degrau {step}! +{seconds}s no relógio",
+  "@runStepUp": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "runPlateLost": "PLACA PERDIDA",
+  "runPlateLostDetail": "Você perdeu uma vida. Esta é uma solução que segue a regra.",
+  "runOverClock": "FIM DO TEMPO",
+  "runOverLives": "SEM VIDAS",
+  "runScoreClock": "{count, plural, =0{Nenhuma placa resolvida} =1{1 placa resolvida} other{{count} placas resolvidas}}",
+  "@runScoreClock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runScoreStreak": "{count, plural, =0{Nenhuma placa na sequência} =1{Sequência de 1 placa} other{Sequência de {count} placas}}",
+  "@runScoreStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runNewRecord": "NOVO RECORDE!",
+  "runBest": "Recorde: {count}",
+  "@runBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "runPlayAgain": "JOGAR DE NOVO",
+  "runNextPlate": "PRÓXIMA PLACA",
+  "runLastSolution": "Uma solução da última placa:"
 }

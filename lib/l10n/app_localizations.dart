@@ -337,7 +337,7 @@ abstract class AppLocalizations {
   /// No description provided for @modeChallengesDesc.
   ///
   /// In pt, this message translates to:
-  /// **'Conjunto de desafios com diferentes dificuldades.'**
+  /// **'Contra o relógio ou com uma regra extra em cada placa. Bata o seu recorde.'**
   String get modeChallengesDesc;
 
   /// No description provided for @modeAdventure.
@@ -349,7 +349,7 @@ abstract class AppLocalizations {
   /// No description provided for @modeAdventureDesc.
   ///
   /// In pt, this message translates to:
-  /// **'Uma placa por cidade, numa viagem pelo Brasil.'**
+  /// **'Todas as placas numa trilha por nível. Ganhe até 3 estrelas em cada fase.'**
   String get modeAdventureDesc;
 
   /// No description provided for @modeDaily.
@@ -1929,6 +1929,330 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'ENTENDI'**
   String get helpGotIt;
+
+  /// No description provided for @homePage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Página inicial'**
+  String get homePage;
+
+  /// No description provided for @adventureCurrent.
+  ///
+  /// In pt, this message translates to:
+  /// **'atual'**
+  String get adventureCurrent;
+
+  /// No description provided for @adventureStage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fase {number}'**
+  String adventureStage(int number);
+
+  /// No description provided for @adventureLockedColumn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abre com {count} fases concluídas no nível anterior.'**
+  String adventureLockedColumn(int count);
+
+  /// No description provided for @adventureLockedStage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bloqueada: conclua as fases anteriores.'**
+  String get adventureLockedStage;
+
+  /// No description provided for @adventureStarsRule.
+  ///
+  /// In pt, this message translates to:
+  /// **'★ resolveu · ★★ no tempo e sem dica · ★★★ e com metade do tempo sobrando'**
+  String get adventureStarsRule;
+
+  /// No description provided for @adventureContinue.
+  ///
+  /// In pt, this message translates to:
+  /// **'CONTINUAR FASE {number}'**
+  String adventureContinue(int number);
+
+  /// No description provided for @adventureAllDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trilha completa!'**
+  String get adventureAllDone;
+
+  /// No description provided for @adventureStarsEarned.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma estrela} =1{1 estrela} other{{count} estrelas}}'**
+  String adventureStarsEarned(int count);
+
+  /// No description provided for @adventureNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'PRÓXIMA FASE'**
+  String get adventureNext;
+
+  /// No description provided for @adventureTrail.
+  ///
+  /// In pt, this message translates to:
+  /// **'TRILHA'**
+  String get adventureTrail;
+
+  /// No description provided for @adventureStageA11y.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fase {number}, placa {plate}, {state}'**
+  String adventureStageA11y(int number, String plate, String state);
+
+  /// No description provided for @adventureStateDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'concluída'**
+  String get adventureStateDone;
+
+  /// No description provided for @adventureStateOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'aberta'**
+  String get adventureStateOpen;
+
+  /// No description provided for @adventureStateLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'bloqueada'**
+  String get adventureStateLocked;
+
+  /// No description provided for @adventureOps.
+  ///
+  /// In pt, this message translates to:
+  /// **'operadores'**
+  String get adventureOps;
+
+  /// No description provided for @challengeClockTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contra o relógio'**
+  String get challengeClockTitle;
+
+  /// No description provided for @challengeClockTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'3 MIN'**
+  String get challengeClockTag;
+
+  /// No description provided for @challengeClockDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolva o máximo de placas em 3 minutos. Pular custa 10 segundos. Subir de degrau dá +10 s.'**
+  String get challengeClockDesc;
+
+  /// No description provided for @challengeRestrictedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com restrição'**
+  String get challengeRestrictedTitle;
+
+  /// No description provided for @challengeRestrictedTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'REGRA EXTRA'**
+  String get challengeRestrictedTag;
+
+  /// No description provided for @challengeRestrictedDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada placa vem com uma regra: sem +, = fixo, operador obrigatório… Você tem 3 vidas.'**
+  String get challengeRestrictedDesc;
+
+  /// No description provided for @challengeLadder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escada fixa: começa no Fácil e sobe de degrau a cada 3 acertos, até o Difícil. Sem dicas e sem pausa.'**
+  String get challengeLadder;
+
+  /// No description provided for @challengeRecord.
+  ///
+  /// In pt, this message translates to:
+  /// **'RECORDE'**
+  String get challengeRecord;
+
+  /// No description provided for @challengeStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEQUÊNCIA'**
+  String get challengeStreak;
+
+  /// No description provided for @challengePlays.
+  ///
+  /// In pt, this message translates to:
+  /// **'PARTIDAS'**
+  String get challengePlays;
+
+  /// No description provided for @challengePlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'JOGAR'**
+  String get challengePlay;
+
+  /// No description provided for @runPlates.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{0 placas} =1{1 placa} other{{count} placas}}'**
+  String runPlates(int count);
+
+  /// No description provided for @runStep.
+  ///
+  /// In pt, this message translates to:
+  /// **'degrau {step}'**
+  String runStep(int step);
+
+  /// No description provided for @runLives.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{sem vidas} =1{1 vida} other{{count} vidas}}'**
+  String runLives(int count);
+
+  /// No description provided for @runSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'PULAR −{seconds}s'**
+  String runSkip(int seconds);
+
+  /// No description provided for @runSkipLife.
+  ///
+  /// In pt, this message translates to:
+  /// **'PULAR −♥'**
+  String get runSkipLife;
+
+  /// No description provided for @ruleTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'REGRA DA PLACA'**
+  String get ruleTitle;
+
+  /// No description provided for @ruleForbid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem {op}: este operador não pode ser usado.'**
+  String ruleForbid(String op);
+
+  /// No description provided for @ruleRequire.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use {op}: a igualdade precisa ter este operador.'**
+  String ruleRequire(String op);
+
+  /// No description provided for @ruleEqualsAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'O = vai entre o {a} e o {b}.'**
+  String ruleEqualsAt(int a, int b);
+
+  /// No description provided for @ruleShortForbid.
+  ///
+  /// In pt, this message translates to:
+  /// **'sem {op}'**
+  String ruleShortForbid(String op);
+
+  /// No description provided for @ruleShortRequire.
+  ///
+  /// In pt, this message translates to:
+  /// **'use {op}'**
+  String ruleShortRequire(String op);
+
+  /// No description provided for @ruleShortEquals.
+  ///
+  /// In pt, this message translates to:
+  /// **'= entre {a} e {b}'**
+  String ruleShortEquals(int a, int b);
+
+  /// No description provided for @ruleBroken.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verdadeira, mas fora da regra'**
+  String get ruleBroken;
+
+  /// No description provided for @runRight.
+  ///
+  /// In pt, this message translates to:
+  /// **'CERTO!'**
+  String get runRight;
+
+  /// No description provided for @runRightDetail.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próxima placa em instantes…'**
+  String get runRightDetail;
+
+  /// No description provided for @runStepUp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Degrau {step}! +{seconds}s no relógio'**
+  String runStepUp(int step, int seconds);
+
+  /// No description provided for @runPlateLost.
+  ///
+  /// In pt, this message translates to:
+  /// **'PLACA PERDIDA'**
+  String get runPlateLost;
+
+  /// No description provided for @runPlateLostDetail.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você perdeu uma vida. Esta é uma solução que segue a regra.'**
+  String get runPlateLostDetail;
+
+  /// No description provided for @runOverClock.
+  ///
+  /// In pt, this message translates to:
+  /// **'FIM DO TEMPO'**
+  String get runOverClock;
+
+  /// No description provided for @runOverLives.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEM VIDAS'**
+  String get runOverLives;
+
+  /// No description provided for @runScoreClock.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma placa resolvida} =1{1 placa resolvida} other{{count} placas resolvidas}}'**
+  String runScoreClock(int count);
+
+  /// No description provided for @runScoreStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma placa na sequência} =1{Sequência de 1 placa} other{Sequência de {count} placas}}'**
+  String runScoreStreak(int count);
+
+  /// No description provided for @runNewRecord.
+  ///
+  /// In pt, this message translates to:
+  /// **'NOVO RECORDE!'**
+  String get runNewRecord;
+
+  /// No description provided for @runBest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recorde: {count}'**
+  String runBest(int count);
+
+  /// No description provided for @runPlayAgain.
+  ///
+  /// In pt, this message translates to:
+  /// **'JOGAR DE NOVO'**
+  String get runPlayAgain;
+
+  /// No description provided for @runNextPlate.
+  ///
+  /// In pt, this message translates to:
+  /// **'PRÓXIMA PLACA'**
+  String get runNextPlate;
+
+  /// No description provided for @runLastSolution.
+  ///
+  /// In pt, this message translates to:
+  /// **'Uma solução da última placa:'**
+  String get runLastSolution;
 }
 
 class _AppLocalizationsDelegate

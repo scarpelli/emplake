@@ -4,6 +4,7 @@ import 'board.dart';
 import 'evaluator.dart';
 import 'expr.dart';
 import 'level.dart';
+import 'rules.dart';
 import 'solution_codec.dart';
 
 class SolveResult {
@@ -50,9 +51,13 @@ class SolveResult {
 }
 
 class Solver {
-  Solver(this.level);
+  Solver(this.level, {this.restriction});
 
   final Level level;
+  final Restriction? restriction;
+
+  late final Enum? _required = restriction?.kind == RestrictionKind.require ? restriction!.op : null;
+  late final OpRules _rules = restriction?.rulesFor(level) ?? level;
 
   static const _limit = 1000000;
   static const _maxFactorial = 10;
@@ -60,13 +65,13 @@ class Solver {
 
   late final _binOps = [
     for (final op in BinOp.values)
-      if (level.binary.contains(op)) op,
+      if (_rules.binary.contains(op)) op,
   ];
   late final _unOps = [
     for (final op in UnOp.values)
-      if (level.unary.contains(op)) op,
+      if (_rules.unary.contains(op)) op,
   ];
-  late final _evaluator = Evaluator(level);
+  late final _evaluator = Evaluator(_rules);
 
   SolveResult solve(String number) {
     final digits = number.split('').map(int.parse).toList();
@@ -74,7 +79,7 @@ class Solver {
     final spans = List.generate(n, (_) => List<Map<int, _Entry>?>.filled(n, null));
     for (var i = 0; i < n; i++) {
       final leaf = <int, _Entry>{};
-      _add(leaf, _Entry(_Q(digits[i], 1), Leaf(0, digits[i], i), 1, 1));
+      _add(leaf, _Entry(_Q(digits[i], 1), Leaf(0, digits[i], i), 1, 1, false));
       _closeUnary(leaf, depth: 2);
       spans[i][i] = leaf;
     }
@@ -93,21 +98,26 @@ class Solver {
     final candidates = <(int, Node, Node)>[];
     var ways = 0;
     final matched = <String>{};
+    final eqAt = restriction?.kind == RestrictionKind.equalsAt ? restriction!.gap : null;
     for (var k = 0; k < n - 1; k++) {
+      if (eqAt != null && k != eqAt) continue;
       final left = spans[0][k]!, right = spans[k + 1][n - 1]!;
-      for (final e in left.entries) {
-        final r = right[e.key];
-        if (r == null) continue;
-        ways = math.min(_maxWays, ways + e.value.ways * r.ways);
-        matched.add('$k:${e.key}');
-        candidates.add((e.value.size + r.size, e.value.node, r.node));
+      for (final e in left.values) {
+        for (final flag in const [false, true]) {
+          final r = right[_key(e.value, flag)];
+          if (r == null) continue;
+          if (_required != null && !e.uses && !r.uses) continue;
+          ways = math.min(_maxWays, ways + e.ways * r.ways);
+          matched.add('$k:${e.value.key}');
+          candidates.add((e.size + r.size, e.node, r.node));
+        }
       }
     }
     candidates.sort((a, b) => a.$1.compareTo(b.$1));
     for (final (size, l, r) in candidates.take(40)) {
       final text = SolutionCodec.encode(l, r);
       final board = SolutionCodec.decode(number, text);
-      if (_evaluator.isSolution(board)) {
+      if (_evaluator.isSolution(board) && (restriction?.allows(board) ?? true)) {
         return SolveResult(
           number: number,
           level: level,
@@ -121,8 +131,10 @@ class Solver {
     return SolveResult(number: number, level: level);
   }
 
+  int _key(_Q value, bool uses) => _required == null ? value.key : value.key * 2 + (uses ? 1 : 0);
+
   void _add(Map<int, _Entry> map, _Entry e) {
-    final key = e.value.key;
+    final key = _key(e.value, e.uses);
     final old = map[key];
     if (old == null) {
       map[key] = e;
@@ -142,7 +154,8 @@ class Solver {
         for (final op in _binOps) {
           final v = _binary(op, x.value, y.value);
           if (v == null) continue;
-          _add(out, _Entry(v, Binary(0, op, x.node, y.node), x.size + y.size + 1, x.ways * y.ways));
+          final uses = x.uses || y.uses || op == _required;
+          _add(out, _Entry(v, Binary(0, op, x.node, y.node), x.size + y.size + 1, x.ways * y.ways, uses));
         }
       }
     }
@@ -155,11 +168,13 @@ class Solver {
       for (final e in frontier) {
         for (final op in _unOps) {
           final v = _unary(op, e.value);
-          if (v == null || v.key == e.value.key) continue;
-          final added = _Entry(v, Unary(0, op, e.node), e.size + 1, e.ways);
-          final isNew = !map.containsKey(v.key);
+          final uses = e.uses || op == _required;
+          if (v == null || (v.key == e.value.key && uses == e.uses)) continue;
+          final added = _Entry(v, Unary(0, op, e.node), e.size + 1, e.ways, uses);
+          final key = _key(v, uses);
+          final isNew = !map.containsKey(key);
           _add(map, added);
-          if (isNew) next.add(map[v.key]!);
+          if (isNew) next.add(map[key]!);
         }
       }
       frontier = next;
@@ -177,7 +192,7 @@ class Solver {
       case BinOp.div:
         if (b.n == 0) return null;
         final r = _Q.make(a.n * b.d, a.d * b.n);
-        if (r != null && !level.allowsFractionalDivision && r.d != 1) return null;
+        if (r != null && !_rules.allowsFractionalDivision && r.d != 1) return null;
         return r;
       case BinOp.pow:
         if (b.d != 1) return null;
@@ -238,12 +253,14 @@ class Solver {
 }
 
 class _Entry {
-  _Entry(this.value, this.node, this.size, this.ways);
+  _Entry(this.value, this.node, this.size, this.ways, this.uses);
 
   final _Q value;
   Node node;
   int size;
   int ways;
+
+  final bool uses;
 }
 
 class _Q {

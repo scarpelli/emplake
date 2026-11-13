@@ -6,7 +6,10 @@ import 'package:go_router/go_router.dart';
 
 import '../data/firestore_repository.dart';
 import '../features/auth/login_page.dart';
+import '../features/adventure/adventure_page.dart';
+import '../features/challenges/challenges_page.dart';
 import '../features/cover/cover_page.dart';
+import '../features/game/domain/challenge.dart';
 import '../features/educational/lesson_page.dart';
 import '../features/game/application/game_controller.dart';
 import '../features/game/domain/level.dart';
@@ -72,6 +75,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: '/play',
                 builder: (_, _) => const ModePage(),
                 routes: [
+                  GoRoute(path: 'adventure', builder: (_, _) => const AdventurePage()),
+                  GoRoute(path: 'challenges', builder: (_, _) => const ChallengesPage()),
                   GoRoute(
                     path: 'learn',
                     builder: (_, _) => const LessonsPage(),
@@ -115,6 +120,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                         number: q['n'],
                         exclude: q['exclude'],
                         practice: q['practice'] == '1',
+                        stage: int.tryParse(q['stage'] ?? ''),
+                        challenge: ChallengeKind.values.asNameMap()[q['challenge']],
+                        nextPlate: q['next'] == '1',
                       );
                     },
                   ),
@@ -149,6 +157,9 @@ String newGameLocation({
   String? number,
   String? exclude,
   bool practice = false,
+  int? stage,
+  ChallengeKind? challenge,
+  bool nextPlate = false,
 }) => Uri(
   path: '/game/new',
   queryParameters: {
@@ -157,5 +168,11 @@ String newGameLocation({
     'n': ?number,
     'exclude': ?exclude,
     if (practice) 'practice': '1',
+    if (stage != null) 'stage': '$stage',
+    if (challenge != null) 'challenge': challenge.name,
+    if (nextPlate) 'next': '1',
   },
 ).toString();
+
+String challengeLocation(ChallengeKind kind, {bool nextPlate = false}) =>
+    newGameLocation(mode: GameMode.challenges, level: Level.easy, challenge: kind, nextPlate: nextPlate);

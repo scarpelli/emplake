@@ -1,6 +1,7 @@
 import 'expr.dart';
+import 'rules.dart';
 
-enum Level {
+enum Level implements OpRules {
   easy(
     binary: {BinOp.add, BinOp.sub, BinOp.mul, BinOp.div, BinOp.pow},
     unary: {UnOp.neg, UnOp.sqrt, UnOp.cbrt, UnOp.fact, UnOp.abs, UnOp.floor, UnOp.ceil},
@@ -38,9 +39,12 @@ enum Level {
     required this.basePoints,
   });
 
+  @override
   final Set<BinOp> binary;
+  @override
   final Set<UnOp> unary;
 
+  @override
   final bool allowsFractionalDivision;
 
   final int seconds;

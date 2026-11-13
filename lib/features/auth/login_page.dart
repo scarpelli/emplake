@@ -10,7 +10,7 @@ import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../core/widgets/emplake_logo.dart';
 
-const teamMembers = ['Bruna Scarpelli', 'Gustavo Kis', 'Ricardo Suzuki'];
+const teamMembers = ['Bruna Scarpelli', 'Gustavo Sanches Martins Kis'];
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/prefs.dart';
 import '../domain/board.dart';
+import '../domain/challenge.dart';
 import '../domain/evaluator.dart';
 import '../domain/expr.dart';
 import '../domain/level.dart';
+import '../domain/rules.dart';
 import '../domain/solution_codec.dart';
 
 enum GameMode { educational, random, specific, challenges, adventure, daily }
@@ -116,6 +118,11 @@ class GameState {
     this.sawLiveValues = true,
     this.streakUsed = 0,
     this.practice = false,
+    this.run,
+    this.restriction,
+    this.stage,
+    this.totalSeconds,
+    this.ruleBroken = false,
   });
 
   final GameMode mode;
@@ -153,7 +160,24 @@ class GameState {
 
   final bool practice;
 
-  bool get canHint => phase == GamePhase.playing && !paused && hintsUsed < 3;
+  final ChallengeRun? run;
+
+  final Restriction? restriction;
+
+  final int? stage;
+
+  final int? totalSeconds;
+
+  final bool ruleBroken;
+
+  bool get isChallenge => run != null;
+
+  OpRules get rules => restriction?.rulesFor(level) ?? level;
+
+  int get clockLength => totalSeconds ?? level.seconds;
+
+  bool get canHint => phase == GamePhase.playing && !paused && hintsUsed < 3 && !isChallenge;
+  bool get canPause => !isChallenge && !practice;
 
   Score get score => level.score(
     secondsLeft: secondsLeft,
@@ -167,7 +191,7 @@ class GameState {
   bool get timeUp => !practice && secondsLeft <= 0;
   bool get canUndo => history.isNotEmpty && phase == GamePhase.playing;
 
-  Verdict get verdict => board.verdict(level);
+  Verdict get verdict => board.verdict(rules);
 
   GameState copyWith({
     Board? board,
@@ -190,6 +214,8 @@ class GameState {
     bool? sawLiveValues,
     int? streakUsed,
     String? solution,
+    ChallengeRun? run,
+    bool? ruleBroken,
   }) => GameState(
     mode: mode,
     level: level,
@@ -213,6 +239,11 @@ class GameState {
     sawLiveValues: sawLiveValues ?? this.sawLiveValues,
     streakUsed: streakUsed ?? this.streakUsed,
     practice: practice,
+    run: run ?? this.run,
+    restriction: restriction,
+    stage: stage,
+    totalSeconds: totalSeconds,
+    ruleBroken: ruleBroken ?? this.ruleBroken,
   );
 
   Map<String, dynamic> toJson() => {
@@ -234,10 +265,19 @@ class GameState {
     'sawLive': sawLiveValues,
     'streakUsed': streakUsed,
     'practice': practice,
+    if (run != null) 'run': run!.toJson(),
+    if (restriction != null) 'rule': restriction!.encode(),
+    'stage': ?stage,
+    'total': ?totalSeconds,
   };
 
   factory GameState.fromJson(Map<String, dynamic> j) {
-    final phase = GamePhase.values.byName(j['phase'] as String);
+    var phase = GamePhase.values.byName(j['phase'] as String);
+    var run = j['run'] == null ? null : ChallengeRun.fromJson((j['run'] as Map).cast<String, dynamic>());
+    if (run != null && !run.over) {
+      run = run.abandon();
+      if (phase == GamePhase.playing) phase = GamePhase.revealed;
+    }
     var save = SaveStatus.values.byName(j['saveStatus'] as String? ?? 'none');
     if (save == SaveStatus.saving) save = SaveStatus.failed;
     return GameState(
@@ -262,11 +302,15 @@ class GameState {
       sawLiveValues: j['sawLive'] as bool? ?? true,
       streakUsed: j['streakUsed'] as int? ?? 0,
       practice: j['practice'] as bool? ?? false,
+      run: run,
+      restriction: j['rule'] == null ? null : Restriction.decode(j['rule'] as String),
+      stage: j['stage'] as int?,
+      totalSeconds: j['total'] as int?,
     );
   }
 }
 
-enum CheckResult { notReady, error, wrong, right }
+enum CheckResult { notReady, error, wrong, ruleBroken, right }
 
 class GameController extends Notifier<GameState?> {
   Timer? _timer;
@@ -311,10 +355,15 @@ class GameController extends Notifier<GameState?> {
       state = left <= 0 ? s.copyWith(paused: false, clearPauseLeft: true) : s.copyWith(pauseLeft: left);
       return;
     }
-    state = s.copyWith(
+    final next = s.copyWith(
       elapsed: s.elapsed + 1,
       secondsLeft: s.practice ? s.secondsLeft : (s.secondsLeft > 0 ? s.secondsLeft - 1 : 0),
     );
+    if (next.run != null && next.secondsLeft <= 0) {
+      _losePlate(next, next.run!.timeUp());
+      return;
+    }
+    state = next;
   }
 
   void start({
@@ -324,17 +373,59 @@ class GameController extends Notifier<GameState?> {
     bool alreadySolved = false,
     bool liveValues = true,
     bool practice = false,
+    int? stage,
+    ChallengeRun? run,
+    Restriction? restriction,
+    String? solution,
   }) {
     _ensureTimer();
+    final clock = run?.kind == ChallengeKind.clock;
     state = GameState(
       mode: mode,
       level: level,
       board: Board.start(number),
-      secondsLeft: level.seconds,
+      secondsLeft: clock ? run!.clock : level.seconds,
+      totalSeconds: clock ? ChallengeRun.clockStart : null,
       alreadySolved: alreadySolved,
       sawLiveValues: liveValues,
       practice: practice,
+      stage: stage,
+      run: run,
+      restriction: restriction,
+      solution: solution,
     );
+  }
+
+  void _losePlate(GameState s, ChallengeRun run) {
+    var board = s.board;
+    if (s.solution != null) {
+      try {
+        board = SolutionCodec.decode(s.number, s.solution!);
+      } on FormatException {
+        board = s.board;
+      }
+    }
+    state = s.copyWith(
+      board: board,
+      history: identical(board, s.board) ? null : [...s.history, s.board],
+      phase: GamePhase.revealed,
+      clearSelection: true,
+      wrongAttempt: false,
+      ruleBroken: false,
+      run: run,
+    );
+  }
+
+  void skipChallenge() {
+    final s = _editable;
+    if (s == null || s.run == null) return;
+    _losePlate(s, s.run!.skip(secondsLeft: s.secondsLeft));
+  }
+
+  void markRunRecorded() {
+    final s = state;
+    if (s?.run == null) return;
+    state = s!.copyWith(run: s.run!.markRecorded());
   }
 
   void noteLiveValuesShown() {
@@ -435,6 +526,7 @@ class GameController extends Notifier<GameState?> {
       selection: select,
       clearSelection: select == null,
       wrongAttempt: false,
+      ruleBroken: false,
     );
   }
 
@@ -572,7 +664,7 @@ class GameController extends Notifier<GameState?> {
 
   void pause() {
     final s = _editable;
-    if (s == null || s.pauseUsed) return;
+    if (s == null || s.pauseUsed || !s.canPause) return;
     state = s.copyWith(paused: true, pauseUsed: true, pauseLeft: Level.pauseSeconds);
   }
 
@@ -590,6 +682,18 @@ class GameController extends Notifier<GameState?> {
     if (!v.isTrue) {
       state = s.copyWith(wrongAttempt: true);
       return CheckResult.wrong;
+    }
+    if (s.restriction != null && !s.restriction!.allows(s.board)) {
+      state = s.copyWith(ruleBroken: true);
+      return CheckResult.ruleBroken;
+    }
+    if (s.run != null) {
+      state = s.copyWith(
+        phase: GamePhase.solved,
+        clearSelection: true,
+        run: s.run!.solve(secondsLeft: s.secondsLeft),
+      );
+      return CheckResult.right;
     }
     final inTime = !s.timeUp;
     final points = s.alreadySolved || s.practice

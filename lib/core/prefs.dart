@@ -10,4 +10,7 @@ abstract final class PrefKeys {
   static const lastLocation = 'nav.lastLocation';
   static const game = 'game.v1';
   static const seenCover = 'nav.seenCover';
+
+  static const adventure = 'adventure.v1';
+  static const challenges = 'challenges.v1';
 }

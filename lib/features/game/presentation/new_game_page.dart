@@ -7,10 +7,12 @@ import '../../../core/l10n_helpers.dart';
 import '../../../core/widgets/bp_widgets.dart';
 import '../../../data/firestore_repository.dart';
 import '../../../data/models.dart';
+import '../../challenges/challenge_store.dart';
 import '../../daily/daily.dart';
 import '../../settings/settings_controller.dart';
 import '../application/catalog_provider.dart';
 import '../application/game_controller.dart';
+import '../domain/challenge.dart';
 import '../domain/level.dart';
 import 'game_page.dart' show tutorialNumber;
 
@@ -22,6 +24,9 @@ class NewGamePage extends ConsumerStatefulWidget {
     this.number,
     this.exclude,
     this.practice = false,
+    this.stage,
+    this.challenge,
+    this.nextPlate = false,
   });
 
   final GameMode mode;
@@ -31,18 +36,26 @@ class NewGamePage extends ConsumerStatefulWidget {
 
   final bool practice;
 
+  final int? stage;
+
+  final ChallengeKind? challenge;
+  final bool nextPlate;
+
   @override
   ConsumerState<NewGamePage> createState() => _NewGamePageState();
 }
 
 class _Prepared {
-  const _Prepared(this.number, this.alreadySolved, {this.level, this.dailyDone});
+  const _Prepared(this.number, this.alreadySolved, {this.level, this.dailyDone, this.run, this.plate});
   final String? number;
   final bool alreadySolved;
 
   final Level? level;
 
   final DailyResult? dailyDone;
+
+  final ChallengeRun? run;
+  final ChallengePlate? plate;
 }
 
 class _NewGamePageState extends ConsumerState<NewGamePage> {
@@ -51,6 +64,7 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
   Future<_Prepared> _prepare() async {
     final repo = ref.read(repositoryProvider);
     if (widget.mode == GameMode.daily) return _prepareDaily(repo);
+    if (widget.mode == GameMode.challenges) return _prepareChallenge();
     if (widget.mode == GameMode.random && widget.number == null && ref.read(settingsProvider).hintsVisible) {
       return const _Prepared(tutorialNumber, false, level: Level.easy);
     }
@@ -81,8 +95,39 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
     return _Prepared(entry.number, false, level: entry.level);
   }
 
+  Future<_Prepared> _prepareChallenge() async {
+    final kind = widget.challenge ?? ChallengeKind.clock;
+    final current = ref.read(gameControllerProvider)?.run;
+    ChallengeRun run;
+    if (widget.nextPlate && current != null && current.kind == kind && !current.over) {
+      run = current;
+    } else {
+      if (current != null && !current.recorded) {
+        await recordChallengeRun(ref, current.abandon());
+        ref.read(gameControllerProvider.notifier).markRunRecorded();
+      }
+      run = ChallengeRun(kind: kind);
+    }
+    final catalog = await ref.read(catalogProvider.future);
+    final plate = nextChallengePlate(catalog, run);
+    return _Prepared(plate?.entry.number, false, level: plate?.level, run: run, plate: plate);
+  }
+
   void _launch(_Prepared p) {
-    if (p.number != null) {
+    if (p.plate != null) {
+      final plate = p.plate!;
+      ref
+          .read(gameControllerProvider.notifier)
+          .start(
+            mode: GameMode.challenges,
+            level: plate.level,
+            number: plate.entry.number,
+            liveValues: ref.read(settingsProvider).showLiveValues,
+            run: p.run!.playing(plate.entry.id),
+            restriction: plate.rule,
+            solution: plate.solution,
+          );
+    } else if (p.number != null) {
       ref
           .read(gameControllerProvider.notifier)
           .start(
@@ -92,6 +137,7 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
             alreadySolved: p.alreadySolved,
             liveValues: ref.read(settingsProvider).showLiveValues,
             practice: widget.practice,
+            stage: widget.stage,
           );
     }
     context.go('/game');

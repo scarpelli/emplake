@@ -13,6 +13,22 @@ abstract final class SolutionCodec {
     UnOp.ceil: 'C',
   };
 
+  static String letterOf(Enum op) => switch (op) {
+    BinOp() => _binary[op]!,
+    UnOp() => _unary[op]!,
+    _ => throw ArgumentError.value(op, 'op'),
+  };
+
+  static Enum opOf(String letter) {
+    for (final e in _binary.entries) {
+      if (e.value == letter) return e.key;
+    }
+    for (final e in _unary.entries) {
+      if (e.value == letter) return e.key;
+    }
+    throw FormatException('unknown operator', letter);
+  }
+
   static String encodeNode(Node n) => switch (n) {
     Leaf(:final digit) => '$digit',
     Binary(:final op, :final left, :final right) => '${_binary[op]}(${encodeNode(left)},${encodeNode(right)})',

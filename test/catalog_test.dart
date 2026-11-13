@@ -7,7 +7,10 @@ import 'package:emplake/features/game/domain/evaluator.dart';
 import 'package:emplake/features/game/domain/format.dart';
 import 'package:emplake/features/game/domain/level.dart';
 import 'package:emplake/features/game/domain/replay.dart';
+import 'package:emplake/features/game/domain/solution_codec.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../tool/catalog_docs.dart';
 
 void main() {
   final catalog = Catalog.fromJsonString(File('assets/catalog.json').readAsStringSync());
@@ -38,6 +41,45 @@ void main() {
     final numbers = [for (final l in Level.values) ...catalog.entriesFor(l).map((e) => e.number)];
     expect(numbers.toSet().length, numbers.length);
     expect(numbers, isNot(contains('1236')), reason: 'kept for the tutorial');
+  });
+
+  group('v2 metadata', () {
+    test('restricted variants follow their rule, break the plain solution and avoid the zero trick', () {
+      for (final e in catalog.all) {
+        final plain = e.board();
+        for (final v in e.variants) {
+          final b = SolutionCodec.decode(e.number, v.solution);
+          expect(Evaluator(v.rule.rulesFor(e.level)).isSolution(b), isTrue, reason: '${e.id} ${v.rule}');
+          expect(v.rule.allows(b), isTrue, reason: '${e.id} ${v.rule}');
+          expect(v.rule.allows(plain), isFalse, reason: '${e.id} ${v.rule}');
+        }
+      }
+      for (final level in Level.values) {
+        expect(catalog.entriesFor(level).where((e) => e.variants.isNotEmpty).length, greaterThan(20));
+      }
+    });
+
+    test('trivial plates have a zero and are spread as warm-ups on the trail', () {
+      for (final level in Level.values) {
+        final list = catalog.entriesFor(level);
+        for (final e in list.where((e) => e.trivial)) {
+          expect(e.number, contains('0'), reason: e.id);
+        }
+        expect(list.where((e) => e.trivial).length, lessThan(list.length ~/ 3), reason: level.name);
+      }
+    });
+
+    test('docs/catalogo is up to date with the catalog', () {
+      for (final MapEntry(:key, :value) in renderCatalogDocs(catalog).entries) {
+        final file = File(key);
+        expect(file.existsSync(), isTrue, reason: '$key missing: run flutter test tool/gen_catalog_test.dart');
+        expect(
+          file.readAsStringSync().replaceAll('\r\n', '\n'),
+          value,
+          reason: '$key is stale: run flutter test tool/gen_catalog_test.dart',
+        );
+      }
+    });
   });
 
   group('draw', () {

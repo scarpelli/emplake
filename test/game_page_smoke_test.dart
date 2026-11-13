@@ -30,7 +30,12 @@ Widget _app(Widget home, {List overrides = const []}) => ProviderScope(
 void main() {
   testWidgets('help opens on the scoring tab and explains hints and the blind bonus', (tester) async {
     await tester.pumpWidget(
-      _app(Builder(builder: (context) => TextButton(onPressed: () => showHelpDialog(context, scoring: true), child: const Text('open')))),
+      _app(
+        Builder(
+          builder: (context) =>
+              TextButton(onPressed: () => showHelpDialog(context, scoring: true), child: const Text('open')),
+        ),
+      ),
     );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
