@@ -371,7 +371,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   Future<void> _nextStage(GameState s) async {
     final progress = await ref.read(adventureProgressProvider.future);
     if (!mounted) return;
-    final next = s.stage == null ? null : progress.nextAfter(s.stage!);
+    final next = s.stage == null ? progress.focus : progress.nextAfter(s.stage!);
     if (next == null) {
       _ctrl.clear();
       context.go('/play/adventure');
@@ -576,18 +576,18 @@ class _GamePageState extends ConsumerState<GamePage> {
     }
     if (b.binaryAt(0) == null) {
       return selectedGap(0)
-          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul))
-          : CoachStep(text: l.tutorialTapGap(1, 2), target: () => _gapCenter(b, 0));
+          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul), balloon: BalloonAt.top)
+          : CoachStep(text: l.tutorialTapGap(1, 2), target: () => _gapCenter(b, 0), balloon: BalloonAt.below);
     }
     if (b.binaryAt(1) == null) {
       return selectedGap(1)
-          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul))
-          : CoachStep(text: l.tutorialLinkThree, target: () => _gapCenter(b, 1));
+          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul), balloon: BalloonAt.top)
+          : CoachStep(text: l.tutorialLinkThree, target: () => _gapCenter(b, 1), balloon: BalloonAt.below);
     }
     if (b.eqGap == null) {
       return selectedGap(2)
-          ? CoachStep(text: l.tutorialPickEquals, target: () => _paletteKeys.globalCenter('='))
-          : CoachStep(text: l.tutorialEqualsGap, target: () => _gapCenter(b, 2));
+          ? CoachStep(text: l.tutorialPickEquals, target: () => _paletteKeys.globalCenter('='), balloon: BalloonAt.top)
+          : CoachStep(text: l.tutorialEqualsGap, target: () => _gapCenter(b, 2), balloon: BalloonAt.below);
     }
     return CoachStep(text: l.tutorialVerify, target: () => _globalCenterOf(_verifyKey));
   }
@@ -689,20 +689,23 @@ class _GamePageState extends ConsumerState<GamePage> {
 
   Widget _mobile(BuildContext context, GameState state, BoxConstraints c) {
     final tall = c.maxHeight >= 720;
-    final fixed = [
+    final top = [
       _GameHeader(state: state),
-      const SizedBox(height: 10),
+      const SizedBox(height: 14),
       _TimerBar(state: state, onPause: _ctrl.pause),
-      const SizedBox(height: 10),
-      _DigitsStrip(digits: state.board.digits),
+      const SizedBox(height: 8),
     ];
-    final bottom = [
+    final middle = [
+      const SizedBox(height: 12),
       _formula(state),
-      const SizedBox(height: 10),
+      const SizedBox(height: 14),
       _Feedback(state: state, showHint: false),
       _palette(state),
-      const SizedBox(height: 10),
-      _Actions(
+      const SizedBox(height: 16),
+    ];
+    final actions = Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: _Actions(
         state: state,
         onUndo: _ctrl.undo,
         onSkip: _skip,
@@ -711,24 +714,24 @@ class _GamePageState extends ConsumerState<GamePage> {
         onHint: _hint,
         verifyKey: _verifyKey,
       ),
-      const SizedBox(height: 12),
-    ];
+    );
 
-    final content = tall
-        ? Column(
-            children: [
-              ...fixed,
-              Expanded(child: _tree(state)),
-              ...bottom,
+    final content = Column(
+      children: tall
+          ? [...top, Expanded(child: _tree(state)), ...middle, actions]
+          : [
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...top,
+                    SizedBox(height: 230, child: _tree(state)),
+                    ...middle,
+                  ],
+                ),
+              ),
+              actions,
             ],
-          )
-        : ListView(
-            children: [
-              ...fixed,
-              SizedBox(height: 240, child: _tree(state)),
-              ...bottom,
-            ],
-          );
+    );
 
     return Stack(
       children: [
@@ -823,7 +826,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 }
 
-String _subtitle(BuildContext context, GameState s, int? points, {int streak = 0}) {
+String _subtitle(BuildContext context, GameState s) {
   final l = context.l10n;
   final parts = [
     if (s.practice) l.practiceShort else s.mode.label(l).toLowerCase(),
@@ -832,9 +835,6 @@ String _subtitle(BuildContext context, GameState s, int? points, {int streak = 0
     if (s.run case final run?) ...[
       l.runPlates(run.solved),
       if (run.kind == ChallengeKind.clock) l.runStep(run.step + 1) else _hearts(run.lives),
-    ] else ...[
-      if (points != null) l.pointsShort(points),
-      if (streak > 0 && !s.practice) l.streakShort(streak),
     ],
   ];
   return parts.join(' · ');
@@ -854,15 +854,13 @@ String _opLabel(Enum op) => switch (op) {
   _ => op.name,
 };
 
-class _GameHeader extends ConsumerWidget {
+class _GameHeader extends StatelessWidget {
   const _GameHeader({required this.state});
   final GameState state;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final profile = ref.watch(profileProvider).value;
-    final points = profile?.totalPoints;
     return Row(
       children: [
         const BrandHome(logoSize: 30, wordmark: false),
@@ -875,21 +873,21 @@ class _GameHeader extends ConsumerWidget {
                 '${context.l10n.infoNumber} ${state.number}',
                 style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1),
               ),
-              InkWell(
-                onTap: () => showHelpDialog(context, scoring: true),
-                child: Text(
-                  _subtitle(context, state, points, streak: profile?.streak ?? 0),
-                  style: t.bodySmall?.copyWith(color: context.bp.muted),
-                ),
+              Text(
+                _subtitle(context, state),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: t.bodySmall?.copyWith(color: context.bp.muted),
               ),
             ],
           ),
         ),
-        const LiveValuesToggle(),
-        const SizedBox(width: 6),
-        const HelpButton(),
-        const SizedBox(width: 6),
-        const SoundToggle(),
+        const SizedBox(width: 8),
+        const LiveValuesToggle(size: 40),
+        const SizedBox(width: 8),
+        const HelpButton(size: 40),
+        const SizedBox(width: 8),
+        const SoundToggle(size: 40),
       ],
     );
   }
@@ -1063,37 +1061,6 @@ class _TimerBar extends StatelessWidget {
   }
 }
 
-class _DigitsStrip extends StatelessWidget {
-  const _DigitsStrip({required this.digits});
-  final List<int> digits;
-
-  @override
-  Widget build(BuildContext context) {
-    final bp = context.bp;
-    return Container(
-      decoration: BoxDecoration(border: Border.all(color: bp.ink.withValues(alpha: 0.7))),
-      child: Row(
-        children: [
-          for (var i = 0; i < digits.length; i++)
-            Expanded(
-              child: Container(
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  border: i == 3 ? null : Border(right: BorderSide(color: bp.lineSoft)),
-                ),
-                child: Text(
-                  '${digits[i]}',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 class _Feedback extends StatelessWidget {
   const _Feedback({required this.state, required this.showHint});
   final GameState state;
@@ -1235,7 +1202,8 @@ class _Actions extends StatelessWidget {
       verifyLabel = showKeys ? '${l.verify} · Enter' : l.verify;
       canVerify = playing;
     }
-    final row = Row(
+    final timeUp = state.timeUp && playing && state.run == null;
+    return Row(
       children: [
         BoxIconButton(icon: Icons.undo, tooltip: l.undo, size: 48, onPressed: playing && state.canUndo ? onUndo : null),
         const SizedBox(width: 8),
@@ -1245,17 +1213,23 @@ class _Actions extends StatelessWidget {
         ],
         Expanded(
           flex: 2,
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
-            onPressed: state.phase == GamePhase.playing ? onSkip : null,
-            child: FittedBox(
-              child: Text(switch (state.run?.kind) {
-                ChallengeKind.clock => l.runSkip(ChallengeRun.skipPenalty),
-                ChallengeKind.restricted => l.runSkipLife,
-                null => showKeys ? '${l.skip} · Esc' : l.skip,
-              }),
-            ),
-          ),
+          child: timeUp
+              ? OutlinedButton(
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
+                  onPressed: onRevealSolution,
+                  child: FittedBox(child: Text(l.seeSolutionShort)),
+                )
+              : OutlinedButton(
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
+                  onPressed: state.phase == GamePhase.playing ? onSkip : null,
+                  child: FittedBox(
+                    child: Text(switch (state.run?.kind) {
+                      ChallengeKind.clock => l.runSkip(ChallengeRun.skipPenalty),
+                      ChallengeKind.restricted => l.runSkipLife,
+                      null => showKeys ? '${l.skip} · Esc' : l.skip,
+                    }),
+                  ),
+                ),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -1265,19 +1239,6 @@ class _Actions extends StatelessWidget {
             onPressed: canVerify ? onVerify : null,
             child: FittedBox(child: Text(verifyLabel)),
           ),
-        ),
-      ],
-    );
-    if (!(state.timeUp && playing)) return row;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        row,
-        const SizedBox(height: 8),
-        TextButton.icon(
-          onPressed: onRevealSolution,
-          icon: const Icon(Icons.lightbulb_outline, size: 18),
-          label: Text(l.seeSolution),
         ),
       ],
     );

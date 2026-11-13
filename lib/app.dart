@@ -42,7 +42,11 @@ class EmplakeApp extends ConsumerWidget {
             textScaler: TextScaler.linear(scale),
             disableAnimations: mq.disableAnimations || settings.reduceMotion,
           ),
-          child: child!,
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => ref.read(soundProvider).onFirstGesture(),
+            child: child!,
+          ),
         );
       },
     );

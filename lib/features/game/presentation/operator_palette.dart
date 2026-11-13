@@ -77,7 +77,7 @@ class OperatorPalette extends StatelessWidget {
           '${l.paletteBetween} · $betweenHint',
           opacity: canLinkGap || canEquals || binaryNode != null || carried != null ? 0.75 : 0.5,
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         _Grid(
           columns: binaryOps.length + 1,
           children: [
@@ -113,9 +113,9 @@ class OperatorPalette extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
         Eyebrow('${l.paletteOver} · ${l.paletteTapNode}', opacity: nodeSelected ? 0.75 : 0.45),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         _Grid(
           columns: 5,
           dashed: true,

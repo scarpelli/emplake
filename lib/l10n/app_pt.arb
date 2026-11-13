@@ -173,7 +173,6 @@
   "practiceModeHint": "Jogue no seu ritmo. Não vale pontos e não entra no histórico.",
   "practiceShort": "treino",
   "practiceTimer": "sem relógio",
-  "practiceNoPoints": "Treino: sem pontos, no seu ritmo.",
   "pointsShort": "{points} pts",
   "@pointsShort": {
     "placeholders": {
@@ -294,6 +293,8 @@
   "skipYes": "SIM, MOSTRAR",
   "skipNo": "NÃO, PULAR",
   "seeSolution": "Ver uma solução",
+  "seeSolutionShort": "SOLUÇÃO",
+  "@seeSolutionShort": {"description": "Ação curta no lugar de Pular quando o tempo acaba: ver uma solução."},
   "verify": "VERIFICAR",
   "linksLeft": "{count, plural, =1{FALTA 1 LIGAÇÃO} other{FALTAM {count} LIGAÇÕES}}",
   "@linksLeft": {
@@ -424,43 +425,6 @@
   },
   "points": "PONTOS",
   "total": "TOTAL",
-  "pointsBreakdown": "{base} base + {bonus} pelo tempo",
-  "@pointsBreakdown": {
-    "placeholders": {
-      "base": {
-        "type": "int"
-      },
-      "bonus": {
-        "type": "int"
-      }
-    }
-  },
-  "pointsLateZero": "Fora do tempo não vale pontos.",
-  "pointsReplayZero": "Você já tinha resolvido este número neste nível, então ele não vale pontos de novo.",
-  "howScoringWorks": "Como funciona?",
-  "scoreHints": "dicas ×{percent}%",
-  "@scoreHints": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "scoreBlind": "às cegas ×1,25",
-  "scoreStreak": "sequência {count}: +{percent}%",
-  "@scoreStreak": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "achievementUnlocked": "Conquista: {title}",
   "@achievementUnlocked": {
     "placeholders": {
@@ -470,22 +434,6 @@
     }
   },
   "achievementBanner": "CONQUISTA DESBLOQUEADA",
-  "savedSolved": "{number} salvo nos seus resolvidos",
-  "@savedSolved": {
-    "placeholders": {
-      "number": {
-        "type": "String"
-      }
-    }
-  },
-  "savedCounts": "{number} conta como resolvido",
-  "@savedCounts": {
-    "placeholders": {
-      "number": {
-        "type": "String"
-      }
-    }
-  },
   "savedReplay": "{number} já estava nos seus resolvidos",
   "@savedReplay": {
     "placeholders": {

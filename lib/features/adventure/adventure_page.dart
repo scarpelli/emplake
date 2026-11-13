@@ -56,12 +56,10 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
     return LayoutBuilder(
       builder: (context, c) {
         final wide = c.maxWidth >= 1000;
-        final pad = wide ? const EdgeInsets.fromLTRB(28, 20, 28, 20) : const EdgeInsets.fromLTRB(16, 12, 16, 0);
+        final pad = wide ? const EdgeInsets.fromLTRB(28, 20, 28, 20) : const EdgeInsets.fromLTRB(20, 12, 20, 0);
         final header = ModeHeader(
           title: l.modeAdventure,
-          trailing: progress == null
-              ? null
-              : Text('${progress.done} / ${progress.total}', style: t.titleMedium?.copyWith(letterSpacing: 1)),
+          helpScoring: true,
         );
         if (progress == null) {
           return Padding(
@@ -86,21 +84,24 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
         _scrollToFocus();
         final focus = progress.focus;
         final intro = Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l.adventureStarsRule, style: t.bodySmall?.copyWith(color: bp.muted)),
               if (focus != null)
-                FilledButton.icon(
-                  onPressed: () => _play(focus),
-                  icon: const Icon(Icons.play_arrow, size: 18),
-                  label: Text(l.adventureContinue(focus.number)),
+                Flexible(
+                  child: FilledButton.icon(
+                    onPressed: () => _play(focus),
+                    icon: const Icon(Icons.play_arrow, size: 18),
+                    label: Text(l.adventureContinue(focus.number)),
+                  ),
                 )
               else if (progress.done == progress.total)
-                Text(l.adventureAllDone, style: t.titleSmall?.copyWith(color: bp.ok)),
+                Flexible(
+                  child: Text(l.adventureAllDone, style: t.titleSmall?.copyWith(color: bp.ok)),
+                ),
+              const SizedBox(width: 16),
+              Text('${progress.done} / ${progress.total}', style: t.titleMedium?.copyWith(letterSpacing: 1)),
             ],
           ),
         );

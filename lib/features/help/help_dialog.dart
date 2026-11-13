@@ -281,6 +281,7 @@ class _ScoringTab extends StatelessWidget {
       _Bullet(l.helpScoringReplay),
       _Bullet(l.helpScoringPractice),
       _Bullet(l.helpScoringPause(Level.pauseSeconds)),
+      _Bullet('${l.modeAdventure}: ${l.adventureStarsRule}'),
     ]);
   }
 }

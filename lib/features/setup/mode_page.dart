@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +46,14 @@ class _ModePageState extends ConsumerState<ModePage> {
     GameMode.specific,
   ];
 
+  PointerDeviceKind? _lastPointer;
+
+  void _open(GameMode m) {
+    final direct = m == _mode || _lastPointer == PointerDeviceKind.touch;
+    setState(() => _mode = m);
+    if (direct) _continue();
+  }
+
   void _continue() {
     if (_mode == GameMode.educational) {
       context.go('/play/learn');
@@ -63,6 +72,7 @@ class _ModePageState extends ConsumerState<ModePage> {
     final t = Theme.of(context).textTheme;
     final bp = context.bp;
     final user = ref.watch(authStateProvider).value;
+    final narrow = MediaQuery.sizeOf(context).width < 600;
     final fallbackName = (user?.displayName?.split(' ').first ?? l.player).toUpperCase();
 
     return ContentWidth(
@@ -114,75 +124,81 @@ class _ModePageState extends ConsumerState<ModePage> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverList.separated(
               itemCount: _listed.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, i) {
                 final m = _listed[i];
                 final selected = m == _mode;
-                return SelectTile(
-                  selected: selected,
-                  enabled: m.isAvailable,
-                  onTap: () => m == _mode ? _continue() : setState(() => _mode = m),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(_icons[m]),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    m.label(l),
-                                    style: t.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: selected ? bp.onInk : bp.ink,
+                return Listener(
+                  onPointerDown: (e) => _lastPointer = e.kind,
+                  child: SelectTile(
+                    selected: selected,
+                    enabled: m.isAvailable,
+                    onTap: () => _open(m),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(_icons[m]),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      m.label(l),
+                                      style: t.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: selected ? bp.onInk : bp.ink,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                if (!m.isAvailable)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(border: Border.all(color: bp.line)),
-                                    child: Text(l.comingSoon, style: t.labelSmall?.copyWith(letterSpacing: 1)),
-                                  )
-                                else
-                                  Text(
-                                    (i + 1).toString().padLeft(2, '0'),
-                                    style: t.labelSmall?.copyWith(color: selected ? bp.onInk : bp.muted),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              m.description(l),
-                              style: t.bodySmall?.copyWith(
-                                height: 1.4,
-                                color: (selected ? bp.onInk : bp.ink).withValues(alpha: 0.8),
+                                  if (!m.isAvailable)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(border: Border.all(color: bp.line)),
+                                      child: Text(l.comingSoon, style: t.labelSmall?.copyWith(letterSpacing: 1)),
+                                    )
+                                  else
+                                    Text(
+                                      (i + 1).toString().padLeft(2, '0'),
+                                      style: t.labelSmall?.copyWith(color: selected ? bp.onInk : bp.muted),
+                                    ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              Text(
+                                m.description(l),
+                                style: t.bodySmall?.copyWith(
+                                  height: 1.4,
+                                  color: (selected ? bp.onInk : bp.ink).withValues(alpha: 0.8),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(20),
-            sliver: SliverToBoxAdapter(
-              child: FilledButton.icon(
-                iconAlignment: IconAlignment.end,
-                icon: const Icon(Icons.arrow_forward),
-                label: Text(l.continueLabel),
-                onPressed: _continue,
+          if (narrow)
+            const SliverToBoxAdapter(child: SizedBox(height: 28))
+          else
+            SliverPadding(
+              padding: const EdgeInsets.all(20),
+              sliver: SliverToBoxAdapter(
+                child: FilledButton.icon(
+                  iconAlignment: IconAlignment.end,
+                  icon: const Icon(Icons.arrow_forward),
+                  label: Text(l.continueLabel),
+                  onPressed: _continue,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

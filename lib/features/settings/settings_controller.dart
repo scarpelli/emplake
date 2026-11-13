@@ -184,7 +184,7 @@ class SettingsController extends Notifier<AppSettings> {
     if (state.anySound) {
       _set(state.copyWith(sfx: false, music: false));
     } else {
-      _set(state.copyWith(sfx: true));
+      _set(state.copyWith(sfx: true, music: true));
     }
   }
 }

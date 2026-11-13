@@ -39,4 +39,21 @@ void main() {
     addTearDown(fresh.dispose);
     expect(fresh.read(settingsProvider).themeMode, ThemeMode.system);
   });
+
+  test('the sound button turns effects and music on together, and both off', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final c = ProviderContainer(overrides: [sharedPreferencesProvider.overrideWithValue(prefs)]);
+    addTearDown(c.dispose);
+    final ctrl = c.read(settingsProvider.notifier);
+    expect(c.read(settingsProvider).anySound, isFalse);
+
+    ctrl.toggleSound();
+    expect(c.read(settingsProvider).sfx, isTrue);
+    expect(c.read(settingsProvider).music, isTrue);
+
+    ctrl.toggleSound();
+    expect(c.read(settingsProvider).sfx, isFalse);
+    expect(c.read(settingsProvider).music, isFalse);
+  });
 }

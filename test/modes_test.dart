@@ -69,6 +69,14 @@ void main() {
       expect(p.done, 0);
     });
 
+    test('after the tutorial (no stage), "next stage" is the current one: stage 1', () {
+      final fresh = AdventureProgress.from(catalog, const {});
+      expect(fresh.focus?.number, 1);
+      final first = fresh.columns.first.stages;
+      final skippedOne = AdventureProgress.from(catalog, {first[1].entry.id: 3});
+      expect(skippedOne.focus?.number, 1);
+    });
+
     test('a window of 3 after the current stage; later columns locked', () {
       final p = AdventureProgress.from(catalog, const {});
       final easy = p.columns.first.stages;

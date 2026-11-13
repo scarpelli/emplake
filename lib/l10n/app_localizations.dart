@@ -544,12 +544,6 @@ abstract class AppLocalizations {
   /// **'sem relógio'**
   String get practiceTimer;
 
-  /// No description provided for @practiceNoPoints.
-  ///
-  /// In pt, this message translates to:
-  /// **'Treino: sem pontos, no seu ritmo.'**
-  String get practiceNoPoints;
-
   /// No description provided for @pointsShort.
   ///
   /// In pt, this message translates to:
@@ -777,6 +771,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Ver uma solução'**
   String get seeSolution;
+
+  /// Ação curta no lugar de Pular quando o tempo acaba: ver uma solução.
+  ///
+  /// In pt, this message translates to:
+  /// **'SOLUÇÃO'**
+  String get seeSolutionShort;
 
   /// No description provided for @verify.
   ///
@@ -1108,48 +1108,6 @@ abstract class AppLocalizations {
   /// **'TOTAL'**
   String get total;
 
-  /// No description provided for @pointsBreakdown.
-  ///
-  /// In pt, this message translates to:
-  /// **'{base} base + {bonus} pelo tempo'**
-  String pointsBreakdown(int base, int bonus);
-
-  /// No description provided for @pointsLateZero.
-  ///
-  /// In pt, this message translates to:
-  /// **'Fora do tempo não vale pontos.'**
-  String get pointsLateZero;
-
-  /// No description provided for @pointsReplayZero.
-  ///
-  /// In pt, this message translates to:
-  /// **'Você já tinha resolvido este número neste nível, então ele não vale pontos de novo.'**
-  String get pointsReplayZero;
-
-  /// No description provided for @howScoringWorks.
-  ///
-  /// In pt, this message translates to:
-  /// **'Como funciona?'**
-  String get howScoringWorks;
-
-  /// No description provided for @scoreHints.
-  ///
-  /// In pt, this message translates to:
-  /// **'dicas ×{percent}%'**
-  String scoreHints(int count, int percent);
-
-  /// No description provided for @scoreBlind.
-  ///
-  /// In pt, this message translates to:
-  /// **'às cegas ×1,25'**
-  String get scoreBlind;
-
-  /// No description provided for @scoreStreak.
-  ///
-  /// In pt, this message translates to:
-  /// **'sequência {count}: +{percent}%'**
-  String scoreStreak(int count, int percent);
-
   /// No description provided for @achievementUnlocked.
   ///
   /// In pt, this message translates to:
@@ -1161,18 +1119,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'CONQUISTA DESBLOQUEADA'**
   String get achievementBanner;
-
-  /// No description provided for @savedSolved.
-  ///
-  /// In pt, this message translates to:
-  /// **'{number} salvo nos seus resolvidos'**
-  String savedSolved(String number);
-
-  /// No description provided for @savedCounts.
-  ///
-  /// In pt, this message translates to:
-  /// **'{number} conta como resolvido'**
-  String savedCounts(String number);
 
   /// No description provided for @savedReplay.
   ///

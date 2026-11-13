@@ -37,6 +37,14 @@ class SoundService {
     }
   }
 
+  bool _gestureSeen = false;
+
+  void onFirstGesture() {
+    if (_gestureSeen) return;
+    _gestureSeen = true;
+    resumeMusicIfEnabled();
+  }
+
   void resumeMusicIfEnabled() {
     if (_ref.read(settingsProvider).music) _startMusic();
   }

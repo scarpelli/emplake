@@ -85,7 +85,8 @@ class BoxIconButton extends StatelessWidget {
 }
 
 class SoundToggle extends ConsumerWidget {
-  const SoundToggle({super.key});
+  const SoundToggle({super.key, this.size = 44});
+  final double size;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,13 +95,15 @@ class SoundToggle extends ConsumerWidget {
     return BoxIconButton(
       icon: on ? Icons.volume_up_outlined : Icons.volume_off_outlined,
       tooltip: on ? l.soundOn : l.soundOff,
+      size: size,
       onPressed: () => ref.read(settingsProvider.notifier).toggleSound(),
     );
   }
 }
 
 class HelpButton extends StatelessWidget {
-  const HelpButton({super.key, this.scoring = false});
+  const HelpButton({super.key, this.scoring = false, this.size = 44});
+  final double size;
 
   final bool scoring;
 
@@ -108,12 +111,14 @@ class HelpButton extends StatelessWidget {
   Widget build(BuildContext context) => BoxIconButton(
     icon: Icons.help_outline,
     tooltip: context.l10n.navHelp,
+    size: size,
     onPressed: () => showHelpDialog(context, scoring: scoring),
   );
 }
 
 class LiveValuesToggle extends ConsumerWidget {
-  const LiveValuesToggle({super.key});
+  const LiveValuesToggle({super.key, this.size = 44});
+  final double size;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -122,6 +127,7 @@ class LiveValuesToggle extends ConsumerWidget {
     return BoxIconButton(
       icon: on ? Icons.visibility_outlined : Icons.visibility_off_outlined,
       tooltip: on ? l.liveValuesHide : l.liveValuesShow,
+      size: size,
       onPressed: () => ref.read(settingsProvider.notifier).toggleLiveValues(),
     );
   }

@@ -40,7 +40,7 @@ class ChallengesPage extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final wide = c.maxWidth >= 760;
-        final pad = wide ? const EdgeInsets.fromLTRB(28, 20, 28, 20) : const EdgeInsets.fromLTRB(16, 12, 16, 0);
+        final pad = wide ? const EdgeInsets.fromLTRB(28, 20, 28, 20) : const EdgeInsets.fromLTRB(20, 12, 20, 0);
         final note = Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Text(l.challengeLadder, style: t.bodySmall?.copyWith(color: bp.muted)),

@@ -4,10 +4,19 @@ import 'package:flutter/scheduler.dart';
 import '../../../core/l10n_helpers.dart';
 import '../../../core/theme/blueprint.dart';
 
+enum BalloonAt {
+  auto,
+
+  below,
+
+  top,
+}
+
 class CoachStep {
-  const CoachStep({required this.text, this.target});
+  const CoachStep({required this.text, this.target, this.balloon = BalloonAt.auto});
 
   final String text;
+  final BalloonAt balloon;
 
   final Offset? Function()? target;
 }
@@ -49,7 +58,12 @@ class _CoachOverlayState extends State<CoachOverlay> with SingleTickerProviderSt
     return LayoutBuilder(
       builder: (context, c) {
         const balloonW = 280.0;
-        final below = at == null || at.dy < c.maxHeight / 2;
+        final place = widget.step.balloon;
+        final below =
+            at == null ||
+            (place == BalloonAt.below && at.dy + 180 < c.maxHeight) ||
+            (place == BalloonAt.auto && at.dy < c.maxHeight / 2);
+        const topSlot = 112.0;
         final left = ((at?.dx ?? c.maxWidth / 2) - balloonW / 2).clamp(8.0, c.maxWidth - balloonW - 8);
         final balloon = Material(
           color: bp.ink,
@@ -99,8 +113,12 @@ class _CoachOverlayState extends State<CoachOverlay> with SingleTickerProviderSt
             Positioned(
               left: left,
               width: balloonW,
-              top: at == null ? 12 : (below ? at.dy + 40 : null),
-              bottom: at != null && !below ? c.maxHeight - at.dy + 40 : null,
+              top: at == null
+                  ? 12
+                  : place == BalloonAt.top
+                  ? topSlot
+                  : (below ? at.dy + 40 : null),
+              bottom: at != null && place != BalloonAt.top && !below ? c.maxHeight - at.dy + 40 : null,
               child: balloon,
             ),
           ],

@@ -280,9 +280,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get practiceTimer => 'no clock';
 
   @override
-  String get practiceNoPoints => 'Practice: no points, at your own pace.';
-
-  @override
   String pointsShort(int points) {
     return '$points pts';
   }
@@ -422,6 +419,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seeSolution => 'See a solution';
+
+  @override
+  String get seeSolutionShort => 'SOLUTION';
 
   @override
   String get verify => 'CHECK';
@@ -622,50 +622,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get total => 'TOTAL';
 
   @override
-  String pointsBreakdown(int base, int bonus) {
-    return '$base base + $bonus for time';
-  }
-
-  @override
-  String get pointsLateZero => 'No points when out of time.';
-
-  @override
-  String get pointsReplayZero =>
-      'You had already solved this number on this level, so it gives no points again.';
-
-  @override
-  String get howScoringWorks => 'How does it work?';
-
-  @override
-  String scoreHints(int count, int percent) {
-    return 'hints ×$percent%';
-  }
-
-  @override
-  String get scoreBlind => 'blind ×1.25';
-
-  @override
-  String scoreStreak(int count, int percent) {
-    return 'streak $count: +$percent%';
-  }
-
-  @override
   String achievementUnlocked(String title) {
     return 'Achievement: $title';
   }
 
   @override
   String get achievementBanner => 'ACHIEVEMENT UNLOCKED';
-
-  @override
-  String savedSolved(String number) {
-    return '$number saved to your solved numbers';
-  }
-
-  @override
-  String savedCounts(String number) {
-    return '$number counts as solved';
-  }
 
   @override
   String savedReplay(String number) {

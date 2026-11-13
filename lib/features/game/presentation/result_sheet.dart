@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n_helpers.dart';
 import '../../../core/theme/blueprint.dart';
 import '../../../core/widgets/bp_widgets.dart';
-import '../../help/help_dialog.dart';
 import '../application/game_controller.dart';
 import '../domain/challenge.dart';
 import '../domain/format.dart';
@@ -46,29 +45,7 @@ class ResultSheet extends StatelessWidget {
     final revealed = state.phase == GamePhase.revealed;
     final inTime = state.solvedInTime && !revealed;
     final accent = revealed ? bp.ink : (inTime ? bp.ok : bp.accent);
-    final sc = state.score;
-    final String breakdown;
-    if (state.practice) {
-      breakdown = l.practiceNoPoints;
-    } else if (state.pointsEarned > 0) {
-      breakdown = [
-        l.pointsBreakdown(sc.base, sc.timeBonus),
-        if (sc.hints > 0) l.scoreHints(sc.hints, (sc.hintFactor * 100).round()),
-        if (sc.blind) l.scoreBlind,
-        if (sc.streak > 0) l.scoreStreak(sc.streak, ((sc.streakFactor - 1) * 100).round()),
-      ].join(' · ');
-    } else {
-      breakdown = !inTime ? l.pointsLateZero : l.pointsReplayZero;
-    }
-
-    final saved = switch (state.saveStatus) {
-      SaveStatus.saving => (Icons.cloud_upload_outlined, l.saving),
-      SaveStatus.savedNew when inTime => (Icons.cloud_done_outlined, l.savedSolved(state.number)),
-      SaveStatus.savedNew => (Icons.cloud_done_outlined, l.savedCounts(state.number)),
-      SaveStatus.savedReplay => (Icons.cloud_done_outlined, l.savedReplay(state.number)),
-      SaveStatus.failed => (Icons.cloud_off_outlined, l.saveError),
-      SaveStatus.none => (Icons.cloud_outlined, ''),
-    };
+    final saveFailed = !revealed && state.saveStatus == SaveStatus.failed;
 
     return Material(
       color: bp.panel,
@@ -77,7 +54,7 @@ class ResultSheet extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: bp.line)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -118,73 +95,43 @@ class ResultSheet extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             FormulaPanel(tokens: linearTokens(state.board), latex: latexOf(state.board), compact: true),
             if (stars != null && !revealed) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Semantics(
                 label: l.adventureStarsEarned(stars!),
                 excludeSemantics: true,
-                child: Row(
-                  children: [
-                    Text(
-                      '${'★' * stars!}${'☆' * (3 - stars!)}',
-                      style: t.headlineSmall?.copyWith(color: accent, letterSpacing: 4),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(l.adventureStarsRule, style: t.bodySmall?.copyWith(color: bp.muted)),
-                    ),
-                  ],
+                child: Text(
+                  '${'★' * stars!}${'☆' * (3 - stars!)}',
+                  textAlign: TextAlign.center,
+                  style: t.headlineMedium?.copyWith(color: accent, letterSpacing: 8),
                 ),
               ),
             ],
             if (!revealed) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   _Stat(label: l.points, value: '+${state.pointsEarned}'),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   _Stat(label: l.total, value: state.totalPoints?.toString() ?? '—'),
                 ],
               ),
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: () => showHelpDialog(context, scoring: true),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, size: 16, color: bp.muted),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(breakdown, style: t.bodySmall?.copyWith(color: bp.muted)),
-                      ),
-                      Text(
-                        l.howScoringWorks,
-                        style: t.bodySmall?.copyWith(color: bp.ink, decoration: TextDecoration.underline),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
-            if (!revealed && saved.$2.isNotEmpty) ...[
-              const SizedBox(height: 10),
+            if (saveFailed) ...[
+              const SizedBox(height: 12),
               Row(
                 children: [
-                  if (state.saveStatus == SaveStatus.saving)
-                    const SizedBox(width: 18, height: 18, child: BpLoader(size: 16))
-                  else
-                    Icon(saved.$1, size: 18, color: state.saveStatus == SaveStatus.failed ? bp.danger : bp.muted),
+                  Icon(Icons.cloud_off_outlined, size: 18, color: bp.danger),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(saved.$2, style: t.bodySmall?.copyWith(color: bp.muted)),
+                    child: Text(l.saveError, style: t.bodySmall?.copyWith(color: bp.muted)),
                   ),
                 ],
               ),
             ],
-            const SizedBox(height: 14),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
@@ -266,7 +213,7 @@ class _RunSheet extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: bp.line)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
