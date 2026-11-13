@@ -52,9 +52,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Try again';
 
   @override
-  String get coverSheet => 'SH. 00 · COVER';
-
-  @override
   String get plateCountry => 'BRAZIL';
 
   @override
@@ -63,15 +60,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coverTap => 'TAP TO START';
-
-  @override
-  String get coverProject => 'PROJECT';
-
-  @override
-  String get coverScale => 'SCALE';
-
-  @override
-  String get coverYear => 'YEAR';
 
   @override
   String get loginSubtitle => 'Sign in to save the numbers you solve.';
@@ -889,6 +877,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOut => 'Sign out';
+
+  @override
+  String get settingsReset => 'RESTORE DEFAULTS';
+
+  @override
+  String get settingsResetTitle => 'Restore the default settings?';
+
+  @override
+  String get settingsResetBody =>
+      'Theme, color, text size, game options, sound and language go back to the defaults. Your progress, points and records stay.';
 
   @override
   String get providerGoogle => 'Google';

@@ -52,9 +52,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get retry => 'Tentar de novo';
 
   @override
-  String get coverSheet => 'FL. 00 · CAPA';
-
-  @override
   String get plateCountry => 'BRASIL';
 
   @override
@@ -63,15 +60,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get coverTap => 'TOQUE PARA COMEÇAR';
-
-  @override
-  String get coverProject => 'PROJETO';
-
-  @override
-  String get coverScale => 'ESCALA';
-
-  @override
-  String get coverYear => 'ANO';
 
   @override
   String get loginSubtitle => 'Entre para salvar seus números resolvidos.';
@@ -892,6 +880,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get signOut => 'Sair';
+
+  @override
+  String get settingsReset => 'RESTAURAR PADRÃO';
+
+  @override
+  String get settingsResetTitle => 'Restaurar as configurações padrão?';
+
+  @override
+  String get settingsResetBody =>
+      'Tema, cor, tamanho do texto, opções de jogo, som e idioma voltam ao padrão. Seu progresso, pontos e recordes não mudam.';
 
   @override
   String get providerGoogle => 'Google';

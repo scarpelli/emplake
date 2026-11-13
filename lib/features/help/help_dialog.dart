@@ -245,15 +245,21 @@ class _ScoringTab extends StatelessWidget {
         child: Column(
           children: [
             row(header: true, [
-              SizedBox(width: 118, child: Eyebrow(l.infoLevel)),
-              Expanded(child: Eyebrow(l.helpScoringTime)),
-              Expanded(child: Eyebrow(l.helpScoringBaseCol)),
+              Expanded(flex: 3, child: Eyebrow(l.infoLevel)),
+              Expanded(flex: 2, child: Eyebrow(l.helpScoringTime)),
+              Expanded(flex: 2, child: Eyebrow(l.helpScoringBaseCol)),
             ]),
             for (final level in Level.values)
               row(last: level == Level.values.last, [
-                SizedBox(width: 118, child: Text(level.label(l), style: levelName)),
-                Expanded(child: Text('${level.seconds}s', style: t.bodyMedium)),
-                Expanded(child: Text(l.pointsShort(level.basePoints), style: t.bodyMedium)),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Text(level.label(l), style: levelName),
+                  ),
+                ),
+                Expanded(flex: 2, child: Text('${level.seconds}s', style: t.bodyMedium)),
+                Expanded(flex: 2, child: Text(l.pointsShort(level.basePoints), style: t.bodyMedium)),
               ]),
           ],
         ),

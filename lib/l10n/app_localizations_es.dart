@@ -52,9 +52,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get retry => 'Reintentar';
 
   @override
-  String get coverSheet => 'HJ. 00 · PORTADA';
-
-  @override
   String get plateCountry => 'BRASIL';
 
   @override
@@ -63,15 +60,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get coverTap => 'TOCA PARA EMPEZAR';
-
-  @override
-  String get coverProject => 'PROYECTO';
-
-  @override
-  String get coverScale => 'ESCALA';
-
-  @override
-  String get coverYear => 'AÑO';
 
   @override
   String get loginSubtitle =>
@@ -895,6 +883,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get signOut => 'Cerrar sesión';
+
+  @override
+  String get settingsReset => 'RESTAURAR VALORES PREDETERMINADOS';
+
+  @override
+  String get settingsResetTitle => '¿Restaurar los ajustes predeterminados?';
+
+  @override
+  String get settingsResetBody =>
+      'El tema, el color, el tamaño del texto, las opciones de juego, el sonido y el idioma vuelven a los predeterminados. Tu progreso, puntos y récords no cambian.';
 
   @override
   String get providerGoogle => 'Google';

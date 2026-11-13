@@ -243,19 +243,26 @@ class _ColumnPanel extends StatelessWidget {
                     style: t.bodySmall?.copyWith(color: bp.muted, letterSpacing: 1),
                   ),
                 ),
-                if (!column.unlocked) ...[
+                if (!column.unlocked || scrollable) ...[
                   const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(Icons.lock_outline, size: 14, color: bp.faint),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          l.adventureLockedColumn(AdventureProgress.checkpoint),
-                          style: t.bodySmall?.copyWith(color: bp.faint),
+                  Visibility(
+                    visible: !column.unlocked,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: Row(
+                      children: [
+                        Icon(Icons.lock_outline, size: 14, color: bp.faint),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            l.adventureLockedColumn(AdventureProgress.checkpoint),
+                            maxLines: 2,
+                            style: t.bodySmall?.copyWith(color: bp.faint),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ],

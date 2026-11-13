@@ -20,7 +20,6 @@ class CoverPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
-    final bp = context.bp;
     final t = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -37,13 +36,9 @@ class CoverPage extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(child: Eyebrow(l.coverSheet)),
-                          const HelpButton(),
-                          const SizedBox(width: 8),
-                          const SoundToggle(),
-                        ],
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [HelpButton(), SizedBox(width: 8), SoundToggle()],
                       ),
                       const Spacer(),
                       const _DimensionedPlate(),
@@ -52,16 +47,7 @@ class CoverPage extends ConsumerWidget {
                       const SizedBox(height: 28),
                       const _TapHint(),
                       const Spacer(),
-                      Container(
-                        decoration: BoxDecoration(border: Border.all(color: bp.line)),
-                        child: Row(
-                          children: [
-                            _TitleCell(label: l.coverProject, value: 'EMPLAKE'),
-                            _TitleCell(label: l.coverScale, value: '1:1'),
-                            _TitleCell(label: l.coverYear, value: '2026', last: true),
-                          ],
-                        ),
-                      ),
+                      const SizedBox(height: 44),
                     ],
                   ),
                 ),
@@ -104,34 +90,6 @@ class _TapHintState extends State<_TapHint> with SingleTickerProviderStateMixin 
             style: Theme.of(context).textTheme.labelLarge?.copyWith(letterSpacing: 2, fontWeight: FontWeight.w600),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TitleCell extends StatelessWidget {
-  const _TitleCell({required this.label, required this.value, this.last = false});
-  final String label;
-  final String value;
-  final bool last;
-
-  @override
-  Widget build(BuildContext context) {
-    final bp = context.bp;
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          border: last ? null : Border(right: BorderSide(color: bp.line)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Eyebrow(label, opacity: 0.6),
-            const SizedBox(height: 2),
-            Text(value, style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600)),
-          ],
-        ),
       ),
     );
   }

@@ -25,26 +25,29 @@ class AppShell extends StatelessWidget {
     return Scaffold(
       backgroundColor: bp.paper,
       body: GridBackground(child: SafeArea(bottom: false, child: shell)),
-      bottomNavigationBar: CurvedNavigationBar(
-        index: current,
-        height: 62,
-        color: bp.deep,
-        buttonBackgroundColor: bp.ink,
-        backgroundColor: bp.paper,
-        animationDuration: const Duration(milliseconds: 380),
-        items: [
-          for (var i = 0; i < icons.length; i++)
-            Tooltip(
-              message: icons[i].$2,
-              child: Semantics(
-                label: icons[i].$2,
-                button: true,
-                selected: i == current,
-                child: Icon(icons[i].$1, size: 26, color: i == current ? bp.onInk : bp.ink.withValues(alpha: 0.75)),
+      bottomNavigationBar: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: CurvedNavigationBar(
+          index: current,
+          height: 62,
+          color: bp.deep,
+          buttonBackgroundColor: bp.ink,
+          backgroundColor: bp.paper,
+          animationDuration: const Duration(milliseconds: 380),
+          items: [
+            for (var i = 0; i < icons.length; i++)
+              Tooltip(
+                message: icons[i].$2,
+                child: Semantics(
+                  label: icons[i].$2,
+                  button: true,
+                  selected: i == current,
+                  child: Icon(icons[i].$1, size: 26, color: i == current ? bp.onInk : bp.ink.withValues(alpha: 0.75)),
+                ),
               ),
-            ),
-        ],
-        onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
+          ],
+          onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
+        ),
       ),
     );
   }

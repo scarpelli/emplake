@@ -137,6 +137,24 @@ class SettingsPage extends ConsumerWidget {
           ]),
           section(l.languageSection, [const LanguagePicker(showNames: true)]),
           section(l.account, [const _AccountRow()]),
+          OutlinedButton.icon(
+            onPressed: () async {
+              final ok = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(l.settingsResetTitle),
+                  content: Text(l.settingsResetBody),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l.cancel)),
+                    FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l.settingsReset)),
+                  ],
+                ),
+              );
+              if (ok == true) ctrl.resetToDefaults();
+            },
+            icon: const Icon(Icons.restart_alt, size: 18),
+            label: Text(l.settingsReset),
+          ),
         ],
       ),
     );

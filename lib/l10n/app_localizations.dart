@@ -184,12 +184,6 @@ abstract class AppLocalizations {
   /// **'Tentar de novo'**
   String get retry;
 
-  /// No description provided for @coverSheet.
-  ///
-  /// In pt, this message translates to:
-  /// **'FL. 00 · CAPA'**
-  String get coverSheet;
-
   /// No description provided for @plateCountry.
   ///
   /// In pt, this message translates to:
@@ -207,24 +201,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'TOQUE PARA COMEÇAR'**
   String get coverTap;
-
-  /// No description provided for @coverProject.
-  ///
-  /// In pt, this message translates to:
-  /// **'PROJETO'**
-  String get coverProject;
-
-  /// No description provided for @coverScale.
-  ///
-  /// In pt, this message translates to:
-  /// **'ESCALA'**
-  String get coverScale;
-
-  /// No description provided for @coverYear.
-  ///
-  /// In pt, this message translates to:
-  /// **'ANO'**
-  String get coverYear;
 
   /// No description provided for @loginSubtitle.
   ///
@@ -1587,6 +1563,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Sair'**
   String get signOut;
+
+  /// No description provided for @settingsReset.
+  ///
+  /// In pt, this message translates to:
+  /// **'RESTAURAR PADRÃO'**
+  String get settingsReset;
+
+  /// No description provided for @settingsResetTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Restaurar as configurações padrão?'**
+  String get settingsResetTitle;
+
+  /// No description provided for @settingsResetBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tema, cor, tamanho do texto, opções de jogo, som e idioma voltam ao padrão. Seu progresso, pontos e recordes não mudam.'**
+  String get settingsResetBody;
 
   /// No description provided for @providerGoogle.
   ///

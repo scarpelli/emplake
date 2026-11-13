@@ -177,6 +177,9 @@ class SettingsController extends Notifier<AppSettings> {
     if (!state.tutorialDone) _set(state.copyWith(tutorialDone: true));
   }
 
+  void resetToDefaults() =>
+      _set(AppSettings(tutorialDone: state.tutorialDone, lessonsDone: state.lessonsDone, lastLevel: state.lastLevel));
+
   void toggleSound() {
     if (state.anySound) {
       _set(state.copyWith(sfx: false, music: false));

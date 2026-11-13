@@ -24,7 +24,7 @@ class BrandHome extends StatelessWidget {
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: InkWell(
-            onTap: () => context.go('/cover'),
+            onTap: () => context.go('/play'),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(

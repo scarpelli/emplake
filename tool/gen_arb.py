@@ -30,15 +30,11 @@ s('ok', 'OK', 'OK', 'OK')
 s('retry', 'Tentar de novo', 'Try again', 'Reintentar')
 
 # Cover
-s('coverSheet', 'FL. 00 · CAPA', 'SH. 00 · COVER', 'HJ. 00 · PORTADA')
 s('plateCountry', 'BRASIL', 'BRAZIL', 'BRASIL')
 s('coverTagline', 'Use os quatro dígitos da placa, na ordem, para montar uma igualdade verdadeira.',
   'Use the four digits of the plate, in order, to build a true equation.',
   'Usa los cuatro dígitos de la placa, en orden, para formar una igualdad verdadera.')
 s('coverTap', 'TOQUE PARA COMEÇAR', 'TAP TO START', 'TOCA PARA EMPEZAR')
-s('coverProject', 'PROJETO', 'PROJECT', 'PROYECTO')
-s('coverScale', 'ESCALA', 'SCALE', 'ESCALA')
-s('coverYear', 'ANO', 'YEAR', 'AÑO')
 
 # Login
 s('loginSubtitle', 'Entre para salvar seus números resolvidos.', 'Sign in to save the numbers you solve.',
@@ -386,6 +382,12 @@ s('music', 'Música', 'Music', 'Música')
 s('languageSection', 'IDIOMA', 'LANGUAGE', 'IDIOMA')
 s('account', 'CONTA', 'ACCOUNT', 'CUENTA')
 s('signOut', 'Sair', 'Sign out', 'Cerrar sesión')
+s('settingsReset', 'RESTAURAR PADRÃO', 'RESTORE DEFAULTS', 'RESTAURAR VALORES PREDETERMINADOS')
+s('settingsResetTitle', 'Restaurar as configurações padrão?', 'Restore the default settings?',
+  '¿Restaurar los ajustes predeterminados?')
+s('settingsResetBody', 'Tema, cor, tamanho do texto, opções de jogo, som e idioma voltam ao padrão. Seu progresso, pontos e recordes não mudam.',
+  'Theme, color, text size, game options, sound and language go back to the defaults. Your progress, points and records stay.',
+  'El tema, el color, el tamaño del texto, las opciones de juego, el sonido y el idioma vuelven a los predeterminados. Tu progreso, puntos y récords no cambian.')
 s('providerGoogle', 'Google', 'Google', 'Google')
 s('providerEmail', 'E-mail', 'Email', 'Correo')
 s('player', 'Jogador', 'Player', 'Jugador')
