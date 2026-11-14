@@ -19,6 +19,7 @@ import '../../adventure/adventure_store.dart';
 import '../../challenges/challenge_store.dart';
 import '../../achievements/achievements.dart';
 import '../../daily/daily.dart';
+import '../../help/help_page.dart';
 import '../../settings/settings_controller.dart';
 import '../application/catalog_provider.dart';
 import '../application/game_controller.dart';
@@ -927,7 +928,7 @@ class _DesktopHeader extends ConsumerWidget {
           Tooltip(
             message: l.helpScoringTitle,
             child: InkWell(
-              onTap: () => context.go('/help?tab=scoring'),
+              onTap: () => showHelp(context, tab: HelpTab.scoring),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 child: Text(l.pointsShort(points), style: t.labelLarge),

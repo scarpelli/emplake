@@ -15,7 +15,6 @@ import '../features/game/application/game_controller.dart';
 import '../features/game/domain/level.dart';
 import '../features/game/presentation/game_page.dart';
 import '../features/game/presentation/new_game_page.dart';
-import '../features/help/help_page.dart';
 import '../features/history/solved_page.dart';
 import '../features/settings/settings_page.dart';
 import '../features/setup/level_page.dart';
@@ -41,8 +40,7 @@ bool _isRestorable(String location) =>
     location.startsWith('/play') ||
     location == '/game' ||
     location.startsWith('/history') ||
-    location.startsWith('/settings') ||
-    location.startsWith('/help');
+    location.startsWith('/settings');
 
 final routerProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(firebaseAuthProvider);
@@ -62,6 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (loc == '/cover') return null;
       if (!signedIn) return loc == '/login' ? null : '/login';
       if (loc == '/login') return saved() ?? '/play';
+      // Help is a dialog now; old links and saved locations land on home.
+      if (loc.startsWith('/help')) return '/play';
       return null;
     },
     errorBuilder: (context, state) => Scaffold(body: Center(child: Text(context.l10n.notFound))),
@@ -134,17 +134,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: '/settings', builder: (_, _) => const SettingsPage())],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/help',
-                builder: (_, state) {
-                  final scoring = state.uri.queryParameters['tab'] == 'scoring';
-                  return HelpPage(key: ValueKey(scoring), initialTab: scoring ? 2 : 0);
-                },
-              ),
-            ],
           ),
         ],
       ),

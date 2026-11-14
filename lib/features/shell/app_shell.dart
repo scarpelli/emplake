@@ -6,13 +6,19 @@ import 'package:go_router/go_router.dart';
 import '../../core/l10n_helpers.dart';
 import '../../core/theme/blueprint.dart';
 import '../game/application/game_controller.dart';
+import '../help/help_page.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
 
+  static const _historyBranch = 1;
   static const _gameBranch = 2;
+
+  /// The help item is an action, not a branch: it opens a dialog over the
+  /// current page and the bar keeps pointing at where the user is.
+  static const _helpItem = 4;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,6 +59,13 @@ class AppShell extends ConsumerWidget {
                 ),
               ),
           ],
+          // The bar skips onTap when letIndexChange says no, so the help item
+          // is handled here: open the dialog and keep the bubble in place.
+          letIndexChange: (i) {
+            if (i != _helpItem) return true;
+            showHelp(context, tab: current == _historyBranch ? HelpTab.scoring : HelpTab.play);
+            return false;
+          },
           onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
         ),
       ),

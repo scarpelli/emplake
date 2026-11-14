@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n_helpers.dart';
 import '../../core/theme/blueprint.dart';
@@ -9,8 +12,172 @@ import '../game/domain/level.dart';
 import '../game/domain/solution_codec.dart';
 import '../game/presentation/tree_view.dart';
 
-class HelpPage extends StatelessWidget {
-  const HelpPage({super.key, this.initialTab = 0});
+enum HelpTab { play, operators, scoring }
+
+/// Below this width the help slides up as a bottom sheet; above it, it pops
+/// up as a centred dialog growing out of the help button.
+const _compactWidth = 600.0;
+
+/// Opens the help over the current screen. The game clock is held while it
+/// is open, so reading the rules mid-plate costs no time.
+Future<void> showHelp(BuildContext context, {HelpTab tab = HelpTab.play}) {
+  final game = ProviderScope.containerOf(context, listen: false).read(gameControllerProvider.notifier);
+  return game.whileHeld(
+    () => showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: context.l10n.close,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      transitionDuration: const Duration(milliseconds: 340),
+      pageBuilder: (_, _, _) => _HelpSheet(initialTab: tab.index),
+      transitionBuilder: (context, animation, _, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+        if (MediaQuery.sizeOf(context).width < _compactWidth) {
+          return SlideTransition(
+            position: Tween(begin: const Offset(0, 1), end: Offset.zero).animate(curved),
+            child: child,
+          );
+        }
+        // Grows out of the help button, the last item of the navigation bar.
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            alignment: const Alignment(0.8, 1),
+            scale: Tween(begin: 0.6, end: 1.0).animate(curved),
+            child: child,
+          ),
+        );
+      },
+    ),
+  );
+}
+
+class _HelpSheet extends StatefulWidget {
+  const _HelpSheet({required this.initialTab});
+
+  final int initialTab;
+
+  @override
+  State<_HelpSheet> createState() => _HelpSheetState();
+}
+
+class _HelpSheetState extends State<_HelpSheet> {
+  double _drag = 0;
+
+  void _onDragEnd(DragEndDetails d) {
+    if (_drag > 120 || (d.primaryVelocity ?? 0) > 700) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() => _drag = 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.width < _compactWidth;
+
+    final header = Padding(
+      padding: EdgeInsets.fromLTRB(20, compact ? 4 : 16, 8, 8),
+      child: PageTitle(
+        eyebrow: l.navHelp.toUpperCase(),
+        title: l.helpPageTitle,
+        trailing: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: l.close,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+    );
+
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (compact)
+          // Drag handle: pulling the sheet down closes it.
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onVerticalDragUpdate: (d) => setState(() => _drag = math.max(0, _drag + d.delta.dy)),
+            onVerticalDragEnd: _onDragEnd,
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                Container(width: 40, height: 4, color: bp.lineSoft),
+                header,
+              ],
+            ),
+          )
+        else
+          header,
+        Expanded(child: HelpContent(initialTab: widget.initialTab)),
+        Container(
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 12 + (compact ? MediaQuery.paddingOf(context).bottom : 0)),
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: bp.lineSoft)),
+          ),
+          alignment: Alignment.centerRight,
+          child: FilledButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l.helpGotIt),
+          ),
+        ),
+      ],
+    );
+
+    final panel = Semantics(
+      scopesRoute: true,
+      namesRoute: true,
+      explicitChildNodes: true,
+      label: l.helpPageTitle,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Container(
+          decoration: BoxDecoration(
+            border: compact ? Border(top: BorderSide(color: bp.line)) : Border.all(color: bp.line),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 24, offset: const Offset(0, 8))],
+          ),
+          child: GridBackground(child: body),
+        ),
+      ),
+    );
+
+    if (compact) {
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: _drag == 0 ? 200 : 0),
+          curve: Curves.easeOut,
+          transform: Matrix4.translationValues(0, _drag, 0),
+          height: size.height * 0.88,
+          width: double.infinity,
+          child: panel,
+        ),
+      );
+    }
+    return SafeArea(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: SizedBox(
+            width: 640,
+            height: math.min(size.height * 0.82, 760),
+            child: panel,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The three help tabs (how to play, operators, scoring).
+class HelpContent extends StatelessWidget {
+  const HelpContent({super.key, this.initialTab = 0});
 
   final int initialTab;
 
@@ -19,31 +186,25 @@ class HelpPage extends StatelessWidget {
     final l = context.l10n;
     final bp = context.bp;
 
-    return ContentWidth(
-      child: DefaultTabController(
-        length: 3,
-        initialIndex: initialTab,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              child: PageTitle(eyebrow: l.navHelp.toUpperCase(), title: l.helpPageTitle),
-            ),
-            TabBar(
-              labelColor: bp.ink,
-              unselectedLabelColor: bp.muted,
-              indicatorColor: bp.ink,
-              dividerColor: bp.lineSoft,
-              tabs: [
-                Tab(text: l.helpTabPlay),
-                Tab(text: l.helpTabOperators),
-                Tab(text: l.helpTabScoring),
-              ],
-            ),
-            const Expanded(child: TabBarView(children: [_PlayTab(), _OperatorsTab(), _ScoringTab()])),
-          ],
-        ),
+    return DefaultTabController(
+      length: 3,
+      initialIndex: initialTab,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TabBar(
+            labelColor: bp.ink,
+            unselectedLabelColor: bp.muted,
+            indicatorColor: bp.ink,
+            dividerColor: bp.lineSoft,
+            tabs: [
+              Tab(text: l.helpTabPlay),
+              Tab(text: l.helpTabOperators),
+              Tab(text: l.helpTabScoring),
+            ],
+          ),
+          const Expanded(child: TabBarView(children: [_PlayTab(), _OperatorsTab(), _ScoringTab()])),
+        ],
       ),
     );
   }

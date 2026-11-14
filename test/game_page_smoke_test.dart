@@ -28,15 +28,36 @@ Widget _app(Widget home, {List overrides = const []}) => ProviderScope(
 );
 
 void main() {
-  testWidgets('help opens on the scoring tab and explains hints and the blind bonus', (tester) async {
-    await tester.pumpWidget(_app(const HelpPage(initialTab: 2)));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Bônus de tempo'), findsOneWidget);
-    expect(find.textContaining('Às cegas'), findsOneWidget);
-    await tester.tap(find.text('OPERADORES'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Fatorial'), findsWidgets);
-  });
+  for (final (label, size) in [('phone', const Size(390, 844)), ('desktop', const Size(1280, 800))]) {
+    testWidgets('help dialog ($label) opens on the scoring tab and closes with GOT IT', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        _app(
+          Builder(
+            builder: (context) => Center(
+              child: TextButton(
+                onPressed: () => showHelp(context, tab: HelpTab.scoring),
+                child: const Text('help'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('help'));
+      await tester.pumpAndSettle();
+      expect(find.text('Como jogar'), findsOneWidget);
+      expect(find.textContaining('Bônus de tempo'), findsOneWidget);
+      expect(find.textContaining('Às cegas'), findsOneWidget);
+      await tester.tap(find.text('OPERADORES'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Fatorial'), findsWidgets);
+      await tester.tap(find.text('ENTENDI'));
+      await tester.pumpAndSettle();
+      expect(find.text('Como jogar'), findsNothing);
+    });
+  }
 
   testWidgets('achievements show at the top of the screen and leave by themselves', (tester) async {
     await tester.pumpWidget(
