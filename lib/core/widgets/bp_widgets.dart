@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../features/help/help_dialog.dart';
 import '../../features/settings/settings_controller.dart';
 import '../l10n_helpers.dart';
 import '../theme/blueprint.dart';
@@ -99,21 +98,6 @@ class SoundToggle extends ConsumerWidget {
       onPressed: () => ref.read(settingsProvider.notifier).toggleSound(),
     );
   }
-}
-
-class HelpButton extends StatelessWidget {
-  const HelpButton({super.key, this.scoring = false, this.size = 44});
-  final double size;
-
-  final bool scoring;
-
-  @override
-  Widget build(BuildContext context) => BoxIconButton(
-    icon: Icons.help_outline,
-    tooltip: context.l10n.navHelp,
-    size: size,
-    onPressed: () => showHelpDialog(context, scoring: scoring),
-  );
 }
 
 class LiveValuesToggle extends ConsumerWidget {

@@ -1,17 +1,21 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n_helpers.dart';
 import '../../core/theme/blueprint.dart';
+import '../game/application/game_controller.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
 
+  static const _gameBranch = 2;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bp = context.bp;
     final l = context.l10n;
     final current = shell.currentIndex;
@@ -20,7 +24,10 @@ class AppShell extends StatelessWidget {
       (Icons.history, l.navHistory),
       (Icons.account_tree_outlined, l.navGame),
       (Icons.settings_outlined, l.navSettings),
+      (Icons.help_outline, l.navHelp),
     ];
+    final away = current != _gameBranch;
+    WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(gameControllerProvider.notifier).setAway(away));
 
     return Scaffold(
       backgroundColor: bp.paper,

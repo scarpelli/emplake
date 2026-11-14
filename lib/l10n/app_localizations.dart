@@ -1504,6 +1504,12 @@ abstract class AppLocalizations {
   /// **'Escolher cor'**
   String get pickColor;
 
+  /// No description provided for @fontFamily.
+  ///
+  /// In pt, this message translates to:
+  /// **'TIPO DA FONTE'**
+  String get fontFamily;
+
   /// No description provided for @fontSize.
   ///
   /// In pt, this message translates to:
@@ -1593,6 +1599,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'COMO JOGAR'**
   String get helpTitle;
+
+  /// No description provided for @helpPageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como jogar'**
+  String get helpPageTitle;
 
   /// No description provided for @helpTabPlay.
   ///

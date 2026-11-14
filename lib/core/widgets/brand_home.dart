@@ -46,12 +46,10 @@ class BrandHome extends StatelessWidget {
 }
 
 class ModeHeader extends StatelessWidget {
-  const ModeHeader({super.key, required this.title, this.trailing, this.helpScoring = false});
+  const ModeHeader({super.key, required this.title, this.trailing});
 
   final String title;
   final Widget? trailing;
-
-  final bool helpScoring;
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +82,6 @@ class ModeHeader extends StatelessWidget {
               ),
               ?trailing,
               const SizedBox(width: 12),
-              HelpButton(scoring: helpScoring),
-              const SizedBox(width: 8),
               const SoundToggle(),
             ],
           ),

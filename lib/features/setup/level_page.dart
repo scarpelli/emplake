@@ -101,8 +101,6 @@ class _LevelPageState extends ConsumerState<LevelPage> {
                 ),
               ),
               const Spacer(),
-              const HelpButton(),
-              const SizedBox(width: 8),
               const SoundToggle(),
             ],
           ),

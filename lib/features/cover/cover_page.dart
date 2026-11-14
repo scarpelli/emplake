@@ -38,7 +38,7 @@ class CoverPage extends ConsumerWidget {
                     children: [
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.end,
-                        children: [HelpButton(), SizedBox(width: 8), SoundToggle()],
+                        children: [SoundToggle()],
                       ),
                       const Spacer(),
                       const _DimensionedPlate(),

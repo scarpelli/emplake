@@ -54,8 +54,6 @@ class LessonsPage extends ConsumerWidget {
                   ),
                 ),
               ),
-              const Spacer(),
-              const HelpButton(),
             ],
           ),
           const SizedBox(height: 16),

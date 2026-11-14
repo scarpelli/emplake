@@ -8,7 +8,7 @@ import 'package:emplake/features/game/domain/expr.dart';
 import 'package:emplake/features/game/domain/level.dart';
 import 'package:emplake/features/game/presentation/coach_overlay.dart';
 import 'package:emplake/features/game/presentation/game_page.dart';
-import 'package:emplake/features/help/help_dialog.dart';
+import 'package:emplake/features/help/help_page.dart';
 import 'package:emplake/features/settings/settings_controller.dart';
 import 'package:emplake/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -29,15 +29,7 @@ Widget _app(Widget home, {List overrides = const []}) => ProviderScope(
 
 void main() {
   testWidgets('help opens on the scoring tab and explains hints and the blind bonus', (tester) async {
-    await tester.pumpWidget(
-      _app(
-        Builder(
-          builder: (context) =>
-              TextButton(onPressed: () => showHelpDialog(context, scoring: true), child: const Text('open')),
-        ),
-      ),
-    );
-    await tester.tap(find.text('open'));
+    await tester.pumpWidget(_app(const HelpPage(initialTab: 2)));
     await tester.pumpAndSettle();
     expect(find.textContaining('Bônus de tempo'), findsOneWidget);
     expect(find.textContaining('Às cegas'), findsOneWidget);

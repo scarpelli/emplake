@@ -848,6 +848,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pickColor => 'Escolher cor';
 
   @override
+  String get fontFamily => 'TIPO DA FONTE';
+
+  @override
   String get fontSize => 'TAMANHO DA FONTE';
 
   @override
@@ -892,6 +895,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get helpTitle => 'COMO JOGAR';
+
+  @override
+  String get helpPageTitle => 'Como jogar';
 
   @override
   String get helpTabPlay => 'JOGAR';

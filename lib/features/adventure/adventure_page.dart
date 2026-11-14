@@ -70,7 +70,6 @@ class _AdventurePageState extends ConsumerState<AdventurePage> {
         final pad = wide ? const EdgeInsets.fromLTRB(28, 20, 28, 20) : const EdgeInsets.fromLTRB(20, 12, 20, 0);
         final header = ModeHeader(
           title: l.modeAdventure,
-          helpScoring: true,
         );
         if (progress == null) {
           return Padding(

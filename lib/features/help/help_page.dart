@@ -9,72 +9,40 @@ import '../game/domain/level.dart';
 import '../game/domain/solution_codec.dart';
 import '../game/presentation/tree_view.dart';
 
-Future<void> showHelpDialog(BuildContext context, {bool scoring = false}) => showDialog<void>(
-  context: context,
-  barrierColor: Colors.black.withValues(alpha: 0.5),
-  builder: (_) => HelpDialog(initialTab: scoring ? 2 : 0),
-);
-
-class HelpDialog extends StatelessWidget {
-  const HelpDialog({super.key, this.initialTab = 0});
+class HelpPage extends StatelessWidget {
+  const HelpPage({super.key, this.initialTab = 0});
 
   final int initialTab;
 
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    final t = Theme.of(context).textTheme;
     final bp = context.bp;
-    final size = MediaQuery.sizeOf(context);
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 520, maxHeight: size.height * 0.85),
-        child: DefaultTabController(
-          length: 3,
-          initialIndex: initialTab,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 12, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l.helpTitle,
-                        style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1.5),
-                      ),
-                    ),
-                    BoxIconButton(
-                      icon: Icons.close,
-                      tooltip: l.helpGotIt,
-                      size: 40,
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-              ),
-              TabBar(
-                labelColor: bp.ink,
-                unselectedLabelColor: bp.muted,
-                indicatorColor: bp.ink,
-                dividerColor: bp.lineSoft,
-                tabs: [
-                  Tab(text: l.helpTabPlay),
-                  Tab(text: l.helpTabOperators),
-                  Tab(text: l.helpTabScoring),
-                ],
-              ),
-              const Flexible(child: TabBarView(children: [_PlayTab(), _OperatorsTab(), _ScoringTab()])),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                child: FilledButton(onPressed: () => Navigator.of(context).pop(), child: Text(l.helpGotIt)),
-              ),
-            ],
-          ),
+    return ContentWidth(
+      child: DefaultTabController(
+        length: 3,
+        initialIndex: initialTab,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+              child: PageTitle(eyebrow: l.navHelp.toUpperCase(), title: l.helpPageTitle),
+            ),
+            TabBar(
+              labelColor: bp.ink,
+              unselectedLabelColor: bp.muted,
+              indicatorColor: bp.ink,
+              dividerColor: bp.lineSoft,
+              tabs: [
+                Tab(text: l.helpTabPlay),
+                Tab(text: l.helpTabOperators),
+                Tab(text: l.helpTabScoring),
+              ],
+            ),
+            const Expanded(child: TabBarView(children: [_PlayTab(), _OperatorsTab(), _ScoringTab()])),
+          ],
         ),
       ),
     );

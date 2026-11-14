@@ -33,7 +33,7 @@ class SettingsPage extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         children: [
-          PageTitle(eyebrow: l.settingsEyebrow, title: l.settingsTitle, trailing: const HelpButton()),
+          PageTitle(eyebrow: l.settingsEyebrow, title: l.settingsTitle),
           const SizedBox(height: 20),
           section(l.theme, [
             Row(
@@ -81,6 +81,21 @@ class SettingsPage extends ConsumerWidget {
                     ),
                   ),
                 ),
+              ],
+            ),
+          ]),
+          section(l.fontFamily, [
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final f in AppFont.values)
+                  SelectTile(
+                    selected: s.font == f,
+                    onTap: () => ctrl.setFont(f),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: Text(f.label, style: TextStyle(fontFamily: f.family)),
+                  ),
               ],
             ),
           ]),

@@ -844,6 +844,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickColor => 'Pick a color';
 
   @override
+  String get fontFamily => 'TYPEFACE';
+
+  @override
   String get fontSize => 'FONT SIZE';
 
   @override
@@ -888,6 +891,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpTitle => 'HOW TO PLAY';
+
+  @override
+  String get helpPageTitle => 'How to play';
 
   @override
   String get helpTabPlay => 'PLAY';

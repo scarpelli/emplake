@@ -19,7 +19,6 @@ import '../../adventure/adventure_store.dart';
 import '../../challenges/challenge_store.dart';
 import '../../achievements/achievements.dart';
 import '../../daily/daily.dart';
-import '../../help/help_dialog.dart';
 import '../../settings/settings_controller.dart';
 import '../application/catalog_provider.dart';
 import '../application/game_controller.dart';
@@ -257,7 +256,9 @@ class _GamePageState extends ConsumerState<GamePage> {
     if (s == null || !s.canHint) return;
     if (s.hintsUsed == 2) {
       final l = context.l10n;
-      final ok = await showChoiceDialog(context, title: l.hintRevealTitle, body: l.hintRevealBody, primary: l.skipYes);
+      final ok = await _ctrl.whileHeld(
+        () => showChoiceDialog(context, title: l.hintRevealTitle, body: l.hintRevealBody, primary: l.skipYes),
+      );
       if (ok != true || !mounted) return;
     }
     final solution = s.solution ?? await ref.read(solutionProvider((s.level, s.number)).future);
@@ -290,7 +291,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       }
       return;
     }
-    final show = await showSkipDialog(context, s.mode);
+    final show = await _ctrl.whileHeld(() => showSkipDialog(context, s.mode));
     if (show == null || !mounted) return;
     ref.read(repositoryProvider)?.recordSkip(s.level, s.number, revealed: show).catchError((_) {});
     _failDaily(s);
@@ -873,8 +874,6 @@ class _GameHeader extends StatelessWidget {
         const SizedBox(width: 8),
         const LiveValuesToggle(size: 40),
         const SizedBox(width: 8),
-        const HelpButton(size: 40),
-        const SizedBox(width: 8),
         const SoundToggle(size: 40),
       ],
     );
@@ -928,7 +927,7 @@ class _DesktopHeader extends ConsumerWidget {
           Tooltip(
             message: l.helpScoringTitle,
             child: InkWell(
-              onTap: () => showHelpDialog(context, scoring: true),
+              onTap: () => context.go('/help?tab=scoring'),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 child: Text(l.pointsShort(points), style: t.labelLarge),
@@ -937,8 +936,6 @@ class _DesktopHeader extends ConsumerWidget {
           ),
         const SizedBox(width: 12),
         const LiveValuesToggle(),
-        const SizedBox(width: 8),
-        const HelpButton(),
         const SizedBox(width: 8),
         const SoundToggle(),
       ],

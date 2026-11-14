@@ -103,8 +103,6 @@ class _ModePageState extends ConsumerState<ModePage> {
                       },
                     ),
                   ),
-                  const HelpButton(),
-                  const SizedBox(width: 8),
                   const SoundToggle(),
                 ],
               ),

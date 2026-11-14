@@ -346,9 +346,24 @@ class GameController extends Notifier<GameState?> {
     _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
+  int _holds = 0;
+
+  bool _away = false;
+
+  Future<T> whileHeld<T>(Future<T> Function() show) async {
+    _holds++;
+    try {
+      return await show();
+    } finally {
+      _holds--;
+    }
+  }
+
+  void setAway(bool away) => _away = away;
+
   void _tick() {
     final s = state;
-    if (s == null || s.phase != GamePhase.playing) return;
+    if (s == null || s.phase != GamePhase.playing || _holds > 0 || _away) return;
     if (s.paused) {
       if (s.pauseLeft == null) return;
       final left = s.pauseLeft! - 1;

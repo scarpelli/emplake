@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/prefs.dart';
 import '../game/domain/level.dart';
@@ -15,6 +16,25 @@ const seedSwatches = <Color>[
   Color(0xFF4E5661),
 ];
 
+enum AppFont {
+  plexMono('IBM Plex Mono'),
+  jetBrainsMono('JetBrains Mono'),
+  spaceMono('Space Mono'),
+  plexSans('IBM Plex Sans'),
+  spaceGrotesk('Space Grotesk');
+
+  const AppFont(this.label);
+  final String label;
+
+  String? get family => switch (this) {
+    AppFont.plexMono => GoogleFonts.ibmPlexMono().fontFamily,
+    AppFont.jetBrainsMono => GoogleFonts.jetBrainsMono().fontFamily,
+    AppFont.spaceMono => GoogleFonts.spaceMono().fontFamily,
+    AppFont.plexSans => GoogleFonts.ibmPlexSans().fontFamily,
+    AppFont.spaceGrotesk => GoogleFonts.spaceGrotesk().fontFamily,
+  };
+}
+
 const supportedLocales = [Locale('pt'), Locale('en'), Locale('es')];
 
 @immutable
@@ -23,6 +43,7 @@ class AppSettings {
     this.themeMode = ThemeMode.system,
     this.seed = const Color(0xFF2460B7),
     this.fontScale = 1.0,
+    this.font = AppFont.plexMono,
     this.sfx = false,
     this.music = false,
     this.locale,
@@ -39,6 +60,7 @@ class AppSettings {
   final ThemeMode themeMode;
   final Color seed;
   final double fontScale;
+  final AppFont font;
 
   final bool sfx;
   final bool music;
@@ -68,6 +90,7 @@ class AppSettings {
     ThemeMode? themeMode,
     Color? seed,
     double? fontScale,
+    AppFont? font,
     bool? sfx,
     bool? music,
     Locale? locale,
@@ -83,6 +106,7 @@ class AppSettings {
     themeMode: themeMode ?? this.themeMode,
     seed: seed ?? this.seed,
     fontScale: fontScale ?? this.fontScale,
+    font: font ?? this.font,
     sfx: sfx ?? this.sfx,
     music: music ?? this.music,
     locale: locale ?? this.locale,
@@ -100,6 +124,7 @@ class AppSettings {
     'themeMode': themeMode.name,
     'seed': seed.toARGB32(),
     'fontScale': fontScale,
+    'font': font.name,
     'sfx': sfx,
     'music': music,
     if (locale != null) 'locale': locale!.languageCode,
@@ -120,6 +145,7 @@ class AppSettings {
       themeMode: byName(ThemeMode.values, j['themeMode'], ThemeMode.system),
       seed: Color(j['seed'] as int? ?? 0xFF2460B7),
       fontScale: (j['fontScale'] as num?)?.toDouble() ?? 1.0,
+      font: byName(AppFont.values, j['font'], AppFont.plexMono),
       sfx: j['sfx'] as bool? ?? false,
       music: j['music'] as bool? ?? false,
       locale: j['locale'] == null ? null : Locale(j['locale'] as String),
@@ -155,6 +181,7 @@ class SettingsController extends Notifier<AppSettings> {
   void setThemeMode(ThemeMode mode) => _set(state.copyWith(themeMode: mode));
   void setSeed(Color seed) => _set(state.copyWith(seed: seed));
   void setFontScale(double scale) => _set(state.copyWith(fontScale: scale));
+  void setFont(AppFont font) => _set(state.copyWith(font: font));
   void setSfx(bool on) => _set(state.copyWith(sfx: on));
   void setMusic(bool on) => _set(state.copyWith(music: on));
   void setLocale(Locale locale) => _set(state.copyWith(locale: locale));

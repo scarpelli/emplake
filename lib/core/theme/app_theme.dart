@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../features/settings/settings_controller.dart';
 import 'blueprint.dart';
@@ -23,7 +22,7 @@ ThemeData buildTheme(AppSettings s, Brightness brightness) {
   );
   final typography = Typography.material2021(platform: TargetPlatform.android);
   final baseText = brightness == Brightness.dark ? typography.white : typography.black;
-  final family = GoogleFonts.ibmPlexMono().fontFamily;
+  final family = s.font.family;
   final text = baseText.apply(fontFamily: family, bodyColor: bp.ink, displayColor: bp.ink);
   const square = RoundedRectangleBorder(borderRadius: BorderRadius.zero);
 

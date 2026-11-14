@@ -50,14 +50,7 @@ class _SolvedPageState extends ConsumerState<SolvedPage> {
             PageTitle(
               eyebrow: l.historyEyebrow,
               title: l.historyTitle,
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  BoxIconButton(icon: Icons.refresh, tooltip: l.retry, onPressed: _reload),
-                  const SizedBox(width: 8),
-                  const HelpButton(),
-                ],
-              ),
+              trailing: BoxIconButton(icon: Icons.refresh, tooltip: l.retry, onPressed: _reload),
             ),
             const SizedBox(height: 16),
             Expanded(

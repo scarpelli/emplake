@@ -1,8 +1,5 @@
-import 'dart:math' as math;
-
-import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/l10n_helpers.dart';
@@ -11,6 +8,8 @@ import '../../core/widgets/bp_widgets.dart';
 import '../../core/widgets/emplake_logo.dart';
 
 const teamMembers = ['Bruna Scarpelli', 'Gustavo Sanches Martins Kis'];
+
+const googleClientId = '502048843819-feh7pu6ee6mared07grb1ndur9bf0n6c.apps.googleusercontent.com';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -23,7 +22,7 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       body: GridBackground(
         child: SignInScreen(
-          providers: [EmailAuthProvider()],
+          providers: [EmailAuthProvider(), GoogleProvider(clientId: googleClientId)],
           showPasswordVisibilityToggle: true,
           breakpoint: 900,
           maxWidth: 1080,
@@ -69,16 +68,7 @@ class LoginPage extends StatelessWidget {
           ),
           footerBuilder: (context, action) {
             final wide = MediaQuery.sizeOf(context).width >= 900;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 16),
-                const _OrDivider(),
-                const SizedBox(height: 16),
-                const Center(child: _GoogleButton()),
-                if (!wide) const Padding(padding: EdgeInsets.only(top: 24), child: _TeamCard()),
-              ],
-            );
+            return wide ? const SizedBox.shrink() : const Padding(padding: EdgeInsets.only(top: 24), child: _TeamCard());
           },
         ),
       ),
@@ -130,105 +120,4 @@ class _TeamCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _OrDivider extends StatelessWidget {
-  const _OrDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    final bp = context.bp;
-    return Row(
-      children: [
-        Expanded(child: Divider(color: bp.lineSoft)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Eyebrow(context.l10n.loginOr, opacity: 0.6),
-        ),
-        Expanded(child: Divider(color: bp.lineSoft)),
-      ],
-    );
-  }
-}
-
-class _GoogleButton extends StatefulWidget {
-  const _GoogleButton();
-
-  @override
-  State<_GoogleButton> createState() => _GoogleButtonState();
-}
-
-class _GoogleButtonState extends State<_GoogleButton> {
-  bool _busy = false;
-
-  Future<void> _signIn() async {
-    setState(() => _busy = true);
-    final provider = GoogleAuthProvider()..setCustomParameters({'prompt': 'select_account'});
-    try {
-      if (kIsWeb) {
-        await FirebaseAuth.instance.signInWithPopup(provider);
-      } else {
-        await FirebaseAuth.instance.signInWithProvider(provider);
-      }
-    } on FirebaseAuthException catch (e) {
-      const cancelled = {'popup-closed-by-user', 'cancelled-popup-request', 'web-context-canceled', 'canceled'};
-      if (!cancelled.contains(e.code) && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.loginGoogleError)));
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => OutlinedButton(
-    style: OutlinedButton.styleFrom(
-      minimumSize: const Size(0, 44),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-    ),
-    onPressed: _busy ? null : _signIn,
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _busy
-            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-            : const SizedBox(width: 18, height: 18, child: CustomPaint(painter: _GoogleGPainter())),
-        const SizedBox(width: 10),
-        Text(context.l10n.loginGoogle),
-      ],
-    ),
-  );
-}
-
-class _GoogleGPainter extends CustomPainter {
-  const _GoogleGPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final s = size.shortestSide;
-    final stroke = s * 0.2;
-    final rect = Rect.fromCircle(center: size.center(Offset.zero), radius: (s - stroke) / 2);
-    Paint p(int color) => Paint()
-      ..color = Color(color)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    double rad(double deg) => deg * math.pi / 180;
-    canvas.drawArc(rect, rad(-40), rad(-100), false, p(0xFFEA4335));
-    canvas.drawArc(rect, rad(-140), rad(-85), false, p(0xFFFBBC05));
-    canvas.drawArc(rect, rad(135), rad(-95), false, p(0xFF34A853));
-    canvas.drawArc(rect, rad(40), rad(-40), false, p(0xFF4285F4));
-    final bar = Paint()..color = const Color(0xFF4285F4);
-    canvas.drawRect(
-      Rect.fromLTRB(
-        size.width / 2,
-        size.height / 2 - stroke / 2,
-        rect.right + stroke / 2,
-        size.height / 2 + stroke / 2,
-      ),
-      bar,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_GoogleGPainter oldDelegate) => false;
 }
