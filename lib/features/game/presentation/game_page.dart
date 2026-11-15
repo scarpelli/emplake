@@ -19,6 +19,7 @@ import '../../adventure/adventure_store.dart';
 import '../../challenges/challenge_store.dart';
 import '../../achievements/achievements.dart';
 import '../../daily/daily.dart';
+import '../../daily/daily_share.dart';
 import '../../help/help_page.dart';
 import '../../settings/settings_controller.dart';
 import '../application/catalog_provider.dart';
@@ -32,6 +33,7 @@ import '../domain/hints.dart';
 import '../domain/level.dart';
 import '../domain/board.dart';
 import '../domain/rules.dart';
+import '../domain/solution_codec.dart';
 import 'fly_back_overlay.dart';
 import 'coach_overlay.dart';
 import 'formula_panel.dart';
@@ -185,6 +187,7 @@ class _GamePageState extends ConsumerState<GamePage> {
           seconds: s.elapsed,
           hints: s.hintsUsed,
           blind: !s.sawLiveValues,
+          solution: SolutionCodec.encodeBoard(s.board),
         );
       }
       ref.invalidate(profileProvider);
@@ -232,23 +235,33 @@ class _GamePageState extends ConsumerState<GamePage> {
         .catchError((_) {});
   }
 
-  Future<void> _shareDaily() async {
+  Future<String?> _dailyText() async {
     final s = ref.read(gameControllerProvider);
-    if (s == null) return;
-    final l = context.l10n;
+    if (s == null) return null;
     final profile = await ref.read(profileProvider.future);
-    final text = Daily.shareText(
+    if (!mounted) return null;
+    final streak = profile?.dailyStreak ?? 0;
+    return Daily.shareText(
       key: Daily.keyFor(DateTime.now()),
       solved: s.phase == GamePhase.solved,
       seconds: s.elapsed,
+      referenceSeconds: s.level.seconds,
       hints: s.hintsUsed,
       blind: !s.sawLiveValues,
-      streak: profile?.dailyStreak ?? 0,
-      hintsLabel: l.hintsCount(s.hintsUsed),
-      blindLabel: l.blindShort,
+      streak: streak,
+      labels: dailyShareLabels(context.l10n, hints: s.hintsUsed, streak: streak),
+      link: dailyShareLink,
     );
-    await Clipboard.setData(ClipboardData(text: text));
-    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.copied)));
+  }
+
+  Future<void> _shareDaily(BuildContext from) async {
+    final text = await _dailyText();
+    if (text != null && from.mounted) await shareDailyText(from, text);
+  }
+
+  Future<void> _copyDaily() async {
+    final text = await _dailyText();
+    if (text != null && mounted) await copyDailyText(context, text);
   }
 
   Future<void> _hint() async {
@@ -671,6 +684,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                 onMenu: _menu,
                 onNext: () => _goNext(state),
                 onShare: state.mode == GameMode.daily ? _shareDaily : null,
+                onCopy: state.mode == GameMode.daily ? _copyDaily : null,
                 stars: state.mode == GameMode.adventure && state.phase == GamePhase.solved ? _stars : null,
                 runRecord: _runRecord,
                 runBest: _runBest,
@@ -1013,15 +1027,18 @@ class _TimerBar extends StatelessWidget {
     final bp = context.bp;
     final t = Theme.of(context).textTheme;
     final frac = (state.secondsLeft / state.clockLength).clamp(0.0, 1.0);
-    if (state.practice) {
+    if (state.untimed) {
       return Row(
         children: [
-          const Icon(Icons.all_inclusive, size: 18),
+          Icon(state.practice ? Icons.all_inclusive : Icons.timer_outlined, size: 18),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(l.practiceTimer, style: t.labelMedium?.copyWith(color: bp.muted)),
+            child: Text(
+              state.practice ? l.practiceTimer : l.dailyTimer,
+              style: t.labelMedium?.copyWith(color: bp.muted),
+            ),
           ),
-          Text('${state.elapsed}s', style: t.labelMedium),
+          Text(Daily.formatSeconds(state.elapsed), style: t.labelMedium),
         ],
       );
     }

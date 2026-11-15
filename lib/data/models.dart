@@ -151,6 +151,7 @@ class DailyResult {
     this.seconds = 0,
     this.hints = 0,
     this.blind = false,
+    this.solution,
   });
 
   factory DailyResult.fromMap(Map<String, dynamic> m) => DailyResult(
@@ -160,6 +161,7 @@ class DailyResult {
     seconds: (m['seconds'] as num?)?.toInt() ?? 0,
     hints: (m['hints'] as num?)?.toInt() ?? 0,
     blind: m['blind'] as bool? ?? false,
+    solution: m['solution'] as String?,
   );
 
   final String number;
@@ -169,6 +171,10 @@ class DailyResult {
   final int seconds;
   final int hints;
   final bool blind;
+
+  /// The player's own expression (SolutionCodec), kept for solved plates so
+  /// it can be shown again after the day's game is over.
+  final String? solution;
 
   bool get solved => status == 'solved';
   bool get finished => status != 'started';

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n_helpers.dart';
+import '../../../core/theme/blueprint.dart';
 import '../../../core/widgets/bp_widgets.dart';
 import '../../../data/firestore_repository.dart';
 import '../../../data/models.dart';
 import '../../challenges/challenge_store.dart';
 import '../../daily/daily.dart';
+import '../../daily/daily_share.dart';
+import '../domain/board.dart';
+import '../domain/format.dart';
+import '../domain/solution_codec.dart';
+import 'formula_panel.dart';
 import '../../settings/settings_controller.dart';
 import '../application/catalog_provider.dart';
 import '../application/game_controller.dart';
@@ -215,47 +220,77 @@ class _DailyDone extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
+    final bp = context.bp;
     final t = Theme.of(context).textTheme;
     final streak = ref.watch(profileProvider).value?.dailyStreak ?? 0;
-    final key = Daily.keyFor(DateTime.now());
     final share = Daily.shareText(
-      key: key,
+      key: Daily.keyFor(DateTime.now()),
       solved: result.solved,
       seconds: result.seconds,
+      referenceSeconds: result.level.seconds,
       hints: result.hints,
       blind: result.blind,
       streak: streak,
-      hintsLabel: l.hintsCount(result.hints),
-      blindLabel: l.blindShort,
+      labels: dailyShareLabels(l, hints: result.hints, streak: streak),
+      link: dailyShareLink,
     );
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(l.dailyAlreadyPlayed, textAlign: TextAlign.center, style: t.titleMedium),
-            const SizedBox(height: 12),
-            SelectableText(share, textAlign: TextAlign.center, style: t.titleSmall),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              alignment: WrapAlignment.center,
-              children: [
-                FilledButton.icon(
-                  onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: share));
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.copied)));
-                    }
-                  },
-                  icon: const Icon(Icons.content_copy, size: 18),
-                  label: Text(l.dailyCopy),
-                ),
-                OutlinedButton(onPressed: () => context.go('/play'), child: Text(l.menu)),
+    Board? board;
+    if (result.solved && result.solution != null) {
+      try {
+        board = SolutionCodec.decode(result.number, result.solution!);
+      } on FormatException {
+        board = null;
+      }
+    }
+    return ContentWidth(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l.dailyAlreadyPlayed, textAlign: TextAlign.center, style: t.titleMedium),
+              if (board != null) ...[
+                const SizedBox(height: 22),
+                Eyebrow(l.dailyYourSolution),
+                const SizedBox(height: 6),
+                FormulaPanel(tokens: linearTokens(board), latex: latexOf(board), compact: true),
               ],
-            ),
-          ],
+              const SizedBox(height: 22),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(border: Border.all(color: bp.lineSoft)),
+                child: SelectableText(share, style: t.bodyMedium?.copyWith(height: 1.5)),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(onPressed: () => context.go('/play'), child: Text(l.menu)),
+                  ),
+                  const SizedBox(width: 8),
+                  BoxIconButton(
+                    icon: Icons.content_copy,
+                    tooltip: l.dailyCopy,
+                    size: 40,
+                    onPressed: () => copyDailyText(context, share),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: Builder(
+                      builder: (button) => FilledButton.icon(
+                        onPressed: () => shareDailyText(button, share),
+                        icon: const Icon(Icons.share, size: 18),
+                        label: Text(l.dailyShare),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

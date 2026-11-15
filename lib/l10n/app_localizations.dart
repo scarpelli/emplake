@@ -337,7 +337,7 @@ abstract class AppLocalizations {
   /// No description provided for @modeDailyDesc.
   ///
   /// In pt, this message translates to:
-  /// **'O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.'**
+  /// **'Todo dia sai um número novo, o mesmo para todo mundo, e você pode levar o tempo que quiser.'**
   String get modeDailyDesc;
 
   /// No description provided for @dailyAlreadyPlayed.
@@ -351,6 +351,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'COPIAR RESULTADO'**
   String get dailyCopy;
+
+  /// No description provided for @dailyPlayedToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 pessoa já jogou hoje} other{{count} pessoas já jogaram hoje}}'**
+  String dailyPlayedToday(int count);
+
+  /// No description provided for @dailyBeFirst.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém jogou ainda hoje'**
+  String get dailyBeFirst;
+
+  /// No description provided for @dailyDoneIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Feita em {time}'**
+  String dailyDoneIn(String time);
+
+  /// No description provided for @dailyBetterThan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Melhor que {percent}% dos jogadores'**
+  String dailyBetterThan(int percent);
+
+  /// No description provided for @dailyFirstToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você foi a primeira pessoa a jogar hoje'**
+  String get dailyFirstToday;
+
+  /// No description provided for @dailyMissedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi dessa vez'**
+  String get dailyMissedTitle;
+
+  /// No description provided for @dailyComeBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amanhã tem uma placa nova'**
+  String get dailyComeBack;
+
+  /// No description provided for @dailyShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'COMPARTILHAR'**
+  String get dailyShare;
+
+  /// No description provided for @dailyTimer.
+  ///
+  /// In pt, this message translates to:
+  /// **'sem limite de tempo nesta placa'**
+  String get dailyTimer;
+
+  /// No description provided for @dailyShareMissed.
+  ///
+  /// In pt, this message translates to:
+  /// **'não resolvido'**
+  String get dailyShareMissed;
+
+  /// No description provided for @dailyYourSolution.
+  ///
+  /// In pt, this message translates to:
+  /// **'SUA SOLUÇÃO'**
+  String get dailyYourSolution;
+
+  /// No description provided for @dailyStreakDays.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 dia seguido} other{{count} dias seguidos}}'**
+  String dailyStreakDays(int count);
 
   /// No description provided for @blindShort.
   ///

@@ -15,6 +15,7 @@ class ResultSheet extends StatelessWidget {
     required this.onMenu,
     required this.onNext,
     this.onShare,
+    this.onCopy,
     this.stars,
     this.runRecord,
     this.runBest,
@@ -24,7 +25,10 @@ class ResultSheet extends StatelessWidget {
   final VoidCallback onMenu;
   final VoidCallback onNext;
 
-  final VoidCallback? onShare;
+  /// Plate of the day: opens the share sheet (gets the button's context so
+  /// the iPad popover can anchor to it) and copies the scoreboard.
+  final void Function(BuildContext button)? onShare;
+  final VoidCallback? onCopy;
 
   final int? stars;
 
@@ -146,13 +150,19 @@ class ResultSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
+                if (onCopy != null) ...[
+                  BoxIconButton(icon: Icons.content_copy, tooltip: l.dailyCopy, onPressed: onCopy, size: 40),
+                  const SizedBox(width: 8),
+                ],
                 Expanded(
                   flex: 2,
                   child: onShare != null
-                      ? FilledButton.icon(
-                          icon: const Icon(Icons.content_copy, size: 18),
-                          onPressed: onShare,
-                          label: Text(l.dailyCopy),
+                      ? Builder(
+                          builder: (button) => FilledButton.icon(
+                            icon: const Icon(Icons.share, size: 18),
+                            onPressed: () => onShare!(button),
+                            label: Text(l.dailyShare),
+                          ),
                         )
                       : FilledButton.icon(
                           iconAlignment: IconAlignment.end,

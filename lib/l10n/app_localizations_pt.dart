@@ -141,7 +141,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get modeDailyDesc =>
-      'O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.';
+      'Todo dia sai um número novo, o mesmo para todo mundo, e você pode levar o tempo que quiser.';
 
   @override
   String get dailyAlreadyPlayed =>
@@ -149,6 +149,66 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dailyCopy => 'COPIAR RESULTADO';
+
+  @override
+  String dailyPlayedToday(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString pessoas já jogaram hoje',
+      one: '1 pessoa já jogou hoje',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dailyBeFirst => 'Ninguém jogou ainda hoje';
+
+  @override
+  String dailyDoneIn(String time) {
+    return 'Feita em $time';
+  }
+
+  @override
+  String dailyBetterThan(int percent) {
+    return 'Melhor que $percent% dos jogadores';
+  }
+
+  @override
+  String get dailyFirstToday => 'Você foi a primeira pessoa a jogar hoje';
+
+  @override
+  String get dailyMissedTitle => 'Não foi dessa vez';
+
+  @override
+  String get dailyComeBack => 'Amanhã tem uma placa nova';
+
+  @override
+  String get dailyShare => 'COMPARTILHAR';
+
+  @override
+  String get dailyTimer => 'sem limite de tempo nesta placa';
+
+  @override
+  String get dailyShareMissed => 'não resolvido';
+
+  @override
+  String get dailyYourSolution => 'SUA SOLUÇÃO';
+
+  @override
+  String dailyStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dias seguidos',
+      one: '1 dia seguido',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get blindShort => 'às cegas';

@@ -8,9 +8,8 @@ import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
 import '../../data/models.dart';
-import '../../core/router.dart';
+import '../daily/daily_card.dart';
 import '../game/application/game_controller.dart';
-import '../game/domain/level.dart';
 
 class ModePage extends ConsumerStatefulWidget {
   const ModePage({super.key});
@@ -110,7 +109,7 @@ class _ModePageState extends ConsumerState<ModePage> {
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            sliver: SliverToBoxAdapter(child: _DailyCard(profile: _profile)),
+            sliver: const SliverToBoxAdapter(child: DailyCard()),
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
@@ -198,54 +197,6 @@ class _ModePageState extends ConsumerState<ModePage> {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _DailyCard extends StatelessWidget {
-  const _DailyCard({required this.profile});
-  final Future<UserProfile>? profile;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = context.l10n;
-    final bp = context.bp;
-    final t = Theme.of(context).textTheme;
-    return Material(
-      color: bp.ink,
-      child: InkWell(
-        onTap: () => context.go(newGameLocation(mode: GameMode.daily, level: Level.intermediate)),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Icon(Icons.today_outlined, color: bp.onInk),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l.modeDaily,
-                      style: t.titleSmall?.copyWith(color: bp.onInk, fontWeight: FontWeight.w600),
-                    ),
-                    Text(l.modeDailyDesc, style: t.bodySmall?.copyWith(color: bp.onInk.withValues(alpha: 0.8))),
-                  ],
-                ),
-              ),
-              FutureBuilder<UserProfile>(
-                future: profile,
-                builder: (context, snap) {
-                  final streak = snap.data?.dailyStreak ?? 0;
-                  return streak > 0
-                      ? Text(l.streakShort(streak), style: t.labelLarge?.copyWith(color: bp.onInk))
-                      : Icon(Icons.arrow_forward, color: bp.onInk);
-                },
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

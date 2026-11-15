@@ -155,6 +155,13 @@ class FirestoreRepository {
 
   DocumentReference<Map<String, dynamic>> _dailyDoc(String key) => _userDoc.collection('daily').doc(key);
 
+  DocumentReference<Map<String, dynamic>> _dailyStats(String key) => _db.collection('dailyStats').doc(key);
+
+  Future<DailyStats> dailyStats(String key) async {
+    final snap = await _dailyStats(key).get();
+    return snap.exists ? DailyStats.fromMap(snap.data()!) : const DailyStats();
+  }
+
   Future<DailyResult?> dailyResult(String key) async {
     final snap = await _dailyDoc(key).get();
     return snap.exists ? DailyResult.fromMap(snap.data()!) : null;
@@ -169,9 +176,22 @@ class FirestoreRepository {
     required int seconds,
     required int hints,
     required bool blind,
+    String? solution,
   }) {
     return _db.runTransaction((tx) async {
       final profile = await tx.get(_userDoc);
+      final previous = await tx.get(_dailyDoc(key));
+      final status = previous.data()?['status'];
+      // Count each player once in the public tally, at their first finish.
+      if (status != 'solved' && status != 'failed') {
+        tx.set(_dailyStats(key), {
+          'plays': FieldValue.increment(1),
+          if (solved)
+            'times': {DailyStats.bucketKey(seconds): FieldValue.increment(1)}
+          else
+            'missed': FieldValue.increment(1),
+        }, SetOptions(merge: true));
+      }
       final data = profile.data() ?? const <String, dynamic>{};
       final streak = Daily.nextStreak(
         key: key,
@@ -184,6 +204,7 @@ class FirestoreRepository {
         'seconds': seconds,
         'hints': hints,
         'blind': blind,
+        'solution': ?solution,
         'finishedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
       tx.set(_userDoc, {'dailyStreak': streak, if (solved) 'lastDaily': key}, SetOptions(merge: true));

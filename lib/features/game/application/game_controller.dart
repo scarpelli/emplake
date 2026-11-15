@@ -176,11 +176,19 @@ class GameState {
 
   int get clockLength => totalSeconds ?? level.seconds;
 
+  /// Practice and the plate of the day run a stopwatch instead of a countdown:
+  /// the time is measured but never runs out.
+  bool get untimed => practice || mode == GameMode.daily;
+
+  /// Seconds left as far as scoring goes. Untimed plates still reward speed:
+  /// the bonus shrinks against the level clock but the plate never expires.
+  int get scoringSecondsLeft => untimed ? (clockLength - elapsed).clamp(0, clockLength) : secondsLeft;
+
   bool get canHint => phase == GamePhase.playing && !paused && hintsUsed < 3 && !isChallenge;
-  bool get canPause => !isChallenge && !practice;
+  bool get canPause => !isChallenge && !untimed;
 
   Score get score => level.score(
-    secondsLeft: secondsLeft,
+    secondsLeft: scoringSecondsLeft,
     inTime: solvedInTime,
     hints: hintsUsed,
     blind: !sawLiveValues,
@@ -188,7 +196,7 @@ class GameState {
   );
 
   String get number => board.number;
-  bool get timeUp => !practice && secondsLeft <= 0;
+  bool get timeUp => !untimed && secondsLeft <= 0;
   bool get canUndo => history.isNotEmpty && phase == GamePhase.playing;
 
   Verdict get verdict => board.verdict(rules);
@@ -372,7 +380,7 @@ class GameController extends Notifier<GameState?> {
     }
     final next = s.copyWith(
       elapsed: s.elapsed + 1,
-      secondsLeft: s.practice ? s.secondsLeft : (s.secondsLeft > 0 ? s.secondsLeft - 1 : 0),
+      secondsLeft: s.untimed ? s.secondsLeft : (s.secondsLeft > 0 ? s.secondsLeft - 1 : 0),
     );
     if (next.run != null && next.secondsLeft <= 0) {
       _losePlate(next, next.run!.timeUp());
@@ -714,7 +722,7 @@ class GameController extends Notifier<GameState?> {
     final points = s.alreadySolved || s.practice
         ? 0
         : s.level.pointsFor(
-            secondsLeft: s.secondsLeft,
+            secondsLeft: s.scoringSecondsLeft,
             inTime: inTime,
             hints: s.hintsUsed,
             blind: !s.sawLiveValues,

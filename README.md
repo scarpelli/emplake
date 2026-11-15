@@ -72,7 +72,7 @@ flutter build web --release
 firebase deploy --only hosting
 ```
 
-O site fica em `https://<id-do-projeto>.web.app`.
+O site fica em <https://emplake.web.app> (site `emplake` do Firebase Hosting, definido em `firebase.json`).
 
 ## Textos e idiomas
 

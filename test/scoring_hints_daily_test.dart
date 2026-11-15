@@ -121,17 +121,69 @@ void main() {
     });
 
     test('share text', () {
+      const labels = DailyShareLabels(
+        title: 'placa do dia',
+        hints: 'sem dicas',
+        blind: 'às cegas',
+        streak: '4 dias seguidos',
+        missed: 'não resolvida',
+      );
       final text = Daily.shareText(
         key: '2026-11-13',
         solved: true,
         seconds: 32,
+        referenceSeconds: 45,
         hints: 0,
         blind: true,
         streak: 4,
-        hintsLabel: 'sem dicas',
-        blindLabel: 'às cegas',
+        labels: labels,
+        link: 'https://emplake.example',
       );
-      expect(text, 'EMPLAKE 13/11 · ✓ 32s · sem dicas · às cegas · 🔥4');
+      expect(text.split('\n'), [
+        'EMPLAKE · placa do dia 13/11',
+        '',
+        '⏱️ 🟩🟩⬜⬜⬜ 32s',
+        '💡 ⚫⚫⚫ sem dicas · 🙈 às cegas',
+        '🔥 4 dias seguidos',
+        '',
+        'https://emplake.example',
+      ]);
+      final slow = Daily.shareText(
+        key: '2026-11-13',
+        solved: true,
+        seconds: 125,
+        referenceSeconds: 45,
+        hints: 1,
+        blind: false,
+        streak: 0,
+        labels: labels,
+      );
+      expect(slow.split('\n'), ['EMPLAKE · placa do dia 13/11', '', '⏱️ 🟩⬜⬜⬜⬜ 2:05', '💡 🟡⚫⚫ sem dicas']);
+      final missed = Daily.shareText(
+        key: '2026-11-13',
+        solved: false,
+        seconds: 80,
+        referenceSeconds: 45,
+        hints: 3,
+        blind: false,
+        streak: 0,
+        labels: labels,
+      );
+      expect(missed.split('\n'), ['EMPLAKE · placa do dia 13/11', '', '⏱️ 🟥🟥🟥🟥🟥 não resolvida']);
+    });
+  });
+
+  group('daily stats', () {
+    test('better than counts slower buckets and misses among the others', () {
+      final stats = DailyStats.fromMap({
+        'plays': 6,
+        'missed': 1,
+        'times': {'b2': 1, 'b4': 2, 'b10': 2},
+      });
+      // Mine is one of the two in b4 (40-49s): slower are b10 (2) + 1 miss, of 5 others.
+      expect(stats.betterThan(42), 60);
+      expect(DailyStats.bucketKey(42), 'b4');
+      expect(const DailyStats(plays: 1, times: {0: 1}).betterThan(5), isNull);
     });
   });
 

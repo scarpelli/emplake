@@ -66,9 +66,50 @@
   "modeAdventure": "Aventura",
   "modeAdventureDesc": "Todas as placas do jogo numa trilha, do Fácil ao Difícil. Cada fase vale até 3 estrelas.",
   "modeDaily": "Placa do dia",
-  "modeDailyDesc": "O mesmo número para todo mundo hoje. Uma tentativa; compartilhe o resultado.",
+  "modeDailyDesc": "Todo dia sai um número novo, o mesmo para todo mundo, e você pode levar o tempo que quiser.",
   "dailyAlreadyPlayed": "Você já jogou a placa de hoje. Volte amanhã para uma nova!",
   "dailyCopy": "COPIAR RESULTADO",
+  "dailyPlayedToday": "{count, plural, =1{1 pessoa já jogou hoje} other{{count} pessoas já jogaram hoje}}",
+  "@dailyPlayedToday": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "dailyBeFirst": "Ninguém jogou ainda hoje",
+  "dailyDoneIn": "Feita em {time}",
+  "@dailyDoneIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyBetterThan": "Melhor que {percent}% dos jogadores",
+  "@dailyBetterThan": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyFirstToday": "Você foi a primeira pessoa a jogar hoje",
+  "dailyMissedTitle": "Não foi dessa vez",
+  "dailyComeBack": "Amanhã tem uma placa nova",
+  "dailyShare": "COMPARTILHAR",
+  "dailyTimer": "sem limite de tempo nesta placa",
+  "dailyShareMissed": "não resolvido",
+  "dailyYourSolution": "SUA SOLUÇÃO",
+  "dailyStreakDays": "{count, plural, =1{1 dia seguido} other{{count} dias seguidos}}",
+  "@dailyStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "blindShort": "às cegas",
   "hintsCount": "{count, plural, =0{sem dicas} =1{1 dica} other{{count} dicas}}",
   "@hintsCount": {
