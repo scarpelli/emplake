@@ -96,8 +96,12 @@ void main() {
       prefs = await SharedPreferences.getInstance();
     });
 
-    Future<ProviderContainer> pumpGame(WidgetTester tester, {bool tutorialDone = false}) async {
-      tester.view.physicalSize = const Size(420, 900);
+    Future<ProviderContainer> pumpGame(
+      WidgetTester tester, {
+      bool tutorialDone = false,
+      Size size = const Size(420, 900),
+    }) async {
+      tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       final container = ProviderContainer(
@@ -146,6 +150,53 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       container.dispose();
     });
+
+    for (final (label, size) in [
+      ('small phone', const Size(360, 640)),
+      ('phone', const Size(390, 844)),
+      ('tablet', const Size(768, 1024)),
+      ('desktop', const Size(1280, 800)),
+    ]) {
+      testWidgets('tutorial balloon never covers what it points at ($label)', (tester) async {
+        final container = await pumpGame(tester, size: size);
+        final c = container.read(gameControllerProvider.notifier);
+
+        Future<void> expectClear(String step) async {
+          await tester.pump(const Duration(milliseconds: 600));
+          final overlay = find.byType(CoachOverlay);
+          // The balloon: the outermost balloon-sized Material around its skip button.
+          final balloon = find
+              .ancestor(of: find.text('PULAR TUTORIAL'), matching: find.byType(Material))
+              .evaluate()
+              .map((e) => tester.getRect(find.byWidget(e.widget)))
+              .where((r) => r.width <= 300)
+              .reduce((a, b) => a.height >= b.height ? a : b);
+          final ring = find.descendant(of: overlay, matching: find.byType(IgnorePointer));
+          expect(ring, findsWidgets, reason: '$step has no target ring');
+          final target = tester.getRect(ring.last);
+          final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
+          expect(balloon.overlaps(target), isFalse, reason: '$step: balloon $balloon covers target $target');
+          expect(balloon.left >= 0 && balloon.right <= screen.width, isTrue, reason: '$step: off screen');
+          expect(balloon.top >= 0 && balloon.bottom <= screen.height, isTrue, reason: '$step: off screen');
+        }
+
+        await expectClear('tap first gap');
+        c.selectGap(0);
+        await expectClear('pick × (1st)');
+        c.applyBinary(BinOp.mul);
+        await expectClear('link the 3');
+        c.selectGap(0);
+        await expectClear('pick × (2nd)');
+        c.applyBinary(BinOp.mul);
+        await expectClear('equals gap');
+        c.selectGap(0);
+        await expectClear('pick =');
+        c.placeEquals();
+        await expectClear('verify');
+        await tester.pumpWidget(const SizedBox());
+        container.dispose();
+      });
+    }
 
     testWidgets('no tutorial after it is done; hint button and its banner work', (tester) async {
       final container = await pumpGame(tester, tutorialDone: true);

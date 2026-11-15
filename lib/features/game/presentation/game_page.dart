@@ -566,17 +566,17 @@ class _GamePageState extends ConsumerState<GamePage> {
     }
     if (b.binaryAt(0) == null) {
       return selectedGap(0)
-          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul), balloon: BalloonAt.top)
+          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul), balloon: BalloonAt.below)
           : CoachStep(text: l.tutorialTapGap(1, 2), target: () => _gapCenter(b, 0), balloon: BalloonAt.below);
     }
     if (b.binaryAt(1) == null) {
       return selectedGap(1)
-          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul), balloon: BalloonAt.top)
+          ? CoachStep(text: l.tutorialPickTimes, target: () => _paletteKeys.globalCenter(mul), balloon: BalloonAt.below)
           : CoachStep(text: l.tutorialLinkThree, target: () => _gapCenter(b, 1), balloon: BalloonAt.below);
     }
     if (b.eqGap == null) {
       return selectedGap(2)
-          ? CoachStep(text: l.tutorialPickEquals, target: () => _paletteKeys.globalCenter('='), balloon: BalloonAt.top)
+          ? CoachStep(text: l.tutorialPickEquals, target: () => _paletteKeys.globalCenter('='), balloon: BalloonAt.below)
           : CoachStep(text: l.tutorialEqualsGap, target: () => _gapCenter(b, 2), balloon: BalloonAt.below);
     }
     return CoachStep(text: l.tutorialVerify, target: () => _globalCenterOf(_verifyKey));

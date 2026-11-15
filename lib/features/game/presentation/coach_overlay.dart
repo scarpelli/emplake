@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -9,7 +11,7 @@ enum BalloonAt {
 
   below,
 
-  top,
+  above,
 }
 
 class CoachStep {
@@ -57,14 +59,6 @@ class _CoachOverlayState extends State<CoachOverlay> with SingleTickerProviderSt
 
     return LayoutBuilder(
       builder: (context, c) {
-        const balloonW = 280.0;
-        final place = widget.step.balloon;
-        final below =
-            at == null ||
-            (place == BalloonAt.below && at.dy + 180 < c.maxHeight) ||
-            (place == BalloonAt.auto && at.dy < c.maxHeight / 2);
-        const topSlot = 112.0;
-        final left = ((at?.dx ?? c.maxWidth / 2) - balloonW / 2).clamp(8.0, c.maxWidth - balloonW - 8);
         final balloon = Material(
           color: bp.ink,
           elevation: 6,
@@ -110,20 +104,75 @@ class _CoachOverlayState extends State<CoachOverlay> with SingleTickerProviderSt
                   ),
                 ),
               ),
-            Positioned(
-              left: left,
-              width: balloonW,
-              top: at == null
-                  ? 12
-                  : place == BalloonAt.top
-                  ? topSlot
-                  : (below ? at.dy + 40 : null),
-              bottom: at != null && place != BalloonAt.top && !below ? c.maxHeight - at.dy + 40 : null,
-              child: balloon,
+            Positioned.fill(
+              child: CustomSingleChildLayout(
+                delegate: BalloonLayout(target: at, prefer: widget.step.balloon),
+                child: balloon,
+              ),
             ),
           ],
         );
       },
     );
   }
+}
+
+/// Places the balloon next to the target without ever covering it (or its
+/// ring). It measures the balloon first, so it holds for any text length,
+/// font size, language and screen: it tries the preferred side, then the
+/// other one, then left/right of the target, and only as a last resort the
+/// side with the most room.
+class BalloonLayout extends SingleChildLayoutDelegate {
+  BalloonLayout({required this.target, required this.prefer});
+
+  final Offset? target;
+  final BalloonAt prefer;
+
+  static const maxWidth = 280.0;
+  static const margin = 8.0;
+
+  /// Distance kept from the target's centre: ring radius plus a gap.
+  static const clearance = 40.0;
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) => BoxConstraints(
+    maxWidth: (constraints.maxWidth - 2 * margin).clamp(0, maxWidth),
+    maxHeight: (constraints.maxHeight - 2 * margin).clamp(0, double.infinity),
+  );
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    final child = childSize;
+    double clampX(double x) => x.clamp(margin, math.max(margin, size.width - child.width - margin));
+    double clampY(double y) => y.clamp(margin, math.max(margin, size.height - child.height - margin));
+
+    final at = target;
+    if (at == null) return Offset(clampX((size.width - child.width) / 2), margin);
+
+    final x = clampX(at.dx - child.width / 2);
+    final roomBelow = size.height - margin - (at.dy + clearance);
+    final roomAbove = at.dy - clearance - margin;
+    final below = Offset(x, at.dy + clearance);
+    final above = Offset(x, at.dy - clearance - child.height);
+
+    final order = switch (prefer) {
+      BalloonAt.below => [true, false],
+      BalloonAt.above => [false, true],
+      BalloonAt.auto => roomBelow >= roomAbove ? [true, false] : [false, true],
+    };
+    for (final b in order) {
+      if (b && roomBelow >= child.height) return below;
+      if (!b && roomAbove >= child.height) return above;
+    }
+
+    // Not enough height on either side (short landscape screens): go beside.
+    final y = clampY(at.dy - child.height / 2);
+    if (size.width - margin - (at.dx + clearance) >= child.width) return Offset(at.dx + clearance, y);
+    if (at.dx - clearance - margin >= child.width) return Offset(at.dx - clearance - child.width, y);
+
+    return roomBelow >= roomAbove ? Offset(x, clampY(below.dy)) : Offset(x, clampY(above.dy));
+  }
+
+  @override
+  bool shouldRelayout(BalloonLayout old) => old.target != target || old.prefer != prefer;
 }
