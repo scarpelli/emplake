@@ -982,6 +982,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get avatarYours => 'Seu avatar';
 
   @override
+  String get openProfile => 'Abrir o seu perfil';
+
+  @override
   String get avatarTitle => 'Seu robô';
 
   @override

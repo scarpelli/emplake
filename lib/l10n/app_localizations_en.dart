@@ -978,6 +978,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get avatarYours => 'Your avatar';
 
   @override
+  String get openProfile => 'Open your profile';
+
+  @override
   String get avatarTitle => 'Your robot';
 
   @override

@@ -15,6 +15,30 @@ import 'settings_controller.dart';
 
 enum _Tab { player, appearance, game }
 
+final _playerTabRequest = NotifierProvider<_PlayerTabRequest, int>(_PlayerTabRequest.new);
+
+class _PlayerTabRequest extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void request() => state++;
+}
+
+void openPlayerSettings(BuildContext context, WidgetRef ref) {
+  ref.read(_playerTabRequest.notifier).request();
+  context.go('/settings');
+}
+
+class _PlayerTabListener extends ConsumerWidget {
+  const _PlayerTabListener();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(_playerTabRequest, (_, _) => DefaultTabController.of(context).index = _Tab.player.index);
+    return const SizedBox.shrink();
+  }
+}
+
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
@@ -49,6 +73,7 @@ class SettingsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const _PlayerTabListener(),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: PageTitle(

@@ -12,6 +12,7 @@ import '../avatar/avatar_page.dart';
 import '../avatar/robot_avatar.dart';
 import '../daily/daily_card.dart';
 import '../game/application/game_controller.dart';
+import '../settings/settings_page.dart';
 
 class ModePage extends ConsumerStatefulWidget {
   const ModePage({super.key});
@@ -88,26 +89,51 @@ class _ModePageState extends ConsumerState<ModePage> {
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
-                  RobotAvatarView(ref.watch(playerAvatarProvider), size: 30, semanticLabel: l.avatarYours),
-                  const SizedBox(width: 10),
                   Expanded(
-                    child: FutureBuilder<UserProfile>(
-                      future: _profile,
-                      builder: (context, snap) {
-                        final name = (snap.data?.displayName.isNotEmpty ?? false)
-                            ? snap.data!.displayName.split(' ').first.toUpperCase()
-                            : fallbackName;
-                        if (snap.connectionState == ConnectionState.waiting) {
-                          return Row(
-                            children: [
-                              Eyebrow(name),
-                              const SizedBox(width: 8),
-                              const SizedBox(width: 28, height: 14, child: BpLoader(size: 14)),
-                            ],
-                          );
-                        }
-                        return Eyebrow(l.greeting(name, snap.data?.totalPoints ?? 0));
-                      },
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Semantics(
+                        button: true,
+                        label: l.openProfile,
+                        child: InkWell(
+                          onTap: () => openPlayerSettings(context, ref),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 44),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                RobotAvatarView(
+                                  ref.watch(playerAvatarProvider),
+                                  size: 30,
+                                  semanticLabel: l.avatarYours,
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: FutureBuilder<UserProfile>(
+                                    future: _profile,
+                                    builder: (context, snap) {
+                                      final name = (snap.data?.displayName.isNotEmpty ?? false)
+                                          ? snap.data!.displayName.split(' ').first.toUpperCase()
+                                          : fallbackName;
+                                      if (snap.connectionState == ConnectionState.waiting) {
+                                        return Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Eyebrow(name),
+                                            const SizedBox(width: 8),
+                                            const SizedBox(width: 28, height: 14, child: BpLoader(size: 14)),
+                                          ],
+                                        );
+                                      }
+                                      return Eyebrow(l.greeting(name, snap.data?.totalPoints ?? 0));
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   const SoundToggle(),

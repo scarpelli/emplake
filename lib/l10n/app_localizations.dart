@@ -1714,6 +1714,12 @@ abstract class AppLocalizations {
   /// **'Seu avatar'**
   String get avatarYours;
 
+  /// No description provided for @openProfile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir o seu perfil'**
+  String get openProfile;
+
   /// No description provided for @avatarTitle.
   ///
   /// In pt, this message translates to:
