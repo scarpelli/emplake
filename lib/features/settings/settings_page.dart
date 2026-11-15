@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/l10n_helpers.dart';
 import '../../core/prefs.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
+import '../avatar/avatar_page.dart';
+import '../avatar/robot_avatar.dart';
 import '../game/application/game_controller.dart';
 import 'seed_color_dialog.dart';
 import 'settings_controller.dart';
@@ -297,6 +300,7 @@ class _PlayerCard extends ConsumerWidget {
     final isGoogle = user?.providerData.any((p) => p.providerId == 'google.com') ?? false;
     final name = user?.displayName?.isNotEmpty == true ? user!.displayName! : l.player;
     final email = user?.email ?? '';
+    void openCreator() => context.go('/settings/avatar');
 
     Widget stat(String label, int? value) => Expanded(
       child: Container(
@@ -321,11 +325,10 @@ class _PlayerCard extends ConsumerWidget {
           decoration: BoxDecoration(border: Border.all(color: bp.line)),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: bp.ink,
-                foregroundColor: bp.onInk,
-                child: Text(name.characters.first.toUpperCase(), style: t.titleMedium?.copyWith(color: bp.onInk)),
+              InkWell(
+                onTap: openCreator,
+                customBorder: const CircleBorder(),
+                child: RobotAvatarView(ref.watch(playerAvatarProvider), size: 44, semanticLabel: l.avatarYours),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -352,6 +355,19 @@ class _PlayerCard extends ConsumerWidget {
                 icon: const Icon(Icons.logout, size: 18),
                 label: Text(l.signOut),
               ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        SelectTile(
+          selected: false,
+          onTap: openCreator,
+          child: Row(
+            children: [
+              const Icon(Icons.brush_outlined, size: 20),
+              const SizedBox(width: 10),
+              Expanded(child: Text(l.avatarCreate)),
+              const Icon(Icons.chevron_right, size: 20),
             ],
           ),
         ),

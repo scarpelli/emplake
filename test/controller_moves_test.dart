@@ -167,4 +167,34 @@ void main() {
       expect(container.read(gameControllerProvider)!.selection, const EqualsSelection());
     });
   });
+
+  test('signs that go on a segment can be dropped or carried onto a node', () async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    final c = container.read(gameControllerProvider.notifier);
+    c.start(mode: GameMode.random, level: Level.easy, number: '1234');
+    final four = container.read(gameControllerProvider)!.board.blocks.last.id;
+
+    expect(c.dropOnNode(const PaletteUnaryDrag(UnOp.sqrt), four), isTrue);
+    final wrapped = container.read(gameControllerProvider)!.board.blocks.last;
+    expect(wrapped, isA<Unary>().having((u) => u.op, 'op', UnOp.sqrt));
+
+    c.undo();
+    c.applyUnary(UnOp.fact);
+    expect(container.read(gameControllerProvider)!.selection, const CarrySelection(PaletteUnaryDrag(UnOp.fact)));
+    c.selectNode(four);
+    expect(container.read(gameControllerProvider)!.board.blocks.last, isA<Unary>().having((u) => u.op, 'op', UnOp.fact));
+
+    expect(c.drop(const PaletteUnaryDrag(UnOp.sqrt), 0), isFalse);
+    expect(c.dropOnNode(const PaletteBinaryDrag(BinOp.add), four), isFalse);
+  });
+
+  test('a sign forbidden by the level is not applied by dropping it', () async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    final c = container.read(gameControllerProvider.notifier);
+    c.start(mode: GameMode.random, level: Level.hard, number: '1234');
+    final four = container.read(gameControllerProvider)!.board.blocks.last.id;
+    expect(c.dropOnNode(const PaletteUnaryDrag(UnOp.sqrt), four), isFalse);
+  });
 }

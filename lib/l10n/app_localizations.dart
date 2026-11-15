@@ -670,6 +670,24 @@ abstract class AppLocalizations {
   /// **'nó selecionado: {node}'**
   String paletteNodeSelected(String node);
 
+  /// No description provided for @paletteCarryingOver.
+  ///
+  /// In pt, this message translates to:
+  /// **'levando {sign}: toque num número ou ramo'**
+  String paletteCarryingOver(String sign);
+
+  /// No description provided for @dropOverOnGap.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esse sinal vai em cima de um número ou de um ramo, e não entre dois números.'**
+  String get dropOverOnGap;
+
+  /// No description provided for @dropBetweenOnNode.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esse sinal vai entre dois números, num dos vãos tracejados.'**
+  String get dropBetweenOnNode;
+
   /// No description provided for @paletteCarrying.
   ///
   /// In pt, this message translates to:
@@ -1689,6 +1707,126 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'MELHOR SEQUÊNCIA'**
   String get statBestStreak;
+
+  /// No description provided for @avatarCreate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar o meu avatar'**
+  String get avatarCreate;
+
+  /// No description provided for @avatarYours.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu avatar'**
+  String get avatarYours;
+
+  /// No description provided for @avatarTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu robô'**
+  String get avatarTitle;
+
+  /// No description provided for @avatarPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia do seu robô'**
+  String get avatarPreview;
+
+  /// No description provided for @avatarShuffle.
+  ///
+  /// In pt, this message translates to:
+  /// **'SORTEAR'**
+  String get avatarShuffle;
+
+  /// No description provided for @avatarSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'SALVAR AVATAR'**
+  String get avatarSave;
+
+  /// No description provided for @avatarSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'SALVO'**
+  String get avatarSaved;
+
+  /// No description provided for @avatarSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não deu para salvar o avatar agora. Tente de novo daqui a pouco.'**
+  String get avatarSaveError;
+
+  /// No description provided for @avatarGroupHead.
+  ///
+  /// In pt, this message translates to:
+  /// **'CABEÇA'**
+  String get avatarGroupHead;
+
+  /// No description provided for @avatarGroupTop.
+  ///
+  /// In pt, this message translates to:
+  /// **'TOPO'**
+  String get avatarGroupTop;
+
+  /// No description provided for @avatarGroupEyes.
+  ///
+  /// In pt, this message translates to:
+  /// **'OLHOS'**
+  String get avatarGroupEyes;
+
+  /// No description provided for @avatarGroupMouth.
+  ///
+  /// In pt, this message translates to:
+  /// **'BOCA'**
+  String get avatarGroupMouth;
+
+  /// No description provided for @avatarGroupSide.
+  ///
+  /// In pt, this message translates to:
+  /// **'LATERAIS'**
+  String get avatarGroupSide;
+
+  /// No description provided for @avatarGroupAcc.
+  ///
+  /// In pt, this message translates to:
+  /// **'ACESSÓRIOS'**
+  String get avatarGroupAcc;
+
+  /// No description provided for @avatarHead.
+  ///
+  /// In pt, this message translates to:
+  /// **'{v, select, rounded{arredondada} square{quadrada} capsule{cápsula} round{redonda} octagon{octógono} other{–}}'**
+  String avatarHead(String v);
+
+  /// No description provided for @avatarTop.
+  ///
+  /// In pt, this message translates to:
+  /// **'{v, select, none{nada} antenna{antena} twoAntennas{duas antenas} spring{mola} heart{coração} propeller{hélice} dome{cúpula} crown{coroa} other{–}}'**
+  String avatarTop(String v);
+
+  /// No description provided for @avatarEyes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{v, select, round{redondos} lashes{cílios} hearts{corações} wink{piscando} sleepy{sonolentos} glasses{óculos} visor{visor} cyclops{ciclope} other{–}}'**
+  String avatarEyes(String v);
+
+  /// No description provided for @avatarMouth.
+  ///
+  /// In pt, this message translates to:
+  /// **'{v, select, smile{sorriso} teeth{dentinhos} open{aberta} wave{onda} grille{grade} line{linha} other{–}}'**
+  String avatarMouth(String v);
+
+  /// No description provided for @avatarSide.
+  ///
+  /// In pt, this message translates to:
+  /// **'{v, select, none{nada} bolts{parafusos} headphones{fones} gears{engrenagens} rods{hastes} other{–}}'**
+  String avatarSide(String v);
+
+  /// No description provided for @avatarAcc.
+  ///
+  /// In pt, this message translates to:
+  /// **'{v, select, none{nada} cheeks{bochechas} bowTie{gravata} tie{gravata longa} medal{medalha} other{–}}'**
+  String avatarAcc(String v);
 
   /// No description provided for @helpTitle.
   ///

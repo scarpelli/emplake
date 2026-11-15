@@ -374,6 +374,19 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String paletteCarryingOver(String sign) {
+    return 'levando $sign: toque num número ou ramo';
+  }
+
+  @override
+  String get dropOverOnGap =>
+      'Esse sinal vai em cima de um número ou de um ramo, e não entre dois números.';
+
+  @override
+  String get dropBetweenOnNode =>
+      'Esse sinal vai entre dois números, num dos vãos tracejados.';
+
+  @override
   String paletteCarrying(String sign) {
     return 'levando $sign: toque num vão';
   }
@@ -964,6 +977,134 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statBestStreak => 'MELHOR SEQUÊNCIA';
+
+  @override
+  String get avatarCreate => 'Criar o meu avatar';
+
+  @override
+  String get avatarYours => 'Seu avatar';
+
+  @override
+  String get avatarTitle => 'Seu robô';
+
+  @override
+  String get avatarPreview => 'Prévia do seu robô';
+
+  @override
+  String get avatarShuffle => 'SORTEAR';
+
+  @override
+  String get avatarSave => 'SALVAR AVATAR';
+
+  @override
+  String get avatarSaved => 'SALVO';
+
+  @override
+  String get avatarSaveError =>
+      'Não deu para salvar o avatar agora. Tente de novo daqui a pouco.';
+
+  @override
+  String get avatarGroupHead => 'CABEÇA';
+
+  @override
+  String get avatarGroupTop => 'TOPO';
+
+  @override
+  String get avatarGroupEyes => 'OLHOS';
+
+  @override
+  String get avatarGroupMouth => 'BOCA';
+
+  @override
+  String get avatarGroupSide => 'LATERAIS';
+
+  @override
+  String get avatarGroupAcc => 'ACESSÓRIOS';
+
+  @override
+  String avatarHead(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'rounded': 'arredondada',
+      'square': 'quadrada',
+      'capsule': 'cápsula',
+      'round': 'redonda',
+      'octagon': 'octógono',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarTop(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'none': 'nada',
+      'antenna': 'antena',
+      'twoAntennas': 'duas antenas',
+      'spring': 'mola',
+      'heart': 'coração',
+      'propeller': 'hélice',
+      'dome': 'cúpula',
+      'crown': 'coroa',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarEyes(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'round': 'redondos',
+      'lashes': 'cílios',
+      'hearts': 'corações',
+      'wink': 'piscando',
+      'sleepy': 'sonolentos',
+      'glasses': 'óculos',
+      'visor': 'visor',
+      'cyclops': 'ciclope',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarMouth(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'smile': 'sorriso',
+      'teeth': 'dentinhos',
+      'open': 'aberta',
+      'wave': 'onda',
+      'grille': 'grade',
+      'line': 'linha',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarSide(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'none': 'nada',
+      'bolts': 'parafusos',
+      'headphones': 'fones',
+      'gears': 'engrenagens',
+      'rods': 'hastes',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarAcc(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'none': 'nada',
+      'cheeks': 'bochechas',
+      'bowTie': 'gravata',
+      'tie': 'gravata longa',
+      'medal': 'medalha',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get helpTitle => 'COMO JOGAR';

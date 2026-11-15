@@ -237,6 +237,16 @@
       }
     }
   },
+  "paletteCarryingOver": "levando {sign}: toque num número ou ramo",
+  "@paletteCarryingOver": {
+    "placeholders": {
+      "sign": {
+        "type": "String"
+      }
+    }
+  },
+  "dropOverOnGap": "Esse sinal vai em cima de um número ou de um ramo, e não entre dois números.",
+  "dropBetweenOnNode": "Esse sinal vai entre dois números, num dos vãos tracejados.",
   "paletteCarrying": "levando {sign}: toque num vão",
   "@paletteCarrying": {
     "placeholders": {
@@ -582,6 +592,32 @@
   "settingsGroupAppearance": "Aparência",
   "settingsGroupGame": "Jogo",
   "statBestStreak": "MELHOR SEQUÊNCIA",
+  "avatarCreate": "Criar o meu avatar",
+  "avatarYours": "Seu avatar",
+  "avatarTitle": "Seu robô",
+  "avatarPreview": "Prévia do seu robô",
+  "avatarShuffle": "SORTEAR",
+  "avatarSave": "SALVAR AVATAR",
+  "avatarSaved": "SALVO",
+  "avatarSaveError": "Não deu para salvar o avatar agora. Tente de novo daqui a pouco.",
+  "avatarGroupHead": "CABEÇA",
+  "avatarGroupTop": "TOPO",
+  "avatarGroupEyes": "OLHOS",
+  "avatarGroupMouth": "BOCA",
+  "avatarGroupSide": "LATERAIS",
+  "avatarGroupAcc": "ACESSÓRIOS",
+  "avatarHead": "{v, select, rounded{arredondada} square{quadrada} capsule{cápsula} round{redonda} octagon{octógono} other{–}}",
+  "@avatarHead": { "placeholders": { "v": { "type": "String" } } },
+  "avatarTop": "{v, select, none{nada} antenna{antena} twoAntennas{duas antenas} spring{mola} heart{coração} propeller{hélice} dome{cúpula} crown{coroa} other{–}}",
+  "@avatarTop": { "placeholders": { "v": { "type": "String" } } },
+  "avatarEyes": "{v, select, round{redondos} lashes{cílios} hearts{corações} wink{piscando} sleepy{sonolentos} glasses{óculos} visor{visor} cyclops{ciclope} other{–}}",
+  "@avatarEyes": { "placeholders": { "v": { "type": "String" } } },
+  "avatarMouth": "{v, select, smile{sorriso} teeth{dentinhos} open{aberta} wave{onda} grille{grade} line{linha} other{–}}",
+  "@avatarMouth": { "placeholders": { "v": { "type": "String" } } },
+  "avatarSide": "{v, select, none{nada} bolts{parafusos} headphones{fones} gears{engrenagens} rods{hastes} other{–}}",
+  "@avatarSide": { "placeholders": { "v": { "type": "String" } } },
+  "avatarAcc": "{v, select, none{nada} cheeks{bochechas} bowTie{gravata} tie{gravata longa} medal{medalha} other{–}}",
+  "@avatarAcc": { "placeholders": { "v": { "type": "String" } } },
   "helpTitle": "COMO JOGAR",
   "helpPageTitle": "Como jogar",
   "helpTabPlay": "JOGAR",

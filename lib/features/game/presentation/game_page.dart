@@ -430,6 +430,19 @@ class _GamePageState extends ConsumerState<GamePage> {
     }
   }
 
+  void _dropOnNode(SignDrag drag, int nodeId) {
+    if (_ctrl.dropOnNode(drag, nodeId)) _sound.play(Sfx.tap);
+  }
+
+  void _wrongDrop(SignDrag drag) {
+    final l = context.l10n;
+    _sound.play(Sfx.error);
+    _buzz(strong: true);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(drag.goesOnNode ? l.dropOverOnGap : l.dropBetweenOnNode)));
+  }
+
   void _dropOutside(SignDrag drag) {
     _ctrl.dropOutside(drag);
     _sound.play(Sfx.tap);
@@ -635,6 +648,8 @@ class _GamePageState extends ConsumerState<GamePage> {
               onDrop: _drop,
               canDrop: _ctrl.canDrop,
               onDropOutside: _dropOutside,
+              onDropOnNode: _dropOnNode,
+              onWrongDrop: _wrongDrop,
             ),
           ),
         ),

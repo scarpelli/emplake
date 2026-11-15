@@ -52,9 +52,11 @@ class OperatorPalette extends StatelessWidget {
     final binaryNode = playing && node is Binary ? node : null;
     final nodeSelected = playing && node != null;
     final carried = sel is CarrySelection ? sel : null;
+    final carriedOver = carried != null && carried.drag.goesOnNode ? carried : null;
 
     final betweenHint = switch (sel) {
       GapSelection() => l.paletteGapSelected,
+      CarrySelection(:final drag) when drag.goesOnNode => l.paletteTapGap,
       CarrySelection(:final op) => l.paletteCarrying(op?.label ?? '='),
       EqualsSelection() => l.paletteNodeSelected('='),
       NodeSelection() when node != null => l.paletteNodeSelected(TreeLayout.of(board).nodes[node.id]?.label ?? ''),
@@ -75,7 +77,7 @@ class OperatorPalette extends StatelessWidget {
       children: [
         Eyebrow(
           '${l.paletteBetween} · $betweenHint',
-          opacity: canLinkGap || canEquals || binaryNode != null || carried != null ? 0.75 : 0.5,
+          opacity: canLinkGap || canEquals || binaryNode != null || (carried != null && carriedOver == null) ? 0.75 : 0.5,
         ),
         const SizedBox(height: 8),
         _Grid(
@@ -114,32 +116,45 @@ class OperatorPalette extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 14),
-        Eyebrow('${l.paletteOver} · ${l.paletteTapNode}', opacity: nodeSelected ? 0.75 : 0.45),
+        Eyebrow(
+          '${l.paletteOver} · ${carriedOver == null ? l.paletteTapNode : l.paletteCarryingOver(carriedOver.isParens ? '( )' : carriedOver.unary!.label)}',
+          opacity: nodeSelected || carriedOver != null ? 0.75 : 0.45,
+        ),
         const SizedBox(height: 8),
         _Grid(
           columns: 5,
           dashed: true,
           children: [
             for (final op in unaryOps)
-              _OpButton(
-                key: keys.of(op),
-                label: op.label,
-                tooltip: rules.unary.contains(op)
-                    ? '${op.name(l)} · ${op.example(context.decimalSeparator)}'
-                    : l.ruleShortForbid(op.label),
-                enabled: nodeSelected && rules.unary.contains(op),
-                struck: !rules.unary.contains(op),
-                active: false,
-                dashed: true,
-                onTap: () => onUnary(op),
+              _dragWhenPlaying(
+                playing && rules.unary.contains(op),
+                PaletteUnaryDrag(op),
+                op.label,
+                _OpButton(
+                  key: keys.of(op),
+                  label: op.label,
+                  tooltip: rules.unary.contains(op)
+                      ? '${op.name(l)} · ${op.example(context.decimalSeparator)}'
+                      : l.ruleShortForbid(op.label),
+                  enabled: playing && rules.unary.contains(op),
+                  struck: !rules.unary.contains(op),
+                  active: carriedOver?.unary == op,
+                  dashed: true,
+                  onTap: () => onUnary(op),
+                ),
               ),
-            _OpButton(
-              label: '( )',
-              tooltip: l.toggleParens,
-              enabled: nodeSelected,
-              active: node?.parens ?? false,
-              dashed: true,
-              onTap: onParens,
+            _dragWhenPlaying(
+              playing,
+              const PaletteParensDrag(),
+              '( )',
+              _OpButton(
+                label: '( )',
+                tooltip: l.toggleParens,
+                enabled: playing,
+                active: (node?.parens ?? false) || (carriedOver?.isParens ?? false),
+                dashed: true,
+                onTap: onParens,
+              ),
             ),
             _OpButton(
               icon: Icons.backspace_outlined,

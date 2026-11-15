@@ -66,6 +66,19 @@ class PaletteEqualsDrag extends SignDrag {
   const PaletteEqualsDrag();
 }
 
+class PaletteUnaryDrag extends SignDrag {
+  const PaletteUnaryDrag(this.op);
+  final UnOp op;
+}
+
+class PaletteParensDrag extends SignDrag {
+  const PaletteParensDrag();
+}
+
+extension SignDragKind on SignDrag {
+  bool get goesOnNode => this is PaletteUnaryDrag || this is PaletteParensDrag;
+}
+
 class MoveBinaryDrag extends SignDrag {
   const MoveBinaryDrag(this.nodeId, this.fromGap);
   final int nodeId;
@@ -86,12 +99,23 @@ class CarrySelection extends Selection {
     _ => null,
   };
 
+  UnOp? get unary => switch (drag) {
+    PaletteUnaryDrag(:final op) => op,
+    _ => null,
+  };
+
   bool get isEquals => drag is PaletteEqualsDrag;
+  bool get isParens => drag is PaletteParensDrag;
 
   @override
-  bool operator ==(Object other) => other is CarrySelection && other.op == op && other.isEquals == isEquals;
+  bool operator ==(Object other) =>
+      other is CarrySelection &&
+      other.op == op &&
+      other.unary == unary &&
+      other.isEquals == isEquals &&
+      other.isParens == isParens;
   @override
-  int get hashCode => Object.hash(op, isEquals);
+  int get hashCode => Object.hash(op, unary, isEquals, isParens);
 }
 
 class GameState {
@@ -508,6 +532,9 @@ class GameController extends Notifier<GameState?> {
     final s = _editable;
     if (s == null) return;
     final node = s.board.find(nodeId);
+    if (s.selection case CarrySelection(:final drag) when drag.goesOnNode) {
+      if (dropOnNode(drag, nodeId)) return;
+    }
     if (s.selection case CarrySelection(:final drag) when node is Binary) {
       if (_dropHere(s, drag, node.digitGap)) return;
     }
@@ -588,10 +615,29 @@ class GameController extends Notifier<GameState?> {
 
   void applyUnary(UnOp op) {
     final s = _editable;
-    final sel = s?.selection;
-    if (s == null || sel is! NodeSelection) return;
-    final next = s.board.applyUnary(sel.nodeId, op);
-    _commit(s, next, select: NodeSelection(next.nextId - 1));
+    if (s == null) return;
+    final sel = s.selection;
+    if (sel is NodeSelection) {
+      dropOnNode(PaletteUnaryDrag(op), sel.nodeId);
+    } else {
+      _carry(s, PaletteUnaryDrag(op));
+    }
+  }
+
+  bool dropOnNode(SignDrag drag, int nodeId) {
+    final s = _editable;
+    if (s == null || s.board.find(nodeId) == null) return false;
+    switch (drag) {
+      case PaletteUnaryDrag(:final op) when s.rules.unary.contains(op):
+        final next = s.board.applyUnary(nodeId, op);
+        _commit(s, next, select: NodeSelection(next.nextId - 1));
+        return true;
+      case PaletteParensDrag():
+        _commit(s, s.board.toggleParens(nodeId), select: NodeSelection(nodeId));
+        return true;
+      default:
+        return false;
+    }
   }
 
   void removeUnary() {
@@ -661,6 +707,7 @@ class GameController extends Notifier<GameState?> {
         PaletteEqualsDrag() => b.dropEquals(gap),
         MoveBinaryDrag(:final nodeId) => b.moveBinary(nodeId, gap),
         MoveEqualsDrag() => b.moveEquals(gap),
+        PaletteUnaryDrag() || PaletteParensDrag() => b,
       };
     } on StateError {
       return b;
@@ -669,9 +716,13 @@ class GameController extends Notifier<GameState?> {
 
   void toggleParens() {
     final s = _editable;
-    final sel = s?.selection;
-    if (s == null || sel is! NodeSelection) return;
-    _commit(s, s.board.toggleParens(sel.nodeId), select: sel);
+    if (s == null) return;
+    final sel = s.selection;
+    if (sel is NodeSelection) {
+      dropOnNode(const PaletteParensDrag(), sel.nodeId);
+    } else {
+      _carry(s, const PaletteParensDrag());
+    }
   }
 
   void undo() {

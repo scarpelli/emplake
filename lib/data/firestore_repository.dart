@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/avatar/robot_avatar.dart';
 import '../features/daily/daily.dart';
 import '../features/game/application/catalog_provider.dart';
 import '../features/game/domain/adventure.dart';
@@ -38,6 +39,8 @@ class FirestoreRepository {
     await _userDoc.set(data, SetOptions(merge: true));
     return UserProfile.fromMap(data);
   }
+
+  Future<void> saveAvatar(RobotAvatar avatar) => _userDoc.set({'avatar': avatar.toMap()}, SetOptions(merge: true));
 
   Future<Set<String>> solvedNumbers(Level level) async {
     final q = await _solved.where('level', isEqualTo: level.name).get();

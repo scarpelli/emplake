@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../features/avatar/robot_avatar.dart';
 import '../features/game/domain/challenge.dart';
 import '../features/game/domain/level.dart';
 
@@ -20,6 +21,7 @@ class UserProfile {
     this.inTimeSolves = 0,
     this.adventure = const {},
     this.challenges = const {},
+    this.avatar,
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> m) => UserProfile(
@@ -46,6 +48,7 @@ class UserProfile {
       for (final e in ((m['challenges'] as Map?) ?? const {}).entries)
         ?ChallengeKind.values.asNameMap()[e.key]: ChallengeStats.fromMap((e.value as Map).cast<String, dynamic>()),
     },
+    avatar: RobotAvatar.fromMap(m['avatar']),
   );
 
   final String displayName;
@@ -70,6 +73,9 @@ class UserProfile {
   final Map<String, int> adventure;
 
   final Map<ChallengeKind, ChallengeStats> challenges;
+
+  /// The robot the player built, or null while they keep the one drawn for them.
+  final RobotAvatar? avatar;
 }
 
 class ChallengeStats {

@@ -372,6 +372,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String paletteCarryingOver(String sign) {
+    return 'carrying $sign: tap a number or branch';
+  }
+
+  @override
+  String get dropOverOnGap =>
+      'This sign goes on a number or a branch, not between two numbers.';
+
+  @override
+  String get dropBetweenOnNode =>
+      'This sign goes between two numbers, in one of the dashed gaps.';
+
+  @override
   String paletteCarrying(String sign) {
     return 'carrying $sign: tap a gap';
   }
@@ -960,6 +973,134 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statBestStreak => 'BEST STREAK';
+
+  @override
+  String get avatarCreate => 'Create my avatar';
+
+  @override
+  String get avatarYours => 'Your avatar';
+
+  @override
+  String get avatarTitle => 'Your robot';
+
+  @override
+  String get avatarPreview => 'Preview of your robot';
+
+  @override
+  String get avatarShuffle => 'SHUFFLE';
+
+  @override
+  String get avatarSave => 'SAVE AVATAR';
+
+  @override
+  String get avatarSaved => 'SAVED';
+
+  @override
+  String get avatarSaveError =>
+      'We couldn\'t save your avatar right now. Please try again in a little while.';
+
+  @override
+  String get avatarGroupHead => 'HEAD';
+
+  @override
+  String get avatarGroupTop => 'TOP';
+
+  @override
+  String get avatarGroupEyes => 'EYES';
+
+  @override
+  String get avatarGroupMouth => 'MOUTH';
+
+  @override
+  String get avatarGroupSide => 'SIDES';
+
+  @override
+  String get avatarGroupAcc => 'ACCESSORIES';
+
+  @override
+  String avatarHead(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'rounded': 'rounded',
+      'square': 'square',
+      'capsule': 'capsule',
+      'round': 'round',
+      'octagon': 'octagon',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarTop(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'none': 'none',
+      'antenna': 'antenna',
+      'twoAntennas': 'two antennas',
+      'spring': 'spring',
+      'heart': 'heart',
+      'propeller': 'propeller',
+      'dome': 'dome',
+      'crown': 'crown',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarEyes(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'round': 'round',
+      'lashes': 'lashes',
+      'hearts': 'hearts',
+      'wink': 'winking',
+      'sleepy': 'sleepy',
+      'glasses': 'glasses',
+      'visor': 'visor',
+      'cyclops': 'cyclops',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarMouth(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'smile': 'smile',
+      'teeth': 'little teeth',
+      'open': 'open',
+      'wave': 'wavy',
+      'grille': 'grille',
+      'line': 'straight',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarSide(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'none': 'none',
+      'bolts': 'bolts',
+      'headphones': 'headphones',
+      'gears': 'gears',
+      'rods': 'rods',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String avatarAcc(String v) {
+    String _temp0 = intl.Intl.selectLogic(v, {
+      'none': 'none',
+      'cheeks': 'cheeks',
+      'bowTie': 'bow tie',
+      'tie': 'long tie',
+      'medal': 'medal',
+      'other': '–',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get helpTitle => 'HOW TO PLAY';

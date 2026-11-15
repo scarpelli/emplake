@@ -152,6 +152,8 @@ class TreeView extends StatefulWidget {
     this.onDrop,
     this.canDrop,
     this.onDropOutside,
+    this.onDropOnNode,
+    this.onWrongDrop,
     this.showValues = true,
     this.hintGaps = const {},
     this.geometry,
@@ -167,6 +169,9 @@ class TreeView extends StatefulWidget {
   final bool Function(SignDrag drag, int digitGap)? canDrop;
 
   final ValueChanged<SignDrag>? onDropOutside;
+
+  final void Function(SignDrag drag, int nodeId)? onDropOnNode;
+  final ValueChanged<SignDrag>? onWrongDrop;
 
   final bool showValues;
 
@@ -349,7 +354,8 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
   bool get _signInHand {
     final sel = widget.state.selection;
     return switch (sel) {
-      CarrySelection() || EqualsSelection() => true,
+      CarrySelection(:final drag) => !drag.goesOnNode,
+      EqualsSelection() => true,
       NodeSelection(:final nodeId, picked: true) => widget.state.board.find(nodeId) is Binary,
       _ => false,
     };
@@ -358,13 +364,13 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
   Widget _interactiveNode(PlacedNode n, {required bool selected, required bool error}) {
     final hinted = n.digitGap != null && widget.hintGaps.contains(n.digitGap);
     final destination = n.kind == TreeNodeKind.gap && _editable && _signInHand;
-    Widget chip({bool hover = false}) => _NodeChip(
+    Widget chip({bool hover = false, bool wrong = false}) => _NodeChip(
       node: n,
       hint: hinted,
       destination: destination,
       selected: selected,
-      hover: hover,
-      error: error,
+      hover: hover && !wrong,
+      error: error || wrong,
       onTap: () {
         switch (n.kind) {
           case TreeNodeKind.gap:
@@ -377,9 +383,9 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
       },
     );
 
-    Widget withDrag({bool hover = false}) {
+    Widget withDrag({bool hover = false, bool wrong = false}) {
       final drag = _editable ? _dragOf(n) : null;
-      if (drag == null) return chip(hover: hover);
+      if (drag == null) return chip(hover: hover, wrong: wrong);
       return SignDraggable(
         data: drag,
         feedback: _NodeChip(node: n, selected: true, error: false, onTap: () {}),
@@ -390,16 +396,37 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
           if (!inside) widget.onDropOutside?.call(drag);
         },
         childWhenDragging: Opacity(opacity: 0.3, child: chip()),
-        child: chip(hover: hover),
+        child: chip(hover: hover, wrong: wrong),
       );
     }
 
     final gap = n.digitGap;
-    if (gap == null || widget.onDrop == null) return withDrag();
+    final takesNodeSigns = n.kind == TreeNodeKind.leaf || n.kind == TreeNodeKind.op;
+    bool fits(SignDrag d) => d.goesOnNode ? takesNodeSigns : gap != null;
+    bool accepts(SignDrag d) {
+      if (!_editable) return false;
+      if (d.goesOnNode) return widget.onDropOnNode != null;
+      if (gap != null) return widget.onDrop != null && (widget.canDrop?.call(d, gap) ?? true);
+      return widget.onWrongDrop != null;
+    }
+
+    if (widget.onDrop == null && widget.onDropOnNode == null) return withDrag();
     return DragTarget<SignDrag>(
-      onWillAcceptWithDetails: (d) => _editable && (widget.canDrop?.call(d.data, gap) ?? true),
-      onAcceptWithDetails: (d) => widget.onDrop!(d.data, gap),
-      builder: (context, candidates, _) => withDrag(hover: candidates.isNotEmpty),
+      onWillAcceptWithDetails: (d) => accepts(d.data),
+      onAcceptWithDetails: (d) {
+        final drag = d.data;
+        if (!fits(drag)) {
+          widget.onWrongDrop?.call(drag);
+        } else if (drag.goesOnNode) {
+          widget.onDropOnNode!(drag, n.id);
+        } else {
+          widget.onDrop!(drag, gap!);
+        }
+      },
+      builder: (context, candidates, _) => withDrag(
+        hover: candidates.isNotEmpty,
+        wrong: candidates.any((d) => d != null && !fits(d)),
+      ),
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../data/firestore_repository.dart';
 import '../features/auth/login_page.dart';
+import '../features/avatar/avatar_page.dart';
 import '../features/adventure/adventure_page.dart';
 import '../features/challenges/challenges_page.dart';
 import '../features/cover/cover_page.dart';
@@ -133,7 +134,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: '/settings', builder: (_, _) => const SettingsPage())],
+            routes: [
+              GoRoute(
+                path: '/settings',
+                builder: (_, _) => const SettingsPage(),
+                routes: [GoRoute(path: 'avatar', builder: (_, _) => const AvatarPage())],
+              ),
+            ],
           ),
         ],
       ),

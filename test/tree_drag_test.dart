@@ -14,9 +14,11 @@ GameState _state() =>
 class _Calls {
   final drops = <(SignDrag, int)>[];
   final outside = <SignDrag>[];
+  final onNode = <(SignDrag, int)>[];
+  final wrong = <SignDrag>[];
 }
 
-Future<_Calls> _pump(WidgetTester tester, {bool showValues = true}) async {
+Future<_Calls> _pump(WidgetTester tester, {bool showValues = true, List<(SignDrag, String)> sources = const []}) async {
   final calls = _Calls();
   await tester.pumpWidget(
     MaterialApp(
@@ -38,7 +40,19 @@ Future<_Calls> _pump(WidgetTester tester, {bool showValues = true}) async {
                 onDrop: (d, g) => calls.drops.add((d, g)),
                 canDrop: (d, g) => true,
                 onDropOutside: calls.outside.add,
+                onDropOnNode: (d, id) => calls.onNode.add((d, id)),
+                onWrongDrop: calls.wrong.add,
               ),
+            ),
+            Row(
+              children: [
+                for (final (drag, label) in sources)
+                  SignDraggable(
+                    data: drag,
+                    feedback: const SizedBox(width: 20, height: 20),
+                    child: SizedBox(width: 48, height: 48, child: Center(child: Text('src $label'))),
+                  ),
+              ],
             ),
             const Expanded(child: SizedBox.expand(key: Key('outside'))),
           ],
@@ -81,6 +95,37 @@ void main() {
     await _drag(tester, find.text('+'), tester.getCenter(find.byKey(const Key('outside'))));
     expect(calls.drops, isEmpty);
     expect(calls.outside.single, isA<MoveBinaryDrag>());
+  }, variant: desktop);
+
+  testWidgets('a sign that goes on a segment is applied to the number it is dropped on', (tester) async {
+    final calls = await _pump(tester, showValues: false, sources: [(const PaletteUnaryDrag(UnOp.sqrt), '√')]);
+    await _drag(tester, find.text('src √'), tester.getCenter(find.text('4')));
+    expect(calls.wrong, isEmpty);
+    final (drag, nodeId) = calls.onNode.single;
+    expect((drag as PaletteUnaryDrag).op, UnOp.sqrt);
+    expect(nodeId, _state().board.blocks.last.id);
+  }, variant: desktop);
+
+  testWidgets('a sign that goes on a segment can wrap a whole branch', (tester) async {
+    final calls = await _pump(tester, showValues: false, sources: [(const PaletteParensDrag(), '( )')]);
+    await _drag(tester, find.text('src ( )'), tester.getCenter(find.text('+')));
+    expect(calls.onNode.single.$2, _state().board.blocks.first.id);
+    expect(calls.drops, isEmpty);
+  }, variant: desktop);
+
+  testWidgets('a sign that goes on a segment is refused between two numbers', (tester) async {
+    final calls = await _pump(tester, showValues: false, sources: [(const PaletteUnaryDrag(UnOp.fact), '!')]);
+    await _drag(tester, find.text('src !'), tester.getCenter(find.byIcon(Icons.add).last));
+    expect(calls.wrong.single, isA<PaletteUnaryDrag>());
+    expect(calls.drops, isEmpty);
+    expect(calls.onNode, isEmpty);
+  }, variant: desktop);
+
+  testWidgets('a sign that goes between numbers is refused on a number', (tester) async {
+    final calls = await _pump(tester, showValues: false, sources: [(const PaletteBinaryDrag(BinOp.mul), '×')]);
+    await _drag(tester, find.text('src ×'), tester.getCenter(find.text('4')));
+    expect(calls.wrong.single, isA<PaletteBinaryDrag>());
+    expect(calls.drops, isEmpty);
   }, variant: desktop);
 
   testWidgets('live values can be hidden', (tester) async {
