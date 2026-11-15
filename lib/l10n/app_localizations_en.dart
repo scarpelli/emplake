@@ -52,9 +52,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Try again';
 
   @override
-  String get plateCountry => 'BRAZIL';
-
-  @override
   String get coverTagline =>
       'Use the four digits of the plate, in order, to build a true equation.';
 

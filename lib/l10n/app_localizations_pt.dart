@@ -52,9 +52,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get retry => 'Tentar de novo';
 
   @override
-  String get plateCountry => 'BRASIL';
-
-  @override
   String get coverTagline =>
       'Use os quatro dígitos da placa, na ordem, para montar uma igualdade verdadeira.';
 

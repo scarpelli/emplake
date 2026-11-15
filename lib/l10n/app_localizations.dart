@@ -184,12 +184,6 @@ abstract class AppLocalizations {
   /// **'Tentar de novo'**
   String get retry;
 
-  /// No description provided for @plateCountry.
-  ///
-  /// In pt, this message translates to:
-  /// **'BRASIL'**
-  String get plateCountry;
-
   /// No description provided for @coverTagline.
   ///
   /// In pt, this message translates to:
