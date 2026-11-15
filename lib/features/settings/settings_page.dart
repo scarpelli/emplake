@@ -9,6 +9,7 @@ import '../../data/firestore_repository.dart';
 import '../auth/guest.dart';
 import '../avatar/avatar_page.dart';
 import '../avatar/robot_avatar.dart';
+import '../daily/daily.dart';
 import '../game/presentation/skip_dialog.dart';
 import 'seed_color_dialog.dart';
 import 'settings_controller.dart';
@@ -430,7 +431,7 @@ class _PlayerCard extends ConsumerWidget {
               const SizedBox(width: 6),
               stat(l.solvedCount, profile?.solvedCount),
               const SizedBox(width: 6),
-              stat(l.statBestStreak, profile?.bestStreak),
+              stat(l.statDayStreak, profile?.streakOn(Daily.keyFor(DateTime.now()))),
             ],
           ),
         ),

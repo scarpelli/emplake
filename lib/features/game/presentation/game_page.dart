@@ -119,6 +119,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         _buzz(strong: true);
       case CheckResult.right when s0?.run != null:
         _sound.play(Sfx.success);
+        unawaited(_countPlayedDay().then((_) => ref.invalidate(profileProvider)));
         setState(() => _sheetVisible = true);
         _autoNext?.cancel();
         _autoNext = Timer(const Duration(milliseconds: 1100), () {
@@ -137,6 +138,16 @@ class _GamePageState extends ConsumerState<GamePage> {
     }
   }
 
+  Future<bool> _countPlayedDay() async {
+    final repo = ref.read(repositoryProvider);
+    if (repo == null) return false;
+    try {
+      return await repo.recordPlayedDay(Daily.keyFor(DateTime.now()));
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> _save() async {
     final s = ref.read(gameControllerProvider);
     if (s == null) return;
@@ -145,15 +156,17 @@ class _GamePageState extends ConsumerState<GamePage> {
       final lesson = catalog.lessons.where((x) => x.practice.number == s.number).firstOrNull;
       if (lesson != null) ref.read(settingsProvider.notifier).markLessonDone(lesson.op.name);
     }
+    final newDay = await _countPlayedDay();
     if (s.practice) {
       _ctrl.setSaveResult(SaveStatus.none);
+      if (newDay) ref.invalidate(profileProvider);
       return;
     }
     if (s.mode == GameMode.adventure && s.stage != null) {
       final stars = AdventureStars.of(
         inTime: s.solvedInTime,
         hints: s.hintsUsed,
-        secondsLeft: s.secondsLeft,
+        secondsLeft: s.scoringSecondsLeft,
         levelSeconds: s.level.seconds,
       );
       if (mounted) setState(() => _stars = stars);
@@ -194,7 +207,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       }
       ref.invalidate(profileProvider);
       if (out.isNew) ref.invalidate(adventureStarsProvider);
-      if (out.isNew || s.mode == GameMode.daily) await _checkAchievements(repo, s);
+      if (out.isNew || newDay || s.mode == GameMode.daily) await _checkAchievements(repo, s);
     } catch (_) {
       _ctrl.setSaveResult(SaveStatus.failed);
     }
@@ -242,7 +255,7 @@ class _GamePageState extends ConsumerState<GamePage> {
     if (s == null) return null;
     final profile = await ref.read(profileProvider.future);
     if (!mounted) return null;
-    final streak = profile?.dailyStreak ?? 0;
+    final streak = profile?.streakOn(Daily.keyFor(DateTime.now())) ?? 0;
     return Daily.shareText(
       key: Daily.keyFor(DateTime.now()),
       solved: s.phase == GamePhase.solved,

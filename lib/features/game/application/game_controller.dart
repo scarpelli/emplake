@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/prefs.dart';
+import '../domain/adventure.dart';
 import '../domain/board.dart';
 import '../domain/challenge.dart';
 import '../domain/evaluator.dart';
@@ -200,9 +201,9 @@ class GameState {
 
   int get clockLength => totalSeconds ?? level.seconds;
 
-  /// Practice and the plate of the day run a stopwatch instead of a countdown:
-  /// the time is measured but never runs out.
-  bool get untimed => practice || mode == GameMode.daily;
+  /// Practice, the plate of the day and the first stages of the Adventure run
+  /// a stopwatch instead of a countdown: the time is measured but never runs out.
+  bool get untimed => practice || mode == GameMode.daily || (mode == GameMode.adventure && AdventureProgress.isUntimed(stage));
 
   /// Seconds left as far as scoring goes. Untimed plates still reward speed:
   /// the bonus shrinks against the level clock but the plate never expires.

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../domain/board.dart';
 import '../domain/catalog.dart';
 import '../domain/level.dart';
 import '../domain/solver.dart';
@@ -15,6 +16,11 @@ Future<String?> findSolution(Ref ref, Level level, String number) async {
 final solutionProvider = FutureProvider.family<String?, (Level, String)>(
   (ref, key) => findSolution(ref, key.$1, key.$2),
 );
+
+final otherSolutionsProvider = FutureProvider.autoDispose.family<List<Board>, (Level, String)>((ref, key) async {
+  await Future<void>.delayed(const Duration(milliseconds: 500));
+  return SolutionFinder(key.$1).find(key.$2);
+});
 
 final catalogProvider = FutureProvider<Catalog>((ref) async {
   final text = await rootBundle.loadString('assets/catalog.json');

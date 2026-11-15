@@ -176,7 +176,16 @@ class FirestoreRepository {
   Future<void> startDaily(String key, {required String number, required Level level}) =>
       _dailyDoc(key).set({'number': number, 'level': level.name, 'status': 'started'}, SetOptions(merge: true));
 
-  Future<int> finishDaily(
+  Future<bool> recordPlayedDay(String key) => _db.runTransaction((tx) async {
+    final data = (await tx.get(_userDoc)).data() ?? const <String, dynamic>{};
+    final last = data['lastDaily'] as String?;
+    if (last == key) return false;
+    final streak = Daily.nextStreak(key: key, lastDay: last, current: (data['dailyStreak'] as num?)?.toInt() ?? 0);
+    tx.set(_userDoc, {'dailyStreak': streak, 'lastDaily': key}, SetOptions(merge: true));
+    return true;
+  });
+
+  Future<void> finishDaily(
     String key, {
     required bool solved,
     required int seconds,
@@ -185,10 +194,8 @@ class FirestoreRepository {
     String? solution,
   }) {
     return _db.runTransaction((tx) async {
-      final profile = await tx.get(_userDoc);
       final previous = await tx.get(_dailyDoc(key));
       final status = previous.data()?['status'];
-      // Count each player once in the public tally, at their first finish.
       if (status != 'solved' && status != 'failed') {
         tx.set(_dailyStats(key), {
           'plays': FieldValue.increment(1),
@@ -198,13 +205,6 @@ class FirestoreRepository {
             'missed': FieldValue.increment(1),
         }, SetOptions(merge: true));
       }
-      final data = profile.data() ?? const <String, dynamic>{};
-      final streak = Daily.nextStreak(
-        key: key,
-        solved: solved,
-        lastDaily: data['lastDaily'] as String?,
-        current: (data['dailyStreak'] as num?)?.toInt() ?? 0,
-      );
       tx.set(_dailyDoc(key), {
         'status': solved ? 'solved' : 'failed',
         'seconds': seconds,
@@ -213,8 +213,6 @@ class FirestoreRepository {
         'solution': ?solution,
         'finishedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      tx.set(_userDoc, {'dailyStreak': streak, if (solved) 'lastDaily': key}, SetOptions(merge: true));
-      return streak;
     });
   }
 

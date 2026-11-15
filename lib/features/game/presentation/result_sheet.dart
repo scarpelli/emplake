@@ -7,6 +7,7 @@ import '../application/game_controller.dart';
 import '../domain/challenge.dart';
 import '../domain/format.dart';
 import 'formula_panel.dart';
+import 'other_solutions.dart';
 
 class ResultSheet extends StatelessWidget {
   const ResultSheet({
@@ -106,6 +107,7 @@ class ResultSheet extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             FormulaPanel(tokens: linearTokens(state.board), latex: latexOf(state.board), compact: true),
+            OtherSolutions(level: state.level, board: state.board),
             if (stars != null && !revealed) ...[
               const SizedBox(height: 16),
               Semantics(
@@ -210,7 +212,7 @@ class _RunSheet extends StatelessWidget {
             Icons.flag_outlined,
             bp.accent,
             clock ? l.runOverClock : l.runOverLives,
-            clock ? l.runScoreClock(run.solved) : l.runScoreStreak(run.solved),
+            l.runScoreSolved(run.solved),
           )
         : solved
         ? (
@@ -265,7 +267,7 @@ class _RunSheet extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  _Stat(label: clock ? l.challengeRecord : l.challengeStreak, value: '${run.solved}'),
+                  _Stat(label: l.challengeRecord, value: '${run.solved}'),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(

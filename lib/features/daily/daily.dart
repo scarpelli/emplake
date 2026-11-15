@@ -2,35 +2,65 @@ import '../game/domain/catalog.dart';
 import '../game/domain/level.dart';
 
 abstract final class Daily {
-  static String keyFor(DateTime now) {
-    final d = now.toUtc();
+  static String keyFor(DateTime now) => _format(now.toLocal());
+
+  static String _format(DateTime d) {
     String two(int v) => v.toString().padLeft(2, '0');
     return '${d.year}-${two(d.month)}-${two(d.day)}';
   }
 
-  static String yesterdayOf(String key) {
-    final d = DateTime.parse('${key}T00:00:00Z').subtract(const Duration(days: 1));
-    return keyFor(d);
-  }
+  static DateTime _dateOf(String key) => DateTime.parse('${key}T00:00:00Z');
+
+  static String yesterdayOf(String key) => _format(_dateOf(key).subtract(const Duration(days: 1)));
+
+  static final _epoch = DateTime.utc(2026, 1, 1);
+
+  static int dayNumber(String key) => _dateOf(key).difference(_epoch).inDays;
+
+  static List<CatalogEntry> pool(Catalog catalog) => [
+    for (final level in Level.values)
+      for (final e in catalog.entriesFor(level))
+        if (e.stars == 2) e,
+  ];
 
   static CatalogEntry entryFor(Catalog catalog, String key) {
-    final pool = [
-      for (final level in Level.values)
-        for (final e in catalog.entriesFor(level))
-          if (e.stars == 2) e,
-    ];
-    var h = 7;
-    for (final c in key.codeUnits) {
-      h = (h * 131 + c) % 1000000007;
-    }
-    return pool[h % pool.length];
+    final entries = pool(catalog);
+    final n = entries.length;
+    final day = dayNumber(key);
+    final round = (day / n).floor();
+    return entries[_round(n, round)[day - round * n]];
   }
 
-  static int nextStreak({required String key, required bool solved, String? lastDaily, int current = 0}) {
-    if (!solved) return 0;
-    if (lastDaily == key) return current;
-    return lastDaily == yesterdayOf(key) ? current + 1 : 1;
+  static List<int> _round(int n, int round) {
+    final order = _shuffle(n, round);
+    if (n > 2 && order.first == _shuffle(n, round - 1).last) {
+      order[0] = order[1];
+      order[1] = _shuffle(n, round - 1).last;
+    }
+    return order;
   }
+
+  static List<int> _shuffle(int n, int round) {
+    final order = List.generate(n, (i) => i);
+    var seed = (round * 7919 + 12345) % 2147483647;
+    if (seed <= 0) seed += 2147483646;
+    for (var i = n - 1; i > 0; i--) {
+      seed = seed * 48271 % 2147483647;
+      final j = seed % (i + 1);
+      final t = order[i];
+      order[i] = order[j];
+      order[j] = t;
+    }
+    return order;
+  }
+
+  static int nextStreak({required String key, String? lastDay, int current = 0}) {
+    if (lastDay == key) return current;
+    return lastDay == yesterdayOf(key) ? current + 1 : 1;
+  }
+
+  static int streakOn(String key, {String? lastDay, int current = 0}) =>
+      lastDay == key || lastDay == yesterdayOf(key) ? current : 0;
 
   /// The scoreboard people paste in chats. Nothing in it gives the plate
   /// away: time as a speed bar against the level clock, hints as lamps.

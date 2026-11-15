@@ -537,6 +537,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get copied => 'Copiado!';
 
   @override
+  String otherSolutions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'OUTRAS $count SOLUÇÕES',
+      one: 'OUTRA SOLUÇÃO',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String otherSolutionsMore(int count) {
+    return 'e mais $count';
+  }
+
+  @override
   String get pause => 'Pausar';
 
   @override
@@ -855,7 +871,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get achDaily7 => 'Semana cheia';
 
   @override
-  String get achDaily7Desc => 'Resolva a placa do dia 7 dias seguidos.';
+  String get achDaily7Desc => 'Resolva uma placa por dia, 7 dias seguidos.';
 
   @override
   String get achHundred => 'Centena';
@@ -973,7 +989,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsGroupGame => 'Jogo';
 
   @override
-  String get statBestStreak => 'MELHOR SEQUÊNCIA';
+  String get statDayStreak => 'DIAS SEGUIDOS';
 
   @override
   String get avatarCreate => 'Criar o meu avatar';
@@ -1127,6 +1143,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get helpExampleCaption =>
       '1236 → 1 × 2 × 3 = 6. Cada ligação sobe um andar na árvore.';
+
+  @override
+  String get helpOtherSolutions =>
+      'Depois de cada número, a folha de resultado mostra outras soluções, das mais simples para as mais elaboradas.';
 
   @override
   String get helpKeys => 'TECLADO';
@@ -1284,8 +1304,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Às cegas: jogando o número inteiro com os valores em tempo real desligados, os pontos valem ×1,25.';
 
   @override
-  String get helpScoringStreak =>
-      'Sequência: cada acerto seguido, no tempo e sem dicas, soma +10% (até +50%). Pular zera a sequência.';
+  String get helpScoringCombo =>
+      'Combo: cada acerto seguido, no tempo e sem dicas, soma +10% (até +50%). Pular zera o combo.';
+
+  @override
+  String get helpDayStreak =>
+      '🔥 Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.';
 
   @override
   String get helpScoringPractice => 'Treino e lições não valem pontos.';
@@ -1331,6 +1355,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get adventureStarsRule =>
       '★ quando você resolve, ★★ no tempo e sem dicas, ★★★ com pelo menos metade do tempo sobrando';
+
+  @override
+  String helpAdventureUntimed(int count) {
+    return 'As $count primeiras fases da Aventura não têm relógio: o tempo é medido, mas não acaba.';
+  }
 
   @override
   String adventureContinue(int number) {
@@ -1401,9 +1430,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get challengeRecord => 'RECORDE';
-
-  @override
-  String get challengeStreak => 'SEQUÊNCIA';
 
   @override
   String get challengePlays => 'PARTIDAS';
@@ -1509,25 +1535,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get runOverLives => 'SEM VIDAS';
 
   @override
-  String runScoreClock(int count) {
+  String runScoreSolved(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: '$count placas resolvidas',
       one: '1 placa resolvida',
       zero: 'Nenhuma placa resolvida',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String runScoreStreak(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Sequência de $count placas',
-      one: 'Sequência de 1 placa',
-      zero: 'Nenhuma placa na sequência',
     );
     return '$_temp0';
   }

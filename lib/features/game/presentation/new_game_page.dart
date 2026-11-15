@@ -103,7 +103,8 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
     final done = await repo?.dailyResult(key);
     if (done != null) {
       final current = ref.read(gameControllerProvider);
-      final resumable = !done.finished && current?.mode == GameMode.daily && current?.number == entry.number;
+      final number = done.number.isNotEmpty ? done.number : entry.number;
+      final resumable = !done.finished && current?.mode == GameMode.daily && current?.number == number;
       if (!resumable) return _Prepared(entry.number, false, level: entry.level, dailyDone: done);
       return _Prepared(null, false, level: entry.level);
     }
@@ -222,9 +223,10 @@ class _DailyDone extends ConsumerWidget {
     final l = context.l10n;
     final bp = context.bp;
     final t = Theme.of(context).textTheme;
-    final streak = ref.watch(profileProvider).value?.dailyStreak ?? 0;
+    final key = Daily.keyFor(DateTime.now());
+    final streak = ref.watch(profileProvider).value?.streakOn(key) ?? 0;
     final share = Daily.shareText(
-      key: Daily.keyFor(DateTime.now()),
+      key: key,
       solved: result.solved,
       seconds: result.seconds,
       referenceSeconds: result.level.seconds,

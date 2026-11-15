@@ -29,7 +29,7 @@ class ChallengesPage extends ConsumerWidget {
         icon: kind == ChallengeKind.clock ? Icons.timer_outlined : Icons.rule,
         title: kind == ChallengeKind.clock ? l.challengeClockTitle : l.challengeRestrictedTitle,
         body: kind == ChallengeKind.clock ? l.challengeClockDesc : l.challengeRestrictedDesc,
-        firstLabel: kind == ChallengeKind.clock ? l.challengeRecord : l.challengeStreak,
+        firstLabel: l.challengeRecord,
         first: '${s.best}',
         plays: '${s.plays}',
         onPlay: () => context.go(challengeLocation(kind)),

@@ -53,6 +53,9 @@ Hoje são 29 das 150. Elas continuam no catálogo, mas cada modo as trata de um 
   Quem revela a solução não ganha estrelas. Rejogar uma fase pode melhorar a nota, e fica guardada a maior.
 - **Pontos:** a Aventura grava em `solved` como o Aleatório. Uma placa já resolvida dá 0 pontos, mas as
   estrelas contam.
+- **Fases sem relógio:** as fases 001–010 usam um cronômetro em vez da contagem regressiva, como a
+  placa do dia. O tempo é medido e conta para as estrelas e o bônus, mas nunca acaba, então quem está
+  começando aprende os operadores sem a pressão do relógio (`AdventureProgress.untimedStages`).
 
 ## Desafios
 
@@ -96,7 +99,7 @@ Regras comuns aos dois:
   e não custa vida.
 - Cada placa tem o tempo do seu nível (45 a 75 s).
 - O jogador tem **3 vidas**, e estourar o tempo ou pular custa uma delas. A placa perdida mostra uma solução que segue a regra.
-- O **recorde** é a maior sequência de placas resolvidas.
+- O **recorde** é o maior número de placas resolvidas antes de perder as 3 vidas.
 
 ### Descartado: Caça às soluções
 
@@ -106,6 +109,28 @@ existem). Ele saiu por dois motivos:
 - Com os unários, o total é infinito: −(−x), |x| e outros geram igualdades novas sem fim, então não
   dá para mostrar algo como "14 / 23".
 - Só com os binários, quase não há o que caçar, porque a mediana das 150 placas é de **1** solução.
+
+## Placa do dia e sequência de dias
+
+- **Sem repetição:** a placa do dia sai das placas ★2 do catálogo (52 hoje), numa ordem embaralhada
+  com semente fixa. Nenhuma placa se repete até o ciclo inteiro passar, e a ordem muda a cada ciclo
+  sem repetir a placa na virada (`Daily.entryFor`).
+- **Fuso local:** o dia vira à meia-noite do jogador, não à meia-noite UTC (21h no Brasil). Todo mundo
+  joga a mesma placa na mesma data, e as estatísticas do dia (`dailyStats`) somam os jogadores pela data.
+- **Uma sequência só:** o 🔥 conta os dias seguidos em que o jogador resolveu pelo menos uma placa, em
+  qualquer modo (desafios e lições incluídos). Ver a solução não conta, e errar a placa do dia não
+  zera a sequência. Ela aparece no topo da tela inicial, nas estatísticas do jogador e no texto
+  compartilhado da placa do dia (`FirestoreRepository.recordPlayedDay`, `Daily.streakOn`).
+- O antigo bônus de acertos seguidos, que soma até +50% nos pontos, passou a se chamar **combo**,
+  para não ser confundido com a sequência de dias.
+
+## Outras soluções
+
+Depois de resolver ou de ver a solução, a folha de resultado mostra quantas outras soluções o número tem
+e lista as mais simples (`SolutionFinder`, em `solver.dart`). A busca considera igualdades com no máximo
+um unário, porque com unários à vontade o total seria infinito (ver "Caça às soluções" acima). Duas
+soluções que só mudam os parênteses contam como uma, e `x + (−y)` não aparece ao lado de `x − y`. O
+cálculo usa frações de inteiros pequenos, como o solver, e cada candidata é conferida pelo `Evaluator`.
 
 ## Onde está no código
 

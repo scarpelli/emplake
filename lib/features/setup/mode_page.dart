@@ -10,6 +10,7 @@ import '../../data/firestore_repository.dart';
 import '../../data/models.dart';
 import '../avatar/avatar_page.dart';
 import '../avatar/robot_avatar.dart';
+import '../daily/daily.dart';
 import '../daily/daily_card.dart';
 import '../game/application/game_controller.dart';
 import '../settings/settings_page.dart';
@@ -75,6 +76,7 @@ class _ModePageState extends ConsumerState<ModePage> {
     final bp = context.bp;
     final user = ref.watch(authStateProvider).value;
     final narrow = MediaQuery.sizeOf(context).width < 600;
+    final streak = ref.watch(profileProvider).value?.streakOn(Daily.keyFor(DateTime.now())) ?? 0;
     final fallbackName = switch (user?.displayName) {
       _ when user?.isAnonymous ?? false => l.guest,
       final name? when name.isNotEmpty => name.split(' ').first,
@@ -136,6 +138,18 @@ class _ModePageState extends ConsumerState<ModePage> {
                       ),
                     ),
                   ),
+                  if (streak > 0)
+                    Semantics(
+                      label: l.dailyStreakDays(streak),
+                      excludeSemantics: true,
+                      child: Tooltip(
+                        message: l.dailyStreakDays(streak),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(l.streakShort(streak), style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ),
                   const SoundToggle(),
                 ],
               ),

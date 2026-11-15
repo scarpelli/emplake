@@ -922,6 +922,18 @@ abstract class AppLocalizations {
   /// **'Copiado!'**
   String get copied;
 
+  /// No description provided for @otherSolutions.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{OUTRA SOLUÇÃO} other{OUTRAS {count} SOLUÇÕES}}'**
+  String otherSolutions(int count);
+
+  /// No description provided for @otherSolutionsMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'e mais {count}'**
+  String otherSolutionsMore(int count);
+
   /// No description provided for @pause.
   ///
   /// In pt, this message translates to:
@@ -1471,7 +1483,7 @@ abstract class AppLocalizations {
   /// No description provided for @achDaily7Desc.
   ///
   /// In pt, this message translates to:
-  /// **'Resolva a placa do dia 7 dias seguidos.'**
+  /// **'Resolva uma placa por dia, 7 dias seguidos.'**
   String get achDaily7Desc;
 
   /// No description provided for @achHundred.
@@ -1696,11 +1708,11 @@ abstract class AppLocalizations {
   /// **'Jogo'**
   String get settingsGroupGame;
 
-  /// No description provided for @statBestStreak.
+  /// No description provided for @statDayStreak.
   ///
   /// In pt, this message translates to:
-  /// **'MELHOR SEQUÊNCIA'**
-  String get statBestStreak;
+  /// **'DIAS SEGUIDOS'**
+  String get statDayStreak;
 
   /// No description provided for @avatarCreate.
   ///
@@ -1869,6 +1881,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'1236 → 1 × 2 × 3 = 6. Cada ligação sobe um andar na árvore.'**
   String get helpExampleCaption;
+
+  /// No description provided for @helpOtherSolutions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Depois de cada número, a folha de resultado mostra outras soluções, das mais simples para as mais elaboradas.'**
+  String get helpOtherSolutions;
 
   /// No description provided for @helpKeys.
   ///
@@ -2128,11 +2146,17 @@ abstract class AppLocalizations {
   /// **'Às cegas: jogando o número inteiro com os valores em tempo real desligados, os pontos valem ×1,25.'**
   String get helpScoringBlind;
 
-  /// No description provided for @helpScoringStreak.
+  /// No description provided for @helpScoringCombo.
   ///
   /// In pt, this message translates to:
-  /// **'Sequência: cada acerto seguido, no tempo e sem dicas, soma +10% (até +50%). Pular zera a sequência.'**
-  String get helpScoringStreak;
+  /// **'Combo: cada acerto seguido, no tempo e sem dicas, soma +10% (até +50%). Pular zera o combo.'**
+  String get helpScoringCombo;
+
+  /// No description provided for @helpDayStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'🔥 Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.'**
+  String get helpDayStreak;
 
   /// No description provided for @helpScoringPractice.
   ///
@@ -2199,6 +2223,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'★ quando você resolve, ★★ no tempo e sem dicas, ★★★ com pelo menos metade do tempo sobrando'**
   String get adventureStarsRule;
+
+  /// No description provided for @helpAdventureUntimed.
+  ///
+  /// In pt, this message translates to:
+  /// **'As {count} primeiras fases da Aventura não têm relógio: o tempo é medido, mas não acaba.'**
+  String helpAdventureUntimed(int count);
 
   /// No description provided for @adventureContinue.
   ///
@@ -2307,12 +2337,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'RECORDE'**
   String get challengeRecord;
-
-  /// No description provided for @challengeStreak.
-  ///
-  /// In pt, this message translates to:
-  /// **'SEQUÊNCIA'**
-  String get challengeStreak;
 
   /// No description provided for @challengePlays.
   ///
@@ -2446,17 +2470,11 @@ abstract class AppLocalizations {
   /// **'SEM VIDAS'**
   String get runOverLives;
 
-  /// No description provided for @runScoreClock.
+  /// No description provided for @runScoreSolved.
   ///
   /// In pt, this message translates to:
   /// **'{count, plural, =0{Nenhuma placa resolvida} =1{1 placa resolvida} other{{count} placas resolvidas}}'**
-  String runScoreClock(int count);
-
-  /// No description provided for @runScoreStreak.
-  ///
-  /// In pt, this message translates to:
-  /// **'{count, plural, =0{Nenhuma placa na sequência} =1{Sequência de 1 placa} other{Sequência de {count} placas}}'**
-  String runScoreStreak(int count);
+  String runScoreSolved(int count);
 
   /// No description provided for @runNewRecord.
   ///

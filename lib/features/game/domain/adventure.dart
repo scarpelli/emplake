@@ -43,6 +43,9 @@ class AdventureProgress {
 
   static const window = 3;
   static const checkpoint = 12;
+  static const untimedStages = 10;
+
+  static bool isUntimed(int? stage) => stage != null && stage >= 1 && stage <= untimedStages;
 
   factory AdventureProgress.from(Catalog catalog, Map<String, int> stars) {
     final columns = <AdventureColumn>[];

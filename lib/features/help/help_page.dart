@@ -7,6 +7,7 @@ import '../../core/l10n_helpers.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../game/application/game_controller.dart';
+import '../game/domain/adventure.dart';
 import '../game/domain/expr.dart';
 import '../game/domain/level.dart';
 import '../game/domain/solution_codec.dart';
@@ -285,6 +286,8 @@ class _PlayTab extends StatelessWidget {
       ),
       const SizedBox(height: 6),
       Text(l.helpExampleCaption, style: t.bodySmall?.copyWith(color: bp.muted)),
+      const SizedBox(height: 6),
+      Text(l.helpOtherSolutions, style: t.bodySmall?.copyWith(color: bp.muted)),
       const SizedBox(height: 16),
       Eyebrow(l.helpKeys),
       const SizedBox(height: 6),
@@ -405,12 +408,14 @@ class _ScoringTab extends StatelessWidget {
       ),
       _Bullet(l.helpScoringHints),
       _Bullet(l.helpScoringBlind),
-      _Bullet(l.helpScoringStreak),
+      _Bullet(l.helpScoringCombo),
+      _Bullet(l.helpDayStreak),
       _Bullet(l.helpScoringLate),
       _Bullet(l.helpScoringReplay),
       _Bullet(l.helpScoringPractice),
       _Bullet(l.helpScoringPause(Level.pauseSeconds)),
       _Bullet('${l.modeAdventure}: ${l.adventureStarsRule}'),
+      _Bullet(l.helpAdventureUntimed(AdventureProgress.untimedStages)),
     ]);
   }
 }

@@ -113,11 +113,41 @@ void main() {
       expect(week.length, greaterThan(3), reason: 'days vary');
     });
 
-    test('streak grows on consecutive days and resets on a miss or a gap', () {
-      expect(Daily.nextStreak(key: '2026-11-13', solved: true, lastDaily: '2026-11-12', current: 3), 4);
-      expect(Daily.nextStreak(key: '2026-11-13', solved: true, lastDaily: '2026-11-10', current: 3), 1);
-      expect(Daily.nextStreak(key: '2026-11-13', solved: false, lastDaily: '2026-11-12', current: 3), 0);
+    test('no plate repeats until the whole pool has been used', () {
+      final n = Daily.pool(catalog).length;
+      String key(int day) {
+        final d = DateTime.utc(2026).add(Duration(days: day));
+        return '${d.year}-${'${d.month}'.padLeft(2, '0')}-${'${d.day}'.padLeft(2, '0')}';
+      }
+
+      expect(Daily.dayNumber(key(400)), 400);
+      for (final round in [-1, 0, 6, 7]) {
+        final plates = {for (var d = round * n; d < (round + 1) * n; d++) Daily.entryFor(catalog, key(d)).number};
+        expect(plates.length, n, reason: 'round $round');
+      }
+      for (var d = -n; d < 8 * n; d++) {
+        expect(Daily.entryFor(catalog, key(d + 1)).number, isNot(Daily.entryFor(catalog, key(d)).number), reason: key(d));
+      }
+    });
+
+    test('the day key follows the local date', () {
+      final late = DateTime(2026, 11, 15, 23, 30);
+      expect(Daily.keyFor(late), '2026-11-15');
+    });
+
+    test('streak grows on consecutive days played and restarts after a gap', () {
+      expect(Daily.nextStreak(key: '2026-11-13', lastDay: '2026-11-12', current: 3), 4);
+      expect(Daily.nextStreak(key: '2026-11-13', lastDay: '2026-11-13', current: 3), 3);
+      expect(Daily.nextStreak(key: '2026-11-13', lastDay: '2026-11-10', current: 3), 1);
+      expect(Daily.nextStreak(key: '2026-11-13', current: 0), 1);
       expect(Daily.yesterdayOf('2026-03-01'), '2026-02-28');
+    });
+
+    test('the streak shown today is 0 once a whole day was missed', () {
+      expect(Daily.streakOn('2026-11-13', lastDay: '2026-11-13', current: 5), 5);
+      expect(Daily.streakOn('2026-11-13', lastDay: '2026-11-12', current: 5), 5);
+      expect(Daily.streakOn('2026-11-13', lastDay: '2026-11-11', current: 5), 0);
+      expect(Daily.streakOn('2026-11-13', current: 5), 0);
     });
 
     test('share text', () {

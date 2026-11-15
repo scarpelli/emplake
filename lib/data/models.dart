@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../features/avatar/robot_avatar.dart';
+import '../features/daily/daily.dart';
 import '../features/game/domain/challenge.dart';
 import '../features/game/domain/level.dart';
 
@@ -66,6 +67,8 @@ class UserProfile {
 
   final int dailyStreak;
   final String? lastDaily;
+
+  int streakOn(String day) => Daily.streakOn(day, lastDay: lastDaily, current: dailyStreak);
 
   final int blindSolves;
   final int inTimeSolves;

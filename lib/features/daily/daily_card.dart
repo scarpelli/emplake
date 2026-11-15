@@ -32,7 +32,14 @@ final dailyTodayProvider = FutureProvider<DailyToday>((ref) async {
       // The card still works without the counts.
     }
   }
-  return (key: key, number: entry.number, level: entry.level, result: result, stats: stats);
+  final own = result != null && result.number.isNotEmpty;
+  return (
+    key: key,
+    number: own ? result.number : entry.number,
+    level: own ? result.level : entry.level,
+    result: result,
+    stats: stats,
+  );
 });
 
 /// The plate of the day banner on the home screen: the four digits as a
@@ -70,7 +77,7 @@ class DailyCard extends ConsumerWidget {
     final digits = (today?.number ?? '····').split('');
 
     void share(BuildContext button) {
-      final streak = ref.read(profileProvider).value?.dailyStreak ?? 0;
+      final streak = ref.read(profileProvider).value?.streakOn(today!.key) ?? 0;
       shareDailyText(
         button,
         Daily.shareText(

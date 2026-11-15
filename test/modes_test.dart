@@ -101,6 +101,23 @@ void main() {
       expect(p.stageOf(hard.id)!.status, StageStatus.done);
       expect(p.done, AdventureProgress.checkpoint + 1);
     });
+
+    test('the first stages run a stopwatch, the later ones the level clock', () {
+      GameState at(int? stage) => GameState(
+        mode: GameMode.adventure,
+        level: Level.easy,
+        board: SolutionCodec.decode('4242', '=(+(4,2),+(4,2))'),
+        secondsLeft: Level.easy.seconds,
+        elapsed: 20,
+        stage: stage,
+      );
+      expect(at(1).untimed, isTrue);
+      expect(at(AdventureProgress.untimedStages).untimed, isTrue);
+      expect(at(AdventureProgress.untimedStages + 1).untimed, isFalse);
+      expect(at(null).untimed, isFalse);
+      expect(at(1).timeUp, isFalse);
+      expect(at(1).scoringSecondsLeft, Level.easy.seconds - 20);
+    });
   });
 
   group('challenge runs', () {

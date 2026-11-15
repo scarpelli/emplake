@@ -36,7 +36,7 @@ class PageTitle extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (leading != null) ...[leading!, const SizedBox(width: 8)],
+        if (leading != null) ...[leading!, const SizedBox(width: 16)],
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
