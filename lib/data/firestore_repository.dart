@@ -40,6 +40,9 @@ class FirestoreRepository {
     return UserProfile.fromMap(data);
   }
 
+  Future<void> saveIdentity({required String displayName, required String email}) =>
+      _userDoc.set({'displayName': displayName, 'email': email}, SetOptions(merge: true));
+
   Future<void> saveAvatar(RobotAvatar avatar) => _userDoc.set({'avatar': avatar.toMap()}, SetOptions(merge: true));
 
   Future<Set<String>> solvedNumbers(Level level) async {

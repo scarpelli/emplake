@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -185,14 +184,18 @@ class _LinkAccountDialogState extends ConsumerState<_LinkAccountDialog> {
   }
 
   Future<void> _done() async {
-    final user = _auth.currentUser!;
-    await user.reload();
-    final fresh = _auth.currentUser!;
+    await _auth.currentUser!.reload();
+    var fresh = _auth.currentUser!;
     final google = fresh.providerData.where((p) => p.providerId == 'google.com').firstOrNull;
-    await FirebaseFirestore.instance.collection('users').doc(fresh.uid).set({
-      'displayName': fresh.displayName ?? google?.displayName ?? '',
-      'email': fresh.email ?? google?.email ?? '',
-    }, SetOptions(merge: true));
+    final googleName = google?.displayName ?? '';
+    if ((fresh.displayName ?? '').isEmpty && googleName.isNotEmpty) {
+      await fresh.updateDisplayName(googleName);
+      await fresh.reload();
+      fresh = _auth.currentUser!;
+    }
+    await ref
+        .read(repositoryProvider)
+        ?.saveIdentity(displayName: fresh.displayName ?? '', email: fresh.email ?? google?.email ?? '');
     ref.invalidate(profileProvider);
     if (!mounted) return;
     final messenger = ScaffoldMessenger.of(context);

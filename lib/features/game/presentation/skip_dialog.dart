@@ -60,10 +60,16 @@ Future<bool?> showChoiceDialog(
                     const SizedBox(height: 8),
                     Text(body, style: t.bodyMedium?.copyWith(height: 1.45, color: context.bp.muted)),
                     const SizedBox(height: 24),
-                    FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(primary)),
+                    FilledButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(primary, textAlign: TextAlign.center),
+                    ),
                     if (secondary != null) ...[
                       const SizedBox(height: 10),
-                      OutlinedButton(onPressed: () => Navigator.of(context).pop(false), child: Text(secondary)),
+                      OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text(secondary, textAlign: TextAlign.center),
+                      ),
                     ],
                   ],
                 ),
