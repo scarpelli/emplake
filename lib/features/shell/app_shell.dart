@@ -30,7 +30,7 @@ class AppShell extends ConsumerWidget {
       (Icons.history, l.navHistory),
       (Icons.account_tree_outlined, l.navGame),
       (Icons.settings_outlined, l.navSettings),
-      (Icons.help_outline, l.navHelp),
+      (Icons.question_mark_rounded, l.navHelp),
     ];
     final away = current != _gameBranch;
     WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(gameControllerProvider.notifier).setAway(away));
@@ -51,12 +51,18 @@ class AppShell extends ConsumerWidget {
             for (var i = 0; i < icons.length; i++)
               Tooltip(
                 message: icons[i].$2,
-                child: Semantics(
-                  label: icons[i].$2,
-                  button: true,
-                  selected: i == current,
-                  child: Icon(icons[i].$1, size: 26, color: i == current ? bp.onInk : bp.ink.withValues(alpha: 0.75)),
-                ),
+                child: i == _helpItem
+                    ? _HelpAction(label: icons[i].$2)
+                    : Semantics(
+                        label: icons[i].$2,
+                        button: true,
+                        selected: i == current,
+                        child: Icon(
+                          icons[i].$1,
+                          size: 26,
+                          color: i == current ? bp.onInk : bp.ink.withValues(alpha: 0.75),
+                        ),
+                      ),
               ),
           ],
           // The bar skips onTap when letIndexChange says no, so the help item
@@ -68,6 +74,38 @@ class AppShell extends ConsumerWidget {
           },
           onTap: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
         ),
+      ),
+    );
+  }
+}
+
+/// The help slot of the bar. Help opens over the current page instead of
+/// being a destination, so it is drawn as an action: set apart by a rule and
+/// shown as a filled round button rather than a bare tab icon.
+class _HelpAction extends StatelessWidget {
+  const _HelpAction({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final bp = context.bp;
+    return Semantics(
+      label: label,
+      button: true,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(width: 1, height: 30, color: bp.ink.withValues(alpha: 0.25)),
+          ),
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: bp.accent),
+            child: Icon(Icons.question_mark_rounded, size: 20, color: bp.onAccent),
+          ),
+        ],
       ),
     );
   }

@@ -207,8 +207,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       ref.invalidate(profileProvider);
       if (!mounted) return;
       unawaited(showAchievementToasts(context, unlocked));
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   Future<void> _finishRun() async {
@@ -576,7 +575,11 @@ class _GamePageState extends ConsumerState<GamePage> {
     }
     if (b.eqGap == null) {
       return selectedGap(2)
-          ? CoachStep(text: l.tutorialPickEquals, target: () => _paletteKeys.globalCenter('='), balloon: BalloonAt.below)
+          ? CoachStep(
+              text: l.tutorialPickEquals,
+              target: () => _paletteKeys.globalCenter('='),
+              balloon: BalloonAt.below,
+            )
           : CoachStep(text: l.tutorialEqualsGap, target: () => _gapCenter(b, 2), balloon: BalloonAt.below);
     }
     return CoachStep(text: l.tutorialVerify, target: () => _globalCenterOf(_verifyKey));
@@ -822,15 +825,52 @@ String _subtitle(BuildContext context, GameState s) {
     if (s.practice) l.practiceShort else s.mode.label(l).toLowerCase(),
     if (s.stage != null) l.adventureStage(s.stage!).toLowerCase(),
     s.level.label(l).toLowerCase(),
-    if (s.run case final run?) ...[
-      l.runPlates(run.solved),
-      if (run.kind == ChallengeKind.clock) l.runStep(run.step + 1) else _hearts(run.lives),
-    ],
+    // The lives / step badge sits on the title line (see [_RunBadge]); the
+    // subtitle ellipsizes on narrow phones and used to swallow them.
+    if (s.run case final run?) l.runPlates(run.solved),
   ];
   return parts.join(' · ');
 }
 
-String _hearts(int lives) => '${'♥' * lives}${'♡' * (ChallengeRun.startLives - lives).clamp(0, 3)}';
+/// Lives of a restricted run (hearts) or the ladder step of a clock run.
+/// Drawn with icons, not ♥ glyphs, so it renders with every typeface.
+class _RunBadge extends StatelessWidget {
+  const _RunBadge({required this.run, this.size = 16});
+  final ChallengeRun run;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final bp = context.bp;
+    final t = Theme.of(context).textTheme;
+    if (run.kind == ChallengeKind.clock) {
+      return Text(l.runStep(run.step + 1).toUpperCase(), style: t.labelLarge?.copyWith(fontWeight: FontWeight.w600));
+    }
+    final total = math.max(ChallengeRun.startLives, run.lives);
+    return Semantics(
+      label: l.runLives(run.lives),
+      child: ExcludeSemantics(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var i = 0; i < total; i++)
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 260),
+                transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),
+                child: Icon(
+                  i < run.lives ? Icons.favorite : Icons.favorite_border,
+                  key: ValueKey(i < run.lives),
+                  size: size,
+                  color: i < run.lives ? bp.danger : bp.muted,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 String ruleText(Restriction r, List<int> digits, AppLocalizations l) => switch (r.kind) {
   RestrictionKind.forbid => l.ruleForbid(_opLabel(r.op!)),
@@ -859,9 +899,18 @@ class _GameHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${context.l10n.infoNumber} ${state.number}',
-                style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1),
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      '${context.l10n.infoNumber} ${state.number}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: t.titleMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1),
+                    ),
+                  ),
+                  if (state.run case final run?) ...[const SizedBox(width: 10), _RunBadge(run: run)],
+                ],
               ),
               Text(
                 _subtitle(context, state),
@@ -915,9 +964,18 @@ class _DesktopHeader extends ConsumerWidget {
         cell(l.infoLevel, state.level.label(l).toUpperCase()),
         if (state.stage != null) cell(l.adventureTrail, l.adventureStage(state.stage!).toUpperCase()),
         if (state.run case final run?)
-          cell(
-            l.runPlates(run.solved).toUpperCase(),
-            run.kind == ChallengeKind.clock ? l.runStep(run.step + 1) : _hearts(run.lives),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              border: Border(left: BorderSide(color: bp.lineSoft)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Eyebrow(l.runPlates(run.solved).toUpperCase(), opacity: 0.6),
+                _RunBadge(run: run, size: 18),
+              ],
+            ),
           ),
         const SizedBox(width: 16),
         Expanded(

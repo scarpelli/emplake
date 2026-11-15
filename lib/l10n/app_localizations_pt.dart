@@ -894,6 +894,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get player => 'Jogador';
 
   @override
+  String get settingsGroupPlayer => 'Jogador';
+
+  @override
+  String get settingsGroupAppearance => 'Aparência';
+
+  @override
+  String get settingsGroupGame => 'Jogo';
+
+  @override
+  String get statBestStreak => 'MELHOR SEQUÊNCIA';
+
+  @override
   String get helpTitle => 'COMO JOGAR';
 
   @override

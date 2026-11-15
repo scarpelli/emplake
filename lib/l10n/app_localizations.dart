@@ -1594,6 +1594,30 @@ abstract class AppLocalizations {
   /// **'Jogador'**
   String get player;
 
+  /// No description provided for @settingsGroupPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogador'**
+  String get settingsGroupPlayer;
+
+  /// No description provided for @settingsGroupAppearance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparência'**
+  String get settingsGroupAppearance;
+
+  /// No description provided for @settingsGroupGame.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogo'**
+  String get settingsGroupGame;
+
+  /// No description provided for @statBestStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'MELHOR SEQUÊNCIA'**
+  String get statBestStreak;
+
   /// No description provided for @helpTitle.
   ///
   /// In pt, this message translates to:

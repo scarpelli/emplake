@@ -890,6 +890,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get player => 'Player';
 
   @override
+  String get settingsGroupPlayer => 'Player';
+
+  @override
+  String get settingsGroupAppearance => 'Appearance';
+
+  @override
+  String get settingsGroupGame => 'Game';
+
+  @override
+  String get statBestStreak => 'BEST STREAK';
+
+  @override
   String get helpTitle => 'HOW TO PLAY';
 
   @override

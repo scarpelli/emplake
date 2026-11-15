@@ -896,6 +896,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get player => 'Jugador';
 
   @override
+  String get settingsGroupPlayer => 'Jugador';
+
+  @override
+  String get settingsGroupAppearance => 'Apariencia';
+
+  @override
+  String get settingsGroupGame => 'Juego';
+
+  @override
+  String get statBestStreak => 'MEJOR RACHA';
+
+  @override
   String get helpTitle => 'CÓMO JUGAR';
 
   @override
