@@ -1548,4 +1548,99 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get runLastSolution => 'Uma solução da última placa:';
+
+  @override
+  String get coverHaveAccount => 'Já tem conta?';
+
+  @override
+  String get coverSignIn => 'Entrar';
+
+  @override
+  String get loginGuest => 'Continuar como convidado';
+
+  @override
+  String get guestError =>
+      'Não foi possível entrar como convidado. Tente de novo.';
+
+  @override
+  String get guest => 'Convidado';
+
+  @override
+  String get guestSubtitle => 'Progresso salvo só neste aparelho';
+
+  @override
+  String get guestCreateAccount => 'Criar conta';
+
+  @override
+  String get guestSignOutTitle => 'Sair do modo convidado?';
+
+  @override
+  String get guestSignOutBody =>
+      'O progresso de convidado será perdido. Crie uma conta antes para guardá-lo.';
+
+  @override
+  String get guestSignOutConfirm => 'Sair e perder o progresso';
+
+  @override
+  String get remindTitle => 'Salve seu progresso';
+
+  @override
+  String get remindFirstGame =>
+      'Gostou? Crie uma conta para guardar seus números resolvidos e jogar em qualquer aparelho.';
+
+  @override
+  String get remindFirstAchievement =>
+      'Primeira conquista! Como convidado, ela fica só neste aparelho. Crie uma conta para não perdê-la.';
+
+  @override
+  String remindSolved(int n) {
+    return 'Você já resolveu $n placas! Crie uma conta para não perder esse progresso.';
+  }
+
+  @override
+  String get remindLater => 'Agora não';
+
+  @override
+  String get linkTitle => 'Criar conta';
+
+  @override
+  String get linkBody =>
+      'Tudo o que você fez como convidado vai junto para a conta nova.';
+
+  @override
+  String get linkGoogle => 'Continuar com Google';
+
+  @override
+  String get linkEmail => 'E-mail';
+
+  @override
+  String get linkPassword => 'Senha';
+
+  @override
+  String get linkSubmit => 'Criar conta com e-mail';
+
+  @override
+  String get linkDone => 'Conta criada! Seu progresso está salvo.';
+
+  @override
+  String get linkExistsTitle => 'Essa conta já existe';
+
+  @override
+  String get linkExistsBody =>
+      'Entrar nela descarta o progresso de convidado deste aparelho.';
+
+  @override
+  String get linkExistsConfirm => 'Entrar mesmo assim';
+
+  @override
+  String get linkWeakPassword => 'A senha precisa ter pelo menos 6 caracteres.';
+
+  @override
+  String get linkInvalidEmail => 'E-mail inválido.';
+
+  @override
+  String get linkWrongPassword => 'Senha incorreta para essa conta.';
+
+  @override
+  String get linkError => 'Não foi possível criar a conta. Tente de novo.';
 }

@@ -7,19 +7,40 @@ import '../../core/prefs.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
+import '../auth/guest.dart';
+import '../auth/login_page.dart';
 
-class CoverPage extends ConsumerWidget {
+class CoverPage extends ConsumerStatefulWidget {
   const CoverPage({super.key});
 
-  void _enter(BuildContext context, WidgetRef ref) {
-    final signedIn = ref.read(firebaseAuthProvider).currentUser != null;
-    final saved = ref.read(sharedPreferencesProvider).getString(PrefKeys.lastLocation);
-    context.go(signedIn ? (saved ?? '/play') : '/login');
+  @override
+  ConsumerState<CoverPage> createState() => _CoverPageState();
+}
+
+class _CoverPageState extends ConsumerState<CoverPage> {
+  bool _busy = false;
+
+  Future<void> _enter() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final user = await ref.read(firebaseAuthProvider).authStateChanges().first;
+    if (!mounted) return;
+    if (user != null) {
+      setState(() => _busy = false);
+      final saved = ref.read(sharedPreferencesProvider).getString(PrefKeys.lastLocation);
+      context.go(saved ?? '/play');
+      return;
+    }
+    final ok = await continueAsGuest(context, ref);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    context.go(ok ? '/play' : '/login');
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l = context.l10n;
+    final signedIn = ref.watch(authStateProvider).value != null;
     final t = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -29,7 +50,7 @@ class CoverPage extends ConsumerWidget {
             button: true,
             label: l.coverTap,
             child: InkWell(
-              onTap: () => _enter(context, ref),
+              onTap: _enter,
               child: ContentWidth(
                 maxWidth: 520,
                 child: Padding(
@@ -45,9 +66,23 @@ class CoverPage extends ConsumerWidget {
                       const SizedBox(height: 32),
                       Text(l.coverTagline, textAlign: TextAlign.center, style: t.bodyLarge?.copyWith(height: 1.5)),
                       const SizedBox(height: 28),
-                      const _TapHint(),
+                      _busy
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const _TapHint(),
                       const Spacer(),
-                      const SizedBox(height: 44),
+                      SizedBox(
+                        height: 44,
+                        child: signedIn
+                            ? null
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(l.coverHaveAccount, style: t.bodySmall?.copyWith(color: context.bp.muted)),
+                                  const SizedBox(width: 2),
+                                  TextLink(label: l.coverSignIn, onTap: () => context.go('/login')),
+                                ],
+                              ),
+                      ),
                     ],
                   ),
                 ),

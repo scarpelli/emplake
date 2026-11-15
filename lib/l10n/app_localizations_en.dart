@@ -1544,4 +1544,98 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get runLastSolution => 'A solution to the last plate:';
+
+  @override
+  String get coverHaveAccount => 'Already have an account?';
+
+  @override
+  String get coverSignIn => 'Sign in';
+
+  @override
+  String get loginGuest => 'Continue as guest';
+
+  @override
+  String get guestError => 'Could not start as a guest. Please try again.';
+
+  @override
+  String get guest => 'Guest';
+
+  @override
+  String get guestSubtitle => 'Progress saved on this device only';
+
+  @override
+  String get guestCreateAccount => 'Create account';
+
+  @override
+  String get guestSignOutTitle => 'Leave guest mode?';
+
+  @override
+  String get guestSignOutBody =>
+      'Your guest progress will be lost. Create an account first to keep it.';
+
+  @override
+  String get guestSignOutConfirm => 'Leave and lose progress';
+
+  @override
+  String get remindTitle => 'Save your progress';
+
+  @override
+  String get remindFirstGame =>
+      'Enjoying it? Create an account to keep the numbers you solve and play on any device.';
+
+  @override
+  String get remindFirstAchievement =>
+      'First achievement! As a guest it lives on this device only. Create an account so you don\'t lose it.';
+
+  @override
+  String remindSolved(int n) {
+    return 'You\'ve already solved $n plates! Create an account so you don\'t lose this progress.';
+  }
+
+  @override
+  String get remindLater => 'Not now';
+
+  @override
+  String get linkTitle => 'Create account';
+
+  @override
+  String get linkBody =>
+      'Everything you did as a guest moves to the new account.';
+
+  @override
+  String get linkGoogle => 'Continue with Google';
+
+  @override
+  String get linkEmail => 'Email';
+
+  @override
+  String get linkPassword => 'Password';
+
+  @override
+  String get linkSubmit => 'Create account with email';
+
+  @override
+  String get linkDone => 'Account created! Your progress is saved.';
+
+  @override
+  String get linkExistsTitle => 'This account already exists';
+
+  @override
+  String get linkExistsBody =>
+      'Signing in to it discards the guest progress on this device.';
+
+  @override
+  String get linkExistsConfirm => 'Sign in anyway';
+
+  @override
+  String get linkWeakPassword => 'The password needs at least 6 characters.';
+
+  @override
+  String get linkInvalidEmail => 'Invalid email.';
+
+  @override
+  String get linkWrongPassword => 'Wrong password for this account.';
+
+  @override
+  String get linkError => 'Could not create the account. Please try again.';
 }

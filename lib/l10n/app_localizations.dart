@@ -2487,6 +2487,180 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Uma solução da última placa:'**
   String get runLastSolution;
+
+  /// No description provided for @coverHaveAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já tem conta?'**
+  String get coverHaveAccount;
+
+  /// No description provided for @coverSignIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get coverSignIn;
+
+  /// No description provided for @loginGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar como convidado'**
+  String get loginGuest;
+
+  /// No description provided for @guestError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível entrar como convidado. Tente de novo.'**
+  String get guestError;
+
+  /// No description provided for @guest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convidado'**
+  String get guest;
+
+  /// No description provided for @guestSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Progresso salvo só neste aparelho'**
+  String get guestSubtitle;
+
+  /// No description provided for @guestCreateAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar conta'**
+  String get guestCreateAccount;
+
+  /// No description provided for @guestSignOutTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair do modo convidado?'**
+  String get guestSignOutTitle;
+
+  /// No description provided for @guestSignOutBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O progresso de convidado será perdido. Crie uma conta antes para guardá-lo.'**
+  String get guestSignOutBody;
+
+  /// No description provided for @guestSignOutConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair e perder o progresso'**
+  String get guestSignOutConfirm;
+
+  /// No description provided for @remindTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salve seu progresso'**
+  String get remindTitle;
+
+  /// No description provided for @remindFirstGame.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gostou? Crie uma conta para guardar seus números resolvidos e jogar em qualquer aparelho.'**
+  String get remindFirstGame;
+
+  /// No description provided for @remindFirstAchievement.
+  ///
+  /// In pt, this message translates to:
+  /// **'Primeira conquista! Como convidado, ela fica só neste aparelho. Crie uma conta para não perdê-la.'**
+  String get remindFirstAchievement;
+
+  /// No description provided for @remindSolved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já resolveu {n} placas! Crie uma conta para não perder esse progresso.'**
+  String remindSolved(int n);
+
+  /// No description provided for @remindLater.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agora não'**
+  String get remindLater;
+
+  /// No description provided for @linkTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar conta'**
+  String get linkTitle;
+
+  /// No description provided for @linkBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tudo o que você fez como convidado vai junto para a conta nova.'**
+  String get linkBody;
+
+  /// No description provided for @linkGoogle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar com Google'**
+  String get linkGoogle;
+
+  /// No description provided for @linkEmail.
+  ///
+  /// In pt, this message translates to:
+  /// **'E-mail'**
+  String get linkEmail;
+
+  /// No description provided for @linkPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha'**
+  String get linkPassword;
+
+  /// No description provided for @linkSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar conta com e-mail'**
+  String get linkSubmit;
+
+  /// No description provided for @linkDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta criada! Seu progresso está salvo.'**
+  String get linkDone;
+
+  /// No description provided for @linkExistsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Essa conta já existe'**
+  String get linkExistsTitle;
+
+  /// No description provided for @linkExistsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar nela descarta o progresso de convidado deste aparelho.'**
+  String get linkExistsBody;
+
+  /// No description provided for @linkExistsConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar mesmo assim'**
+  String get linkExistsConfirm;
+
+  /// No description provided for @linkWeakPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'A senha precisa ter pelo menos 6 caracteres.'**
+  String get linkWeakPassword;
+
+  /// No description provided for @linkInvalidEmail.
+  ///
+  /// In pt, this message translates to:
+  /// **'E-mail inválido.'**
+  String get linkInvalidEmail;
+
+  /// No description provided for @linkWrongPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha incorreta para essa conta.'**
+  String get linkWrongPassword;
+
+  /// No description provided for @linkError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível criar a conta. Tente de novo.'**
+  String get linkError;
 }
 
 class _AppLocalizationsDelegate

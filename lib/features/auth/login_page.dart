@@ -4,12 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../core/l10n_helpers.dart';
 import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../core/widgets/emplake_logo.dart';
+import 'guest.dart';
 
 const teamMembers = ['Bruna Scarpelli', 'Gustavo Sanches Martins Kis'];
 
@@ -27,78 +29,153 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       body: GridBackground(
-        child: SignInScreen(
-          providers: [EmailAuthProvider()],
-          showPasswordVisibilityToggle: true,
-          breakpoint: 900,
-          maxWidth: 1080,
-          headerMaxExtent: _headerHeight,
-          headerBuilder: (context, constraints, shrinkOffset) => ClipRect(
-            child: OverflowBox(
-              alignment: Alignment.bottomCenter,
-              minHeight: _headerHeight,
-              maxHeight: _headerHeight,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+        child: Theme(
+          data: _linkTheme(Theme.of(context)),
+          child: SignInScreen(
+            providers: [EmailAuthProvider()],
+            showPasswordVisibilityToggle: true,
+            breakpoint: 900,
+            maxWidth: 1080,
+            headerMaxExtent: _headerHeight,
+            headerBuilder: (context, constraints, shrinkOffset) => ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.bottomCenter,
+                minHeight: _headerHeight,
+                maxHeight: _headerHeight,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Align(alignment: Alignment.topRight, child: LanguagePicker()),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          const EmplakeLogo(size: 40),
+                          const SizedBox(width: 12),
+                          Text(
+                            'EMPLAKE',
+                            style: t.headlineMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 4),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(l.loginSubtitle, style: t.bodyMedium?.copyWith(color: context.bp.muted)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            sideBuilder: (context, constraints) => Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(40),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Align(alignment: Alignment.topRight, child: LanguagePicker()),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        const EmplakeLogo(size: 40),
-                        const SizedBox(width: 12),
-                        Text(
-                          'EMPLAKE',
-                          style: t.headlineMedium?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 4),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(l.loginSubtitle, style: t.bodyMedium?.copyWith(color: context.bp.muted)),
+                    const LanguagePicker(showNames: true),
+                    const SizedBox(height: 40),
+                    const EmplakeLogo(size: 72),
+                    const SizedBox(height: 16),
+                    Text('EMPLAKE', style: t.displaySmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 6)),
+                    const SizedBox(height: 8),
+                    Text(l.loginSubtitle, style: t.titleMedium?.copyWith(color: context.bp.muted)),
+                    const SizedBox(height: 40),
+                    const _TeamCard(),
                   ],
                 ),
               ),
             ),
-          ),
-          sideBuilder: (context, constraints) => Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(40),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            footerBuilder: (context, action) {
+              final wide = MediaQuery.sizeOf(context).width >= 900;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const LanguagePicker(showNames: true),
-                  const SizedBox(height: 40),
-                  const EmplakeLogo(size: 72),
                   const SizedBox(height: 16),
-                  Text('EMPLAKE', style: t.displaySmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 6)),
-                  const SizedBox(height: 8),
-                  Text(l.loginSubtitle, style: t.titleMedium?.copyWith(color: context.bp.muted)),
-                  const SizedBox(height: 40),
-                  const _TeamCard(),
+                  const _OrDivider(),
+                  const SizedBox(height: 16),
+                  const Center(child: _GoogleButton()),
+                  const SizedBox(height: 12),
+                  const Center(child: _GuestLink()),
+                  if (!wide) const Padding(padding: EdgeInsets.only(top: 24), child: _TeamCard()),
                 ],
-              ),
-            ),
+              );
+            },
           ),
-          footerBuilder: (context, action) {
-            final wide = MediaQuery.sizeOf(context).width >= 900;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 16),
-                const _OrDivider(),
-                const SizedBox(height: 16),
-                const Center(child: _GoogleButton()),
-                if (!wide) const Padding(padding: EdgeInsets.only(top: 24), child: _TeamCard()),
-              ],
-            );
-          },
         ),
       ),
     );
   }
+}
+
+class _GuestLink extends ConsumerStatefulWidget {
+  const _GuestLink();
+
+  @override
+  ConsumerState<_GuestLink> createState() => _GuestLinkState();
+}
+
+class _GuestLinkState extends ConsumerState<_GuestLink> {
+  bool _busy = false;
+
+  @override
+  Widget build(BuildContext context) => TextLink(
+    label: context.l10n.loginGuest,
+    onTap: _busy
+        ? null
+        : () async {
+            setState(() => _busy = true);
+            await continueAsGuest(context, ref);
+            if (mounted) setState(() => _busy = false);
+          },
+  );
+}
+
+class TextLink extends StatelessWidget {
+  const TextLink({super.key, required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final bp = context.bp;
+    final color = onTap == null ? bp.muted : bp.ink;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall
+              ?.copyWith(color: color, decoration: TextDecoration.underline, decorationColor: color),
+        ),
+      ),
+    );
+  }
+}
+
+ThemeData _linkTheme(ThemeData base) {
+  final text = base.textTheme;
+  final buttonText = text.labelLarge?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 1);
+  return base.copyWith(
+    textTheme: text.copyWith(
+      labelLarge: text.bodySmall?.copyWith(
+        decoration: TextDecoration.underline,
+        decorationColor: base.colorScheme.primary,
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: (base.elevatedButtonTheme.style ?? const ButtonStyle()).copyWith(
+        textStyle: WidgetStatePropertyAll(buttonText),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: (base.textButtonTheme.style ?? const ButtonStyle()).copyWith(
+        textStyle: WidgetStatePropertyAll(text.labelLarge),
+      ),
+    ),
+  );
 }
 
 class _TeamCard extends StatelessWidget {
@@ -200,7 +277,7 @@ class _GoogleButton extends StatelessWidget {
               height: 18,
               child: busy
                   ? LoadingAnimationWidget.hexagonDots(color: context.bp.ink, size: 18)
-                  : const CustomPaint(painter: _GoogleGPainter()),
+                  : const CustomPaint(painter: GoogleGPainter()),
             ),
             const SizedBox(width: 10),
             Text(context.l10n.loginGoogle),
@@ -211,8 +288,8 @@ class _GoogleButton extends StatelessWidget {
   );
 }
 
-class _GoogleGPainter extends CustomPainter {
-  const _GoogleGPainter();
+class GoogleGPainter extends CustomPainter {
+  const GoogleGPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -241,5 +318,5 @@ class _GoogleGPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_GoogleGPainter oldDelegate) => false;
+  bool shouldRepaint(GoogleGPainter oldDelegate) => false;
 }
