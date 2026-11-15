@@ -74,6 +74,16 @@ firebase deploy --only hosting
 
 O site fica em <https://emplake.web.app> (site `emplake` do Firebase Hosting, definido em `firebase.json`).
 
+## Flutter 3.50 e `material_ui`
+
+O app roda no Flutter 3.50 (Dart 3.14). A migração para os pacotes `material_ui` e `cupertino_ui`
+(`dart fix --apply --code=migrate_design_widgets`) foi feita na branch `migra-flutter-3-50`, mas ficou
+fora da `main`: o `firebase_ui_auth`, exigido para o login, ainda usa `package:flutter/material.dart`.
+No 3.50 essa biblioteca é uma cópia separada do Material, então os widgets do pacote não encontram o
+tema nem as traduções do app, e o formulário de login quebra. Curved Navigation Bar, flutter_math_fork,
+loading_animation_widget e country_flags também ainda usam a biblioteca antiga. Como ela só está
+descontinuada, sem data de remoção, a `main` segue com ela até esses pacotes migrarem.
+
 ## Textos e idiomas
 
 Os textos ficam em `lib/l10n/app_*.arb`. Para acrescentar ou alterar um texto, edite a tabela em `tool/gen_arb.py` e rode:
