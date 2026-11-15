@@ -157,7 +157,8 @@ class OperatorPalette extends StatelessWidget {
               ),
             ),
             _OpButton(
-              icon: Icons.backspace_outlined,
+              icon: Icons.backspace,
+              tone: context.bp.danger,
               tooltip: l.removeOperator,
               enabled: playing && (node is Unary || node is Binary || (sel is EqualsSelection && board.eqGap != null)),
               active: false,
@@ -232,6 +233,7 @@ class _OpButton extends StatelessWidget {
     required this.onTap,
     this.dashed = false,
     this.struck = false,
+    this.tone,
   });
 
   final String? label;
@@ -242,12 +244,14 @@ class _OpButton extends StatelessWidget {
   final bool dashed;
 
   final bool struck;
+  final Color? tone;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final bp = context.bp;
-    final fg = active ? bp.onInk : bp.ink;
+    final fg = active ? bp.onInk : (tone ?? bp.ink);
+    final lit = tone != null && enabled;
     return Tooltip(
       message: tooltip,
       child: Semantics(
@@ -259,14 +263,16 @@ class _OpButton extends StatelessWidget {
           duration: const Duration(milliseconds: 150),
           opacity: enabled || active ? 1 : 0.35,
           child: Material(
-            color: active ? bp.ink : Colors.transparent,
+            color: active ? bp.ink : (lit ? tone!.withValues(alpha: 0.14) : Colors.transparent),
             child: InkWell(
               onTap: enabled ? onTap : null,
               child: Container(
                 alignment: Alignment.center,
-                decoration: BoxDecoration(border: Border.all(color: bp.ink.withValues(alpha: 0.7))),
+                decoration: BoxDecoration(
+                  border: Border.all(color: tone ?? bp.ink.withValues(alpha: 0.7), width: tone != null ? 1.5 : 1),
+                ),
                 child: icon != null
-                    ? Icon(icon, size: 18, color: fg)
+                    ? Icon(icon, size: tone != null ? 20 : 18, color: fg)
                     : Text(
                         label!,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(

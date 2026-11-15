@@ -8,6 +8,8 @@ import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
 import '../../data/models.dart';
+import '../avatar/avatar_page.dart';
+import '../avatar/robot_avatar.dart';
 import '../daily/daily_card.dart';
 import '../game/application/game_controller.dart';
 
@@ -82,6 +84,8 @@ class _ModePageState extends ConsumerState<ModePage> {
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
+                  RobotAvatarView(ref.watch(playerAvatarProvider), size: 30, semanticLabel: l.avatarYours),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: FutureBuilder<UserProfile>(
                       future: _profile,

@@ -237,14 +237,37 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Map<int, Offset> _targets(Size size) {
-    const padX = 8.0, padTop = 28.0, padBottom = 26.0;
+  static const _minScale = 0.72;
+  static const _minEdge = 12.0;
+
+  double _scale = 1;
+
+  ({Map<int, Offset> pos, double scale, double height}) _fit(Size size) {
+    const padX = 8.0;
     final rows = math.max(_layout.rows, 3);
-    final rowH = math.min(size.width > 600 ? 96.0 : 64.0, (size.height - padTop - padBottom) / rows);
+    double pads(double s) => 37 * s + 18;
+    double minRow(double s) => 38 * s + _minEdge;
+
+    var scale = 1.0;
+    var height = size.height;
+    var rowH = (height - pads(1)) / rows;
+    if (rowH < minRow(1)) {
+      scale = ((height - 18 - rows * _minEdge) / (37 + 38 * rows)).clamp(_minScale, 1.0);
+      rowH = minRow(scale);
+      final needed = rows * rowH + pads(scale);
+      if (needed > height + 1) height = needed;
+    }
+    rowH = math.min(size.width > 600 ? 96.0 : 64.0, rowH);
+
+    final padBottom = 19 * scale + 7;
     final colW = (size.width - 2 * padX) / 4;
-    return {
-      for (final n in _layout.nodes.values) n.id: Offset(padX + n.x * colW, size.height - padBottom - n.row * rowH),
-    };
+    return (
+      scale: scale,
+      height: height,
+      pos: {
+        for (final n in _layout.nodes.values) n.id: Offset(padX + n.x * colW, height - padBottom - n.row * rowH),
+      },
+    );
   }
 
   Offset _start(int id, Map<int, Offset> targets) {
@@ -273,10 +296,13 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final targets = _targets(constraints.biggest);
+        final fit = _fit(constraints.biggest);
+        final targets = fit.pos;
         final width = constraints.biggest.width;
+        _scale = fit.scale;
+        final scrolls = fit.height > constraints.biggest.height;
 
-        return AnimatedBuilder(
+        final tree = AnimatedBuilder(
           animation: _c,
           builder: (context, _) {
             final t = Curves.easeOutCubic.transform(_c.value);
@@ -323,7 +349,7 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
                   if (widget.showValues && n.kind == TreeNodeKind.op && eval.result.values[n.id] != null)
                     _valueLabel(
                       at: pos[n.id]!,
-                      gap: _NodeChip.halfWidth(context, n) + 6,
+                      gap: _NodeChip.halfWidth(context, n) * _scale + 6,
                       onLeft: (parentOf[n.id]?.x ?? n.x) > n.x,
                       width: width,
                       value: eval.result.values[n.id]!.display(decimalSeparator: sep),
@@ -334,6 +360,13 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
               ],
             );
           },
+        );
+
+        return SingleChildScrollView(
+          reverse: true,
+          clipBehavior: scrolls ? Clip.hardEdge : Clip.none,
+          physics: scrolls ? null : const NeverScrollableScrollPhysics(),
+          child: SizedBox(width: width, height: fit.height, child: tree),
         );
       },
     );
@@ -366,6 +399,7 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
     final destination = n.kind == TreeNodeKind.gap && _editable && _signInHand;
     Widget chip({bool hover = false, bool wrong = false}) => _NodeChip(
       node: n,
+      scale: _scale,
       hint: hinted,
       destination: destination,
       selected: selected,
@@ -450,8 +484,8 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
       child: Text(onLeft ? '$value ←' : '→ $value', maxLines: 1, softWrap: false, style: style),
     );
     return onLeft
-        ? Positioned(right: width - at.dx + gap, top: at.dy - 26, child: label)
-        : Positioned(left: at.dx + gap, top: at.dy - 26, child: label);
+        ? Positioned(right: width - at.dx + gap, top: at.dy - 26 * _scale, child: label)
+        : Positioned(left: at.dx + gap, top: at.dy - 26 * _scale, child: label);
   }
 
   Widget _equalsVerdict(BuildContext context, Offset at, Verdict v, String sep) {
@@ -468,7 +502,7 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
         '${l.display(decimalSeparator: sep)} ${equal ? '=' : '≠'} ${r.display(decimalSeparator: sep)}'
         '${complete && equal ? ' ✓' : ''}';
     return Positioned(
-      left: at.dx + 24,
+      left: at.dx + 18 * _scale + 6,
       top: at.dy - 9,
       child: IgnorePointer(
         child: Text(
@@ -514,12 +548,14 @@ class _NodeChip extends StatelessWidget {
     required this.selected,
     required this.error,
     required this.onTap,
+    this.scale = 1,
     this.hover = false,
     this.hint = false,
     this.destination = false,
   });
 
   final PlacedNode node;
+  final double scale;
   final bool selected;
 
   final bool hint;
@@ -627,7 +663,7 @@ class _NodeChip extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: EdgeInsets.all(node.kind == TreeNodeKind.gap ? 11 : 6),
-            child: hint ? _HintPulse(child: shape) : shape,
+            child: Transform.scale(scale: scale, child: hint ? _HintPulse(child: shape) : shape),
           ),
         ),
       ),

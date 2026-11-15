@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/audio/sound_service.dart';
 import 'core/router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/web/theme_chrome.dart';
 import 'features/settings/settings_controller.dart';
 import 'l10n/app_localizations.dart';
 
@@ -37,15 +38,23 @@ class EmplakeApp extends ConsumerWidget {
       builder: (context, child) {
         final mq = MediaQuery.of(context);
         final scale = mq.textScaler.scale(1) * settings.fontScale;
-        return MediaQuery(
-          data: mq.copyWith(
-            textScaler: TextScaler.linear(scale),
-            disableAnimations: mq.disableAnimations || settings.reduceMotion,
-          ),
-          child: Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: (_) => ref.read(soundProvider).onFirstGesture(),
-            child: child!,
+        return ThemeChrome(
+          seed: settings.seed,
+          brightness: switch (settings.themeMode) {
+            ThemeMode.light => Brightness.light,
+            ThemeMode.dark => Brightness.dark,
+            ThemeMode.system => mq.platformBrightness,
+          },
+          child: MediaQuery(
+            data: mq.copyWith(
+              textScaler: TextScaler.linear(scale),
+              disableAnimations: mq.disableAnimations || settings.reduceMotion,
+            ),
+            child: Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (_) => ref.read(soundProvider).onFirstGesture(),
+              child: child!,
+            ),
           ),
         );
       },
