@@ -1,7 +1,7 @@
 <!-- Gerado por tool/gen_catalog_test.dart a partir de assets/catalog.json. Não edite à mão. -->
 # Fácil — 40 placas
 
-Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão não inteira aceita · 45 s · 5 pontos base.
+Os operadores são + − × ÷ xʸ e −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉. A divisão não inteira é aceita, e cada placa tem 45 s e vale 5 pontos base.
 
 [← catálogo](README.md)
 
@@ -54,7 +54,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `5 × 0 = 4 × 0` → cada lado vale **0**
 - **LaTeX:** `5 \times 0 = 4 \times 0`
 - **Código:** `=(*(5,0),*(4,0))`
-- **Operadores:** × · 6 nós (6 = só dois binários além do =) · "=" depois do 2º dígito
+- **Operadores:** × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 2º dígito
 - **Trivial (×0):** sim · **Placa do dia:** não
 - **Com restrição:**
   - *sem ×* (`-*`): `5^0 = 4^0` → cada lado vale **1** — código `=(^(5,0),^(4,0))`
@@ -67,7 +67,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `0 = 0 × (3 + 4)` → cada lado vale **0**
 - **LaTeX:** `0 = 0 \times \left(3+4\right)`
 - **Código:** `=(0,*(0,+(3,4)))`
-- **Operadores:** + × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** sim · **Placa do dia:** não
 - **Com restrição:**
   - *= depois do 2º dígito* (`=1`): `0 + 0 = ⌊3 ÷ 4⌋` → cada lado vale **0** — código `=(+(0,0),f(/(3,4)))`
@@ -78,7 +78,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `6 = 0 + 0 + 6` → cada lado vale **6**
 - **LaTeX:** `6 = 0+0+6`
 - **Código:** `=(6,+(0,+(0,6)))`
-- **Operadores:** + · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `6 − (0 − 0) = 6` → cada lado vale **6** — código `=(-(6,-(0,0)),6)`
@@ -91,7 +91,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `4 + 1 + 4 = 9` → cada lado vale **9**
 - **LaTeX:** `4+1+4 = 9`
 - **Código:** `=(+(4,+(1,4)),9)`
-- **Operadores:** + · 6 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `4 − 1^4 = √9` → cada lado vale **3** — código `=(-(4,^(1,4)),s(9))`
@@ -104,7 +104,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `3 = 3 + 0 × 3` → cada lado vale **3**
 - **LaTeX:** `3 = 3+0 \times 3`
 - **Código:** `=(3,+(3,*(0,3)))`
-- **Operadores:** + × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** sim · **Placa do dia:** não
 - **Com restrição:** nenhuma variante verificada
 
@@ -114,7 +114,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1 = 1^(6 + 0)` → cada lado vale **1**
 - **LaTeX:** `1 = {1}^{6+0}`
 - **Código:** `=(1,^(1,+(6,0)))`
-- **Operadores:** + xʸ · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + xʸ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `1 = 1^(6 − 0)` → cada lado vale **1** — código `=(1,^(1,-(6,0)))`
@@ -127,7 +127,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `4 + 2 = 4 + 2` → cada lado vale **6**
 - **LaTeX:** `4+2 = 4+2`
 - **Código:** `=(+(4,2),+(4,2))`
-- **Operadores:** + · 6 nós (6 = só dois binários além do =) · "=" depois do 2º dígito
+- **Operadores:** + · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 2º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `4 = 2 × (4 − 2)` → cada lado vale **4** — código `=(4,*(2,-(4,2)))`
@@ -140,7 +140,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `0 = (5 − 5) × 9` → cada lado vale **0**
 - **LaTeX:** `0 = \left(5-5\right) \times 9`
 - **Código:** `=(0,*(-(5,5),9))`
-- **Operadores:** − × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** sim · **Placa do dia:** não
 - **Com restrição:**
   - *= depois do 3º dígito* (`=2`): `0! − (5 + 5) = −9` → cada lado vale **−9** — código `=(-(!(0),+(5,5)),n(9))`
@@ -151,7 +151,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `9 − (2 + 3) = 4` → cada lado vale **4**
 - **LaTeX:** `9-\left(2+3\right) = 4`
 - **Código:** `=(-(9,+(2,3)),4)`
-- **Operadores:** + − · 6 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + − · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem −* (`--`): `9 = 2 + 3 + 4` → cada lado vale **9** — código `=(9,+(2,+(3,4)))`
@@ -164,7 +164,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1^7 + 8 = 9` → cada lado vale **9**
 - **LaTeX:** `{1}^{7}+8 = 9`
 - **Código:** `=(+(^(1,7),8),9)`
-- **Operadores:** + xʸ · 6 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + xʸ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `1^7 − (−8) = 9` → cada lado vale **9** — código `=(-(^(1,7),n(8)),9)`
@@ -177,7 +177,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1 = 6^(8 × 0)` → cada lado vale **1**
 - **LaTeX:** `1 = {6}^{8 \times 0}`
 - **Código:** `=(1,^(6,*(8,0)))`
-- **Operadores:** × xʸ · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** × xʸ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** sim · **Placa do dia:** não
 - **Com restrição:**
   - *sem ×* (`-*`): `1 = (6 + 8)^0` → cada lado vale **1** — código `=(1,^(+(6,8),0))`
@@ -190,7 +190,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `6 + 1 + 2 = 9` → cada lado vale **9**
 - **LaTeX:** `6+1+2 = 9`
 - **Código:** `=(+(6,+(1,2)),9)`
-- **Operadores:** + · 6 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `6 = 1 × 2 × √9` → cada lado vale **6** — código `=(6,*(1,*(2,s(9))))`
@@ -203,7 +203,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1 = (4 + 5) ÷ 9` → cada lado vale **1**
 - **LaTeX:** `1 = \frac{4+5}{9}`
 - **Código:** `=(1,/(+(4,5),9))`
-- **Operadores:** + ÷ · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + ÷ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem ÷* (`-/`): `1 × (4 + 5) = 9` → cada lado vale **9** — código `=(*(1,+(4,5)),9)`
@@ -216,7 +216,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `7 = 0 × 3 + 7` → cada lado vale **7**
 - **LaTeX:** `7 = 0 \times 3+7`
 - **Código:** `=(7,+(*(0,3),7))`
-- **Operadores:** + × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** sim · **Placa do dia:** não
 - **Com restrição:** nenhuma variante verificada
 
@@ -226,7 +226,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `8 = 5 + 3 × 1` → cada lado vale **8**
 - **LaTeX:** `8 = 5+3 \times 1`
 - **Código:** `=(8,+(5,*(3,1)))`
-- **Operadores:** + × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `(8 − 5) ÷ 3 = 1` → cada lado vale **1** — código `=(/(-(8,5),3),1)`
@@ -239,7 +239,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1^(2 + 9) = 1` → cada lado vale **1**
 - **LaTeX:** `{1}^{2+9} = 1`
 - **Código:** `=(^(1,+(2,9)),1)`
-- **Operadores:** + xʸ · 6 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + xʸ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem xʸ* (`-^`): `1 = 2 ÷ (√9 − 1)` → cada lado vale **1** — código `=(1,/(2,-(s(9),1)))`
@@ -252,7 +252,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `0 = 8 × ⌊1 ÷ 6⌋` → cada lado vale **0**
 - **LaTeX:** `0 = 8 \times \left\lfloor \frac{1}{6} \right\rfloor`
 - **Código:** `=(0,*(8,f(/(1,6))))`
-- **Operadores:** × ÷ ⌊x⌋ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** × ÷ ⌊x⌋ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** sim · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem ×* (`-*`): `0 = ⌊8^(1 − 6)⌋` → cada lado vale **0** — código `=(0,f(^(8,-(1,6))))`
@@ -265,7 +265,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1 = 3 + 4 − 6` → cada lado vale **1**
 - **LaTeX:** `1 = 3+4-6`
 - **Código:** `=(1,+(3,-(4,6)))`
-- **Operadores:** + − · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + − · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `1 = (3 − 4)^6` → cada lado vale **1** — código `=(1,^(-(3,4),6))`
@@ -278,7 +278,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `6 + 2 = 2 × 4` → cada lado vale **8**
 - **LaTeX:** `6+2 = 2 \times 4`
 - **Código:** `=(+(6,2),*(2,4))`
-- **Operadores:** + × · 6 nós (6 = só dois binários além do =) · "=" depois do 2º dígito
+- **Operadores:** + × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 2º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `6 − √(2 × 2) = 4` → cada lado vale **4** — código `=(-(6,s(*(2,2))),4)`
@@ -291,7 +291,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `5 + 3 = 2^3` → cada lado vale **8**
 - **LaTeX:** `5+3 = {2}^{3}`
 - **Código:** `=(+(5,3),^(2,3))`
-- **Operadores:** + xʸ · 6 nós (6 = só dois binários além do =) · "=" depois do 2º dígito
+- **Operadores:** + xʸ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 2º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `5 − ⌈3 ÷ 2⌉ = 3` → cada lado vale **3** — código `=(-(5,C(/(3,2))),3)`
@@ -304,7 +304,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1 = 3^(5 − 5)` → cada lado vale **1**
 - **LaTeX:** `1 = {3}^{5-5}`
 - **Código:** `=(1,^(3,-(5,5)))`
-- **Operadores:** − xʸ · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − xʸ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem xʸ* (`-^`): `1 = ⌈3 ÷ (5 + 5)⌉` → cada lado vale **1** — código `=(1,C(/(3,+(5,5))))`
@@ -317,7 +317,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `9 = 7 + 1 × 2` → cada lado vale **9**
 - **LaTeX:** `9 = 7+1 \times 2`
 - **Código:** `=(9,+(7,*(1,2)))`
-- **Operadores:** + × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem +* (`-+`): `9 − 7 = 1 × 2` → cada lado vale **2** — código `=(-(9,7),*(1,2))`
@@ -330,7 +330,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `6 = 3 × 5 − 9` → cada lado vale **6**
 - **LaTeX:** `6 = 3 \times 5-9`
 - **Código:** `=(6,-(*(3,5),9))`
-- **Operadores:** − × · 6 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − × · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem −* (`--`): `6 = 3 × 5 + (−9)` → cada lado vale **6** — código `=(6,+(*(3,5),n(9)))`
@@ -343,7 +343,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `2 + 7 = 3 + 6` → cada lado vale **9**
 - **LaTeX:** `2+7 = 3+6`
 - **Código:** `=(+(2,7),+(3,6))`
-- **Operadores:** + · 6 nós (6 = só dois binários além do =) · "=" depois do 2º dígito
+- **Operadores:** + · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 2º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem +* (`-+`): `2 = −(7 − 3 − 6)` → cada lado vale **2** — código `=(2,n(-(-(7,3),6)))`
@@ -356,7 +356,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `5 + 2 ÷ 2 = 6` → cada lado vale **6**
 - **LaTeX:** `5+\frac{2}{2} = 6`
 - **Código:** `=(+(5,/(2,2)),6)`
-- **Operadores:** + ÷ · 6 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + ÷ · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem +* (`-+`): `(5 − 2) × 2 = 6` → cada lado vale **6** — código `=(*(-(5,2),2),6)`
@@ -369,7 +369,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `3 = 1 + ∛8 + 0` → cada lado vale **3**
 - **LaTeX:** `3 = 1+\sqrt[3]{8}+0`
 - **Código:** `=(3,+(1,+(c(8),0)))`
-- **Operadores:** + ∛ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + ∛ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem ∛* (`-c`): `3 = √(1 + 8) + 0` → cada lado vale **3** — código `=(3,+(s(+(1,8)),0))`
@@ -382,7 +382,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `9 = 3 × (4 − 0!)` → cada lado vale **9**
 - **LaTeX:** `9 = 3 \times \left(4-0!\right)`
 - **Código:** `=(9,*(3,-(4,!(0))))`
-- **Operadores:** − × ! · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − × ! · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem ×* (`-*`): `9 = 3^(√4 + 0)` → cada lado vale **9** — código `=(9,^(3,+(s(4),0)))`
@@ -395,7 +395,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `1 = 9 − 4 × ∛8` → cada lado vale **1**
 - **LaTeX:** `1 = 9-4 \times \sqrt[3]{8}`
 - **Código:** `=(1,-(9,*(4,c(8))))`
-- **Operadores:** − × ∛ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − × ∛ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem −* (`--`): `1 + √9 + 4 = 8` → cada lado vale **8** — código `=(+(1,+(s(9),4)),8)`
@@ -408,7 +408,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `5 + 3! − 6 = 5` → cada lado vale **5**
 - **LaTeX:** `5+3!-6 = 5`
 - **Código:** `=(+(5,-(!(3),6)),5)`
-- **Operadores:** + − ! · 7 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + − ! · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem +* (`-+`): `5 − (3! − 6) = 5` → cada lado vale **5** — código `=(-(5,-(!(3),6)),5)`
@@ -421,7 +421,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `(9 − 8) × 3 = √9` → cada lado vale **3**
 - **LaTeX:** `\left(9-8\right) \times 3 = \sqrt{9}`
 - **Código:** `=(*(-(9,8),3),s(9))`
-- **Operadores:** − × √ · 7 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** − × √ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem ×* (`-*`): `9 = 8 + 3 ÷ √9` → cada lado vale **9** — código `=(9,+(8,/(3,s(9))))`
@@ -434,7 +434,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `6 = 7 − (0!)^8` → cada lado vale **6**
 - **LaTeX:** `6 = 7-{\left(0!\right)}^{8}`
 - **Código:** `=(6,-(7,^(!(0),8)))`
-- **Operadores:** − xʸ ! · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − xʸ ! · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *= depois do 3º dígito* (`=2`): `6 + ∛(7 + 0!) = 8` → cada lado vale **8** — código `=(+(6,c(+(7,!(0)))),8)`
@@ -446,7 +446,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `6 = (2 + 6^0)!` → cada lado vale **6**
 - **LaTeX:** `6 = \left(2+{6}^{0}\right)!`
 - **Código:** `=(6,!(+(2,^(6,0))))`
-- **Operadores:** + xʸ ! · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + xʸ ! · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem !* (`-!`): `√(6^2) = 6 + 0` → cada lado vale **6** — código `=(s(^(6,2)),+(6,0))`
@@ -459,7 +459,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `8 = 8 × (3 − ∛8)` → cada lado vale **8**
 - **LaTeX:** `8 = 8 \times \left(3-\sqrt[3]{8}\right)`
 - **Código:** `=(8,*(8,-(3,c(8))))`
-- **Operadores:** − × ∛ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − × ∛ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem ×* (`-*`): `8 ÷ 8 = 3 − ∛8` → cada lado vale **1** — código `=(/(8,8),-(3,c(8)))`
@@ -472,7 +472,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `9 = 7 + 1 × ∛8` → cada lado vale **9**
 - **LaTeX:** `9 = 7+1 \times \sqrt[3]{8}`
 - **Código:** `=(9,+(7,*(1,c(8))))`
-- **Operadores:** + × ∛ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** + × ∛ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** pode sair
 - **Com restrição:**
   - *sem +* (`-+`): `9 − 7 = 1 × ∛8` → cada lado vale **2** — código `=(-(9,7),*(1,c(8)))`
@@ -485,7 +485,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `5 = 7 − ⌈9 ÷ 8⌉` → cada lado vale **5**
 - **LaTeX:** `5 = 7-\left\lceil \frac{9}{8} \right\rceil`
 - **Código:** `=(5,-(7,C(/(9,8))))`
-- **Operadores:** − ÷ ⌈x⌉ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − ÷ ⌈x⌉ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem −* (`--`): `⌈(5 + 7) ÷ 9⌉ = ∛8` → cada lado vale **2** — código `=(C(/(+(5,7),9)),c(8))`
@@ -498,7 +498,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `4 = 4 × ⌊7 ÷ 5⌋` → cada lado vale **4**
 - **LaTeX:** `4 = 4 \times \left\lfloor \frac{7}{5} \right\rfloor`
 - **Código:** `=(4,*(4,f(/(7,5))))`
-- **Operadores:** × ÷ ⌊x⌋ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** × ÷ ⌊x⌋ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem ×* (`-*`): `4 = 4 ÷ ⌊7 ÷ 5⌋` → cada lado vale **4** — código `=(4,/(4,f(/(7,5))))`
@@ -511,7 +511,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `7 = √(7^(8 ÷ 4))` → cada lado vale **7**
 - **LaTeX:** `7 = \sqrt{{7}^{\frac{8}{4}}}`
 - **Código:** `=(7,s(^(7,/(8,4))))`
-- **Operadores:** ÷ xʸ √ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** ÷ xʸ √ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem √* (`-s`): `7 = 7 + ⌊8^(−4)⌋` → cada lado vale **7** — código `=(7,+(7,f(^(8,n(4)))))`
@@ -524,7 +524,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `4 + ⌈7 ÷ 3⌉ = 7` → cada lado vale **7**
 - **LaTeX:** `4+\left\lceil \frac{7}{3} \right\rceil = 7`
 - **Código:** `=(+(4,C(/(7,3))),7)`
-- **Operadores:** + ÷ ⌈x⌉ · 7 nós (6 = só dois binários além do =) · "=" depois do 3º dígito
+- **Operadores:** + ÷ ⌈x⌉ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem +* (`-+`): `4 = ⌊−(7 ÷ 3 − 7)⌋` → cada lado vale **4** — código `=(4,f(n(-(/(7,3),7))))`
@@ -537,7 +537,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `7 = 8 − √4 ÷ 2` → cada lado vale **7**
 - **LaTeX:** `7 = 8-\frac{\sqrt{4}}{2}`
 - **Código:** `=(7,-(8,/(s(4),2)))`
-- **Operadores:** − ÷ √ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** − ÷ √ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem −* (`--`): `7 = 8 + √4 ÷ (−2)` → cada lado vale **7** — código `=(7,+(8,/(s(4),n(2))))`
@@ -550,7 +550,7 @@ Operadores: + − × ÷ xʸ · −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉ · divisão n�
 - **Solução:** `2 = 2 × ⌊9 ÷ 6⌋` → cada lado vale **2**
 - **LaTeX:** `2 = 2 \times \left\lfloor \frac{9}{6} \right\rfloor`
 - **Código:** `=(2,*(2,f(/(9,6))))`
-- **Operadores:** × ÷ ⌊x⌋ · 7 nós (6 = só dois binários além do =) · "=" depois do 1º dígito
+- **Operadores:** × ÷ ⌊x⌋ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
   - *sem ×* (`-*`): `2 = 2 ÷ ⌊9 ÷ 6⌋` → cada lado vale **2** — código `=(2,/(2,f(/(9,6))))`

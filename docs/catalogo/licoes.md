@@ -1,7 +1,7 @@
 <!-- Gerado por tool/gen_catalog_test.dart a partir de assets/catalog.json. Não edite à mão. -->
 # Lições do modo Educacional
 
-Uma lição por operador: um exemplo mostrado passo a passo e uma placa para o jogador tentar. Os números das lições não se repetem no catálogo de sorteio.
+Há uma lição por operador, com um exemplo mostrado passo a passo e uma placa para o jogador tentar. Os números das lições não se repetem no catálogo de sorteio.
 
 [← catálogo](README.md)
 

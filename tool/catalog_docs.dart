@@ -83,8 +83,8 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
     ..writeln('# Catálogo de placas')
     ..writeln()
     ..writeln(
-      'O jogo sorteia placas **só** deste catálogo (`assets/catalog.json`). Cada placa '
-      'é um número de 4 dígitos, o nível em que ela é oferecida, a dificuldade e uma '
+      'O jogo sorteia placas **só** deste catálogo (`assets/catalog.json`). Cada entrada '
+      'tem o número de 4 dígitos, o nível em que a placa é oferecida, a dificuldade e uma '
       'solução verificada pelo próprio `Evaluator` do jogo.',
     )
     ..writeln()
@@ -106,7 +106,7 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
       '| **${catalog.all.where((e) => e.variants.isNotEmpty).length}** ($variants variantes) | 1–${catalog.length} |',
     )
     ..writeln()
-    ..writeln('Lições do modo Educacional: [licoes.md](licoes.md).')
+    ..writeln('As lições do modo Educacional estão em [licoes.md](licoes.md).')
     ..writeln()
     ..writeln('## Regras dos níveis')
     ..writeln()
@@ -131,25 +131,25 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
     ..writeln('| `n` | número da placa (4 dígitos, usados nessa ordem, sem concatenar) |')
     ..writeln('| `l` | nível: `easy`, `intermediate`, `advanced`, `hard` |')
     ..writeln(
-      '| `s` | **dificuldade** 1–3 (★). ★1 operadores simples e muitos valores onde os lados se encontram; '
-      '★2 poucos valores ou um unário; ★3 dois ou mais unários. Não confundir com as estrelas que o jogador ganha numa fase da Aventura. |',
+      '| `s` | **dificuldade** de 1 a 3 (★). Uma placa ★1 usa operadores simples e tem muitos valores em que os dois lados se encontram; '
+      'uma ★2 tem poucos desses valores ou usa um unário; uma ★3 usa dois ou mais unários. Essas estrelas são diferentes das que o jogador ganha numa fase da Aventura. |',
     )
     ..writeln(
-      '| `x` | solução em notação prefixa (`=(esquerda,direita)`). Binários `+ - * / ^`; '
-      'unários `n` (−x), `s` (√), `c` (∛), `!`, `a` (\\|x\\|), `f` (⌊x⌋), `C` (⌈x⌉). |',
+      '| `x` | solução em notação prefixa (`=(esquerda,direita)`). Os binários são `+ - * / ^`, e os '
+      'unários são `n` (−x), `s` (√), `c` (∛), `!`, `a` (\\|x\\|), `f` (⌊x⌋) e `C` (⌈x⌉). |',
     )
     ..writeln(
       '| `t` | **trivial**: a placa tem 0 e a solução anula um lado com × 0 (ou 0 ÷ x, 0ʸ). '
-      'Na Aventura vira aquecimento; fica fora do Contra o relógio; no Com restrição recebe "sem ×". |',
+      'Na Aventura, a placa vira aquecimento; no Contra o relógio, fica de fora; e no Com restrição, recebe a regra "sem ×". |',
     )
     ..writeln(
-      '| `r` | variantes do desafio **Com restrição**: `{r: regra, x: solução}`. Regras: `-op` (sem op), '
-      '`+op` (use op), `=k` (= no vão k, 0 = depois do 1º dígito). Cada variante tem solução verificada '
-      'sob a regra e **invalida** a solução `x` original. |',
+      '| `r` | variantes do desafio **Com restrição**: `{r: regra, x: solução}`. As regras são `-op` (sem o operador), '
+      '`+op` (use o operador) e `=k` (o = fica no vão k, e o vão 0 é o que vem depois do 1º dígito). Cada variante tem uma solução verificada '
+      'sob a regra, e a regra **invalida** a solução `x` original. |',
     )
     ..writeln()
     ..writeln(
-      'A ordem das entradas de cada nível no JSON é a **ordem da trilha da Aventura**. Placas novas entram no fim do nível.',
+      'A ordem das entradas de cada nível no JSON é a **ordem da trilha da Aventura**, e as placas novas entram no fim do nível.',
     )
     ..writeln()
     ..writeln('## Como regenerar')
@@ -159,8 +159,8 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
     ..writeln('```')
     ..writeln()
     ..writeln(
-      'Lê as entradas atuais, recalcula `t` e `r`, verifica tudo com as regras do jogo e reescreve '
-      '`assets/catalog.json` e estes arquivos. `test/catalog_test.dart` falha se os docs ficarem desatualizados.',
+      'O comando lê as entradas atuais, recalcula `t` e `r`, verifica tudo com as regras do jogo e reescreve '
+      'o `assets/catalog.json` e estes arquivos. O `test/catalog_test.dart` falha se os docs ficarem desatualizados.',
     );
   files['docs/catalogo/README.md'] = idx.toString();
 
@@ -171,9 +171,9 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
       ..writeln('# ${levelName[level]} — ${list.length} placas')
       ..writeln()
       ..writeln(
-        'Operadores: ${level.binary.map(opLabel).join(' ')} · ${level.unary.map(opLabel).join(' ')} · '
-        'divisão não inteira ${level.allowsFractionalDivision ? 'aceita' : 'dá erro'} · ${level.seconds} s · '
-        '${level.basePoints} pontos base.',
+        'Os operadores são ${level.binary.map(opLabel).join(' ')} e ${level.unary.map(opLabel).join(' ')}. '
+        'A divisão não inteira ${level.allowsFractionalDivision ? 'é aceita' : 'dá erro'}, e cada placa tem ${level.seconds} s '
+        'e vale ${level.basePoints} pontos base.',
       )
       ..writeln()
       ..writeln('[← catálogo](README.md)')
@@ -198,7 +198,7 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
         ..writeln('- **Código:** `${e.solution}`')
         ..writeln(
           '- **Operadores:** ${opsUsed(board).map(opLabel).join(' ')} · ${nodeCount(board)} nós '
-          '(6 = só dois binários além do =) · "=" depois do ${board.eqDigitGap! + 1}º dígito',
+          '(6 nós indicam só dois binários além do =) · "=" depois do ${board.eqDigitGap! + 1}º dígito',
         )
         ..writeln(
           '- **Trivial (×0):** ${e.trivial ? 'sim' : 'não'} · **Placa do dia:** ${e.stars == 2 ? 'pode sair' : 'não'}',
@@ -225,7 +225,7 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
     ..writeln('# Lições do modo Educacional')
     ..writeln()
     ..writeln(
-      'Uma lição por operador: um exemplo mostrado passo a passo e uma placa para o jogador tentar. '
+      'Há uma lição por operador, com um exemplo mostrado passo a passo e uma placa para o jogador tentar. '
       'Os números das lições não se repetem no catálogo de sorteio.',
     )
     ..writeln()

@@ -20,9 +20,9 @@ A expressão é montada como uma **árvore que cresce para cima**:
 | Avançado | + − × ÷ ( ) √ ! \|x\| |
 | Difícil | + − × ÷ ( ) \|x\| |
 
-Modos: Aleatório, Específico, Placa do dia, Educacional, **Aventura** (todas as placas numa trilha por nível, com até 3 estrelas por fase) e **Desafios** (Contra o relógio e Com restrição). As regras estão em [docs/modos.md](docs/modos.md), e cada placa do catálogo, com a solução, em [docs/catalogo/](docs/catalogo/README.md).
+Modos: Aleatório, Específico, Placa do dia, Educacional, **Aventura** (todas as placas numa trilha por nível, com até 3 estrelas por fase) e **Desafios** (Contra o relógio e Com restrição). As regras dos modos estão em [docs/modos.md](docs/modos.md), e as placas do catálogo, com as suas soluções, estão em [docs/catalogo/](docs/catalogo/README.md).
 
-No desktop: `Enter` verifica, `Esc` pula, `Tab` alterna a seleção, `Ctrl+Z` desfaz e `+ - * / ^ = ! ( )` aplicam operadores.
+No desktop, `Enter` verifica, `Esc` pula, `Tab` alterna a seleção, `Ctrl+Z` desfaz e `+ - * / ^ = ! ( )` aplicam operadores.
 
 ## Estrutura
 
@@ -81,10 +81,6 @@ Os textos ficam em `lib/l10n/app_*.arb`. Para acrescentar ou alterar um texto, e
 ```sh
 python tool/gen_arb.py lib/l10n && flutter gen-l10n
 ```
-
-## Entrega no AVA
-
-Somente os `.dart` de `lib/` (inclui os gerados em `lib/l10n/` e o `lib/firebase_options.dart`).
 
 ## Créditos
 

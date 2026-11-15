@@ -6,34 +6,33 @@ a trilha de lições (Aventura), o *Ramp Up* (Contra o relógio) e os corações
 
 ## Princípios
 
-- **Um catálogo só.** Todos os modos sorteiam do mesmo `assets/catalog.json`, com soluções
-  verificadas pelo `Evaluator` do jogo. Os modos novos não inventam placas. O que muda é a
-  ordem, o filtro e as regras extras.
-- **Os números das 150 placas não mudaram.** O histórico dos jogadores (resolvido = número + nível),
-  a placa do dia e as lições continuam válidos. O catálogo passou para a versão 2 só com metadados
-  novos: `t` (trivial) e `r` (variantes com restrição).
-- **Níveis com as regras do jogo.** No Emplake, "fácil" quer dizer *mais ferramentas*: o Fácil tem
-  todos os operadores e o Difícil só + − × ÷ com −x e |x|. Os cabeçalhos da Aventura mostram os
-  operadores reais de cada nível (`Level.operatorLabels`). O mockup serviu só de layout.
+- Todos os modos sorteiam do mesmo `assets/catalog.json`, com soluções verificadas pelo
+  `Evaluator` do jogo. Os modos novos não criam placas, só mudam a ordem, o filtro e as regras extras.
+- Os números das 150 placas não mudaram, então o histórico dos jogadores (uma placa resolvida é
+  identificada pelo número e pelo nível), a placa do dia e as lições continuam válidos. O catálogo
+  passou para a versão 2 ganhando só dois metadados: `t` (trivial) e `r` (variantes com restrição).
+- No Emplake, "fácil" quer dizer *mais ferramentas*: o Fácil tem todos os operadores, e o Difícil
+  só tem + − × ÷, −x e |x|. Os cabeçalhos da Aventura mostram os operadores reais de cada nível
+  (`Level.operatorLabels`), e do mockup aproveitamos só o layout.
 
 ## Placas triviais (com 0)
 
 Muitas placas com 0 saem na hora anulando um lado com × 0 (ex.: 6004 → 6 × 0 = 0 × 4). O gerador marca
 como **trivial** a placa que tem 0 e cuja solução tem um ×, ÷ ou ^ que vale 0 porque um operando é 0.
-Hoje são 29 das 150. Elas não saíram do catálogo. Cada modo tem uma regra própria para elas:
+Hoje são 29 das 150. Elas continuam no catálogo, mas cada modo as trata de um jeito:
 
 | Modo | Placas triviais |
 |---|---|
-| Aleatório, Específico, placa do dia | Sem mudança. |
-| Aventura | Entram como **aquecimento**: as 2 primeiras fases de cada coluna, depois uma a cada 2 fases normais. Ensinam o truque do ×0 de propósito. |
-| Contra o relógio | **Excluídas**, porque seriam ponto de graça numa corrida contra o tempo. |
+| Aleatório, Específico, placa do dia | Entram no sorteio como as outras. |
+| Aventura | Entram como **aquecimento**: as 2 primeiras fases de cada coluna, depois uma a cada 2 fases normais, para ensinar o truque do ×0. |
+| Contra o relógio | Ficam **de fora**, porque seriam pontos de graça numa corrida contra o tempo. |
 | Com restrição | Recebem primeiro a regra **"sem ×"**, que desliga o truque. Variantes que ainda saem com ×0, como 0 ÷ 1 = 0 + 0, são descartadas. Placas sem nenhuma variante decente (ex.: 0100) ficam fora do desafio. |
 
 ## Aventura: a coleção inteira como trilha
 
-- **Sempre a coleção inteira.** São quatro colunas (Fácil → Difícil) com *todas* as placas do
-  catálogo, hoje 40 + 40 + 35 + 35 = 150. Quando o catálogo crescer, a trilha cresce sozinha. Placas
-  novas entram no fim do seu nível, para não deslocar o progresso de ninguém.
+- **Coleção inteira:** são quatro colunas (do Fácil ao Difícil) com *todas* as placas do catálogo,
+  hoje 40 + 40 + 35 + 35 = 150. Quando o catálogo crescer, a trilha cresce junto, e as placas novas
+  entram no fim do seu nível para não deslocar o progresso de ninguém.
 - **Ordem:** dentro de cada nível, a ordem das entradas no JSON é a ordem da trilha: dificuldade ★,
   depois a `difficulty` do solver, com as triviais intercaladas como aquecimento. As fases são
   numeradas ao longo da coleção: 001–040 Fácil, 041–080 Intermediário, 081–115 Avançado,
@@ -51,8 +50,8 @@ Hoje são 29 das 150. Elas não saíram do catálogo. Cada modo tem uma regra pr
   - ★★ resolveu no tempo e sem dica;
   - ★★★ resolveu no tempo, sem dica e com pelo menos metade do tempo sobrando.
 
-  Revelar a solução não dá estrela. Rejogar uma fase pode melhorar a nota, e fica guardada a maior.
-- **Pontos:** a Aventura grava em `solved` como o Aleatório. Uma placa já resolvida dá 0 ponto, mas as
+  Quem revela a solução não ganha estrelas. Rejogar uma fase pode melhorar a nota, e fica guardada a maior.
+- **Pontos:** a Aventura grava em `solved` como o Aleatório. Uma placa já resolvida dá 0 pontos, mas as
   estrelas contam.
 
 ## Desafios
@@ -73,18 +72,19 @@ Os dois desafios sobem a mesma **escada fixa**. A cada 3 acertos o jogador sobe 
 Regras comuns aos dois:
 
 - Não há dicas nem pausa.
-- Nenhuma placa se repete na mesma partida. Quando o degrau acaba, o sorteio vale o nível inteiro.
-- Os desafios **não** somam em `totalPoints` nem gravam em `solved`, para não gastar placas do
-  Aleatório. Têm recordes próprios.
+- Nenhuma placa se repete na mesma partida. Quando acabam as placas do degrau, o sorteio passa a
+  valer para o nível inteiro.
+- Os desafios **não** somam em `totalPoints` nem gravam em `solved`, para não gastar as placas do
+  Aleatório, e têm recordes próprios.
 - Uma partida interrompida (recarregar a página, voltar pelo MENU ou começar outra partida) termina
   com a pontuação que tinha e conta como jogada.
 
 ### D.01 Contra o relógio (referência: *Ramp Up* do Duolingo)
 
 - Um relógio de **3:00** vale para a partida toda e passa de uma placa para a outra.
-- **Subir de degrau dá +10 s.** **Pular custa 10 s**, sem diálogo, e não conta para o degrau.
+- Subir de degrau dá **+10 s**. Pular custa **10 s**, não abre diálogo e não conta para o degrau.
 - O tempo zerado encerra a partida e mostra uma solução da última placa.
-- **Recorde** = maior número de placas resolvidas numa partida.
+- O **recorde** é o maior número de placas resolvidas numa partida.
 
 ### D.02 Com restrição (referência: corações do Duolingo)
 
@@ -95,24 +95,24 @@ Regras comuns aos dois:
 - Uma igualdade verdadeira que quebra a regra é recusada com o aviso "Verdadeira, mas fora da regra",
   e não custa vida.
 - Cada placa tem o tempo do seu nível (45 a 75 s).
-- **3 vidas:** estourar o tempo ou pular custa uma. A placa perdida mostra uma solução que segue a regra.
-- **Recorde** = maior sequência de placas resolvidas.
+- O jogador tem **3 vidas**, e estourar o tempo ou pular custa uma delas. A placa perdida mostra uma solução que segue a regra.
+- O **recorde** é a maior sequência de placas resolvidas.
 
 ### Descartado: Caça às soluções
 
 O mockup tinha um terceiro desafio, "Caça às soluções" (uma placa, quantas igualdades diferentes
 existem). Ele saiu por dois motivos:
 
-- **Com unários, o total é infinito.** −(−x), |x| e outros geram novas igualdades sem fim, então não dá
-  para mostrar "14 / 23".
-- **Só com binários, quase não há o que caçar.** A mediana das 150 placas é de **1** solução.
+- Com os unários, o total é infinito: −(−x), |x| e outros geram igualdades novas sem fim, então não
+  dá para mostrar algo como "14 / 23".
+- Só com os binários, quase não há o que caçar, porque a mediana das 150 placas é de **1** solução.
 
 ## Onde está no código
 
 | Parte | Arquivo |
 |---|---|
 | Regras extras (`Restriction`, `OpRules`) | `lib/features/game/domain/rules.dart` |
-| Solver com restrição (obrigatório = flag na DP; = fixo = filtro do vão) | `lib/features/game/domain/solver.dart` |
+| Solver com restrição (o operador obrigatório vira uma flag na DP, e o "=" fixo filtra o vão) | `lib/features/game/domain/solver.dart` |
 | Trilha, desbloqueio e estrelas | `lib/features/game/domain/adventure.dart` |
 | Escada, partida e sorteio dos desafios | `lib/features/game/domain/challenge.dart` |
 | Estado da partida (relógio que passa de placa a placa, vidas, `ruleBroken`) | `lib/features/game/application/game_controller.dart` |
@@ -127,5 +127,5 @@ faz a trilha e os recordes funcionarem offline e no build de preview.
 
 ## Para depois
 
-- Conquistas novas: "coluna completa" na Aventura e "10 placas" no Contra o relógio.
-- Ampliar o catálogo: placas novas entram no fim de cada nível e o gerador calcula `t` e `r` para elas.
+- Criar conquistas novas, como "coluna completa" na Aventura e "10 placas" no Contra o relógio.
+- Ampliar o catálogo. As placas novas entram no fim de cada nível, e o gerador calcula `t` e `r` para elas.
