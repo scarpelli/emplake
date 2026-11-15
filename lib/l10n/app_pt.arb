@@ -364,22 +364,6 @@
   "latex": "LATEX",
   "copy": "Copiar",
   "copied": "Copiado!",
-  "otherSolutions": "{count, plural, =1{OUTRA SOLUÇÃO} other{OUTRAS {count} SOLUÇÕES}}",
-  "@otherSolutions": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "otherSolutionsMore": "e mais {count}",
-  "@otherSolutionsMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "pause": "Pausar",
   "pausedTitle": "PAUSADO",
   "pausedBody": "A árvore fica escondida durante a pausa.",
@@ -643,7 +627,6 @@
   "helpTabScoring": "PONTOS",
   "helpExample": "EXEMPLO",
   "helpExampleCaption": "1236 → 1 × 2 × 3 = 6. Cada ligação sobe um andar na árvore.",
-  "helpOtherSolutions": "Depois de cada número, a folha de resultado mostra outras soluções, das mais simples para as mais elaboradas.",
   "helpKeys": "TECLADO",
   "helpKeysList": "Enter verificar · Esc pular · Tab seleção · Ctrl+Z desfazer · ⌫ remover · H dica\n+ − * / ^ = ( ) operadores · ! fatorial · r √ · c ∛ · a |x| · n −x · f ⌊x⌋ · F ⌈x⌉",
   "helpOperatorsIntro": "Os binários (+ − × ÷ xʸ) ligam dois blocos num vão. Os outros agem sobre um trecho: toque num número ou ramo e escolha.",
@@ -754,7 +737,7 @@
   "helpScoringHints": "Dicas: a 1ª mostra onde vai o = (fica com 2/3 dos pontos), a 2ª uma primeira ligação (1/3), a 3ª revela a solução (0 pontos; o número volta ao sorteio).",
   "helpScoringBlind": "Às cegas: jogando o número inteiro com os valores em tempo real desligados, os pontos valem ×1,25.",
   "helpScoringCombo": "Combo: cada acerto seguido, no tempo e sem dicas, soma +10% (até +50%). Pular zera o combo.",
-  "helpDayStreak": "🔥 Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.",
+  "helpDayStreak": "Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.",
   "helpScoringPractice": "Treino e lições não valem pontos.",
   "helpScoringPause": "Você tem uma pausa de {seconds}s por número; durante a pausa o relógio para e a árvore fica escondida.",
   "@helpScoringPause": {

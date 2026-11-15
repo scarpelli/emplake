@@ -131,6 +131,24 @@ class _ModePageState extends ConsumerState<ModePage> {
                                     },
                                   ),
                                 ),
+                                if (streak > 0) ...[
+                                  const SizedBox(width: 12),
+                                  Tooltip(
+                                    message: l.dailyStreakDays(streak),
+                                    child: Semantics(
+                                      label: l.dailyStreakDays(streak),
+                                      excludeSemantics: true,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.local_fire_department_outlined, size: 16, color: bp.accent),
+                                          const SizedBox(width: 3),
+                                          Eyebrow('$streak', opacity: 1, color: bp.accent),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -138,18 +156,6 @@ class _ModePageState extends ConsumerState<ModePage> {
                       ),
                     ),
                   ),
-                  if (streak > 0)
-                    Semantics(
-                      label: l.dailyStreakDays(streak),
-                      excludeSemantics: true,
-                      child: Tooltip(
-                        message: l.dailyStreakDays(streak),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(l.streakShort(streak), style: t.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
-                        ),
-                      ),
-                    ),
                   const SoundToggle(),
                 ],
               ),

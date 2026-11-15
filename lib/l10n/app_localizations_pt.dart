@@ -537,22 +537,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get copied => 'Copiado!';
 
   @override
-  String otherSolutions(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'OUTRAS $count SOLUÇÕES',
-      one: 'OUTRA SOLUÇÃO',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String otherSolutionsMore(int count) {
-    return 'e mais $count';
-  }
-
-  @override
   String get pause => 'Pausar';
 
   @override
@@ -1145,10 +1129,6 @@ class AppLocalizationsPt extends AppLocalizations {
       '1236 → 1 × 2 × 3 = 6. Cada ligação sobe um andar na árvore.';
 
   @override
-  String get helpOtherSolutions =>
-      'Depois de cada número, a folha de resultado mostra outras soluções, das mais simples para as mais elaboradas.';
-
-  @override
   String get helpKeys => 'TECLADO';
 
   @override
@@ -1309,7 +1289,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get helpDayStreak =>
-      '🔥 Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.';
+      'Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.';
 
   @override
   String get helpScoringPractice => 'Treino e lições não valem pontos.';

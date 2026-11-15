@@ -7,7 +7,6 @@ import '../application/game_controller.dart';
 import '../domain/challenge.dart';
 import '../domain/format.dart';
 import 'formula_panel.dart';
-import 'other_solutions.dart';
 
 class ResultSheet extends StatelessWidget {
   const ResultSheet({
@@ -107,7 +106,6 @@ class ResultSheet extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             FormulaPanel(tokens: linearTokens(state.board), latex: latexOf(state.board), compact: true),
-            OtherSolutions(level: state.level, board: state.board),
             if (stars != null && !revealed) ...[
               const SizedBox(height: 16),
               Semantics(

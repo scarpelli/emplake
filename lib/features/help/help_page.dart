@@ -286,8 +286,6 @@ class _PlayTab extends StatelessWidget {
       ),
       const SizedBox(height: 6),
       Text(l.helpExampleCaption, style: t.bodySmall?.copyWith(color: bp.muted)),
-      const SizedBox(height: 6),
-      Text(l.helpOtherSolutions, style: t.bodySmall?.copyWith(color: bp.muted)),
       const SizedBox(height: 16),
       Eyebrow(l.helpKeys),
       const SizedBox(height: 6),

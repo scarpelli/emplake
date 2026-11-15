@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'board.dart';
 import 'evaluator.dart';
 import 'expr.dart';
-import 'format.dart';
 import 'level.dart';
 import 'rules.dart';
 import 'solution_codec.dart';
@@ -295,94 +294,4 @@ class _Q {
   }
 
   int get key => (n + Solver._limit) * (Solver._limit + 1) + d;
-}
-
-class _Side {
-  const _Side(this.node, this.value);
-
-  final Node node;
-  final _Q value;
-}
-
-class SolutionFinder {
-  SolutionFinder(this.level);
-
-  final Level level;
-
-  static const maxUnary = 1;
-
-  late final _solver = Solver(level);
-  late final _evaluator = Evaluator(level);
-  final _memo = <(int, int, int), List<_Side>>{};
-  List<int> _digits = const [];
-
-  static String sameIdea(Board board) => linearText(board).replaceAll(RegExp('[()]'), '');
-
-  List<Board> find(String number) {
-    _digits = number.split('').map(int.parse).toList();
-    _memo.clear();
-    final n = _digits.length;
-    final found = <String, (Board, int, int)>{};
-    for (var gap = 0; gap < n - 1; gap++) {
-      for (var a = 0; a <= maxUnary; a++) {
-        for (var b = 0; a + b <= maxUnary; b++) {
-          final right = <int, List<_Side>>{};
-          for (final r in _sides(gap + 1, n - 1, b)) {
-            right.putIfAbsent(r.value.key, () => []).add(r);
-          }
-          for (final l in _sides(0, gap, a)) {
-            for (final r in right[l.value.key] ?? const <_Side>[]) {
-              final board = SolutionCodec.decode(number, SolutionCodec.encode(l.node, r.node));
-              final idea = sameIdea(board);
-              if (found.containsKey(idea) || !_evaluator.isSolution(board)) continue;
-              final size = board.blocks.fold(0, (s, b) => s + b.descendants.length);
-              found[idea] = (board, a + b, size);
-            }
-          }
-        }
-      }
-    }
-    final ranked = found.entries.toList()
-      ..sort((x, y) {
-        final (_, ux, sx) = x.value;
-        final (_, uy, sy) = y.value;
-        if (ux != uy) return ux.compareTo(uy);
-        if (sx != sy) return sx.compareTo(sy);
-        return x.key.compareTo(y.key);
-      });
-    return [for (final e in ranked) e.value.$1];
-  }
-
-  List<_Side> _sides(int i, int j, int unary) => _memo.putIfAbsent((i, j, unary), () => _build(i, j, unary));
-
-  List<_Side> _build(int i, int j, int unary) {
-    final out = <_Side>[];
-    if (i == j && unary == 0) out.add(_Side(Leaf(0, _digits[i], i), _Q(_digits[i], 1)));
-    for (var k = i; k < j; k++) {
-      for (var a = 0; a <= unary; a++) {
-        final rights = _sides(k + 1, j, unary - a);
-        for (final l in _sides(i, k, a)) {
-          for (final r in rights) {
-            for (final op in _solver._binOps) {
-              if (_restatesSign(op, r.node)) continue;
-              final v = _solver._binary(op, l.value, r.value);
-              if (v != null) out.add(_Side(Binary(0, op, l.node, r.node), v));
-            }
-          }
-        }
-      }
-    }
-    if (unary > 0) {
-      for (final child in _sides(i, j, unary - 1)) {
-        for (final op in _solver._unOps) {
-          final v = _solver._unary(op, child.value);
-          if (v != null && v.key != child.value.key) out.add(_Side(Unary(0, op, child.node), v));
-        }
-      }
-    }
-    return out;
-  }
-
-  static bool _restatesSign(BinOp op, Node right) =>
-      (op == BinOp.add || op == BinOp.sub) && right is Unary && right.op == UnOp.neg;
 }

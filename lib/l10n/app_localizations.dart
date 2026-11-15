@@ -922,18 +922,6 @@ abstract class AppLocalizations {
   /// **'Copiado!'**
   String get copied;
 
-  /// No description provided for @otherSolutions.
-  ///
-  /// In pt, this message translates to:
-  /// **'{count, plural, =1{OUTRA SOLUÇÃO} other{OUTRAS {count} SOLUÇÕES}}'**
-  String otherSolutions(int count);
-
-  /// No description provided for @otherSolutionsMore.
-  ///
-  /// In pt, this message translates to:
-  /// **'e mais {count}'**
-  String otherSolutionsMore(int count);
-
   /// No description provided for @pause.
   ///
   /// In pt, this message translates to:
@@ -1882,12 +1870,6 @@ abstract class AppLocalizations {
   /// **'1236 → 1 × 2 × 3 = 6. Cada ligação sobe um andar na árvore.'**
   String get helpExampleCaption;
 
-  /// No description provided for @helpOtherSolutions.
-  ///
-  /// In pt, this message translates to:
-  /// **'Depois de cada número, a folha de resultado mostra outras soluções, das mais simples para as mais elaboradas.'**
-  String get helpOtherSolutions;
-
   /// No description provided for @helpKeys.
   ///
   /// In pt, this message translates to:
@@ -2155,7 +2137,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpDayStreak.
   ///
   /// In pt, this message translates to:
-  /// **'🔥 Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.'**
+  /// **'Dias seguidos: resolva pelo menos uma placa por dia, em qualquer modo, para a sequência crescer. Ver a solução não conta.'**
   String get helpDayStreak;
 
   /// No description provided for @helpScoringPractice.
