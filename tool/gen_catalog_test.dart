@@ -16,11 +16,13 @@ import 'catalog_docs.dart';
 
 const tutorialNumber = '1236';
 
-const pool = 600;
+const zeroShare = 0.2;
+
+const maxDifficulty = 7.0;
 
 const maxVariantSize = 9;
 
-final regenV1 = Platform.environment['EMPLAKE_REGEN_V1'] == '1';
+final regen = Platform.environment['EMPLAKE_REGEN'] == '1';
 final forceReorder = Platform.environment['EMPLAKE_REORDER'] == '1';
 
 void main() {
@@ -31,7 +33,9 @@ void main() {
 
     final entries = <CatalogEntry>[];
     for (final level in Level.values) {
-      final enriched = [for (final e in source.entriesFor(level)) enrich(e)];
+      final enriched = [
+        for (final e in source.entriesFor(level)) enrich(e.copyWith(stars: Solver(level).solve(e.number).stars)),
+      ];
       entries.addAll(version < 2 || forceReorder ? trailOrder(enriched) : enriched);
     }
     final catalog = Catalog(entries, lessons: source.lessons);
@@ -61,97 +65,76 @@ void main() {
     print('trivial: $trivial · variants: $variants · entries with a variant: $withVariant');
   });
 
-  test('generate catalog v1 from scratch (EMPLAKE_REGEN_V1=1)', skip: !regenV1, () {
-    final used = <String>{tutorialNumber};
+  test('regenerate catalog entries (EMPLAKE_REGEN=1)', skip: !regen, () {
+    final source = Catalog.fromJsonString(File('assets/catalog.json').readAsStringSync());
+    final used = <String>{
+      tutorialNumber,
+      for (final lesson in source.lessons) ...[lesson.example.number, lesson.practice.number],
+    };
     final entries = <CatalogEntry>[];
 
     for (final level in Level.values) {
-      final quota = Catalog.quota[level]!;
       final solver = Solver(level);
-      final order = [for (var i = 0; i < 10000; i++) i.toString().padLeft(4, '0')]..shuffle(Random(2026 + level.index));
-
-      final found = <SolveResult>[];
-      for (final number in order) {
-        if (found.length >= pool) break;
-        if (used.contains(number)) continue;
+      final bands = <int, List<SolveResult>>{1: [], 2: [], 3: []};
+      for (var i = 0; i < 10000; i++) {
+        final number = i.toString().padLeft(4, '0');
+        if (used.contains(number) || SolveResult.mirroredNumber(number)) continue;
         final r = solver.solve(number);
-        if (r.solvable) found.add(r);
+        if (!r.solvable || r.difficulty > maxDifficulty) continue;
+        bands[r.stars]!.add(r);
       }
-      found.sort((a, b) {
+      int tie(SolveResult r) => (int.parse(r.number) * 7919 + level.index * 104729) % 10007;
+      int byDifficulty(SolveResult a, SolveResult b) {
         final c = a.difficulty.compareTo(b.difficulty);
-        return c != 0 ? c : a.number.compareTo(b.number);
-      });
+        return c != 0 ? c : tie(a).compareTo(tie(b));
+      }
 
-      final n3 = (quota * 0.15).round();
-      final n2 = (quota * 0.35).round();
-      final n1 = quota - n2 - n3;
-      final bands = [(1, 0.0, 0.5, n1), (2, 0.5, 0.85, n2), (3, 0.85, 1.0, n3)];
-      for (final (stars, from, to, count) in bands) {
-        final band = found.sublist((found.length * from).floor(), (found.length * to).floor());
-        final step = band.length / count;
-        for (var i = 0; i < count; i++) {
-          final r = band[(i * step).floor()];
+      for (final (stars, count) in bandSizes(Catalog.quota[level]!)) {
+        final band = bands[stars]!;
+        final zero = band.where((r) => r.number.contains('0')).toList()..sort(byDifficulty);
+        final plain = band.where((r) => !r.number.contains('0')).toList()..sort(byDifficulty);
+        final zeros = min((count * zeroShare).round(), zero.length);
+        final picked = [...spread(zero, zeros), ...spread(plain, count - zeros)]..sort(byDifficulty);
+        expect(picked, hasLength(count), reason: '${level.name} ★$stars');
+        for (final r in picked) {
           used.add(r.number);
           entries.add(CatalogEntry(number: r.number, level: level, stars: stars, solution: r.solution!));
         }
       }
     }
 
-    final lessons = <Lesson>[];
-    final found = <Enum, List<CatalogEntry>>{};
-    for (final level in [Level.easy, Level.hard]) {
-      final solver = Solver(level);
-      final order = [for (var i = 0; i < 10000; i++) i.toString().padLeft(4, '0')]..shuffle(Random(7 + level.index));
-      for (final number in order) {
-        if (Lesson.order.every((op) => (found[op]?.length ?? 0) >= 2)) break;
-        if (used.contains(number)) continue;
-        final r = solver.solve(number);
-        if (!r.solvable || r.size > 8) continue;
-        final board = r.board();
-        final ops = opsIn(board);
-        for (final op in Lesson.order) {
-          final list = found[op] ??= [];
-          final basics = op is UnOp
-              ? const {BinOp.add, BinOp.sub, BinOp.mul, BinOp.div}
-              : const {BinOp.add, BinOp.sub, BinOp.mul};
-          if (list.length < 2 && ops.contains(op) && ops.every((o) => o == op || basics.contains(o))) {
-            list.add(CatalogEntry(number: number, level: level, stars: r.stars, solution: r.solution!));
-            used.add(number);
-            break;
-          }
-        }
-      }
-    }
-    if ((found[UnOp.abs]?.length ?? 0) < 2) {
-      final solver = Solver(Level.hard);
-      for (var i = 0; i < 10000 && (found[UnOp.abs]?.length ?? 0) < 2; i++) {
-        final number = ((i * 7919) % 10000).toString().padLeft(4, '0');
-        if (used.contains(number)) continue;
-        final r = solver.solve(number);
-        if (!r.solvable) continue;
-        final text = absVariant(number, r.solution!);
-        if (text == null) continue;
-        (found[UnOp.abs] ??= []).add(CatalogEntry(number: number, level: Level.hard, stars: 3, solution: text));
-        used.add(number);
-      }
-    }
-    for (final op in Lesson.order) {
-      final list = found[op] ?? const [];
-      if (list.length == 2) lessons.add(Lesson(op: op, example: list[0], practice: list[1]));
-    }
-
-    for (final e in [
-      ...entries,
-      for (final lesson in lessons) ...[lesson.example, lesson.practice],
-    ]) {
+    for (final e in entries) {
       expect(Evaluator(e.level).isSolution(e.board()), isTrue, reason: '${e.level.name} ${e.number} ${e.solution}');
     }
-    final catalog = Catalog(entries, lessons: lessons);
+    final catalog = Catalog(entries, lessons: source.lessons);
     expect(catalog.length, 150);
-    // ignore: avoid_print
-    print('lessons: ${lessons.map((l) => l.op.name).join(', ')}');
     File('assets/catalog.json').writeAsStringSync('${catalog.toJsonString(version: 1)}\n');
   });
+}
+
+List<(int, int)> bandSizes(int quota) {
+  final n3 = (quota * 0.15).round();
+  final n2 = (quota * 0.35).round();
+  return [(1, quota - n2 - n3), (2, n2), (3, n3)];
+}
+
+List<SolveResult> spread(List<SolveResult> sorted, int count) {
+  String shape(SolveResult r) => r.solution!.replaceAll(RegExp(r'[0-9]'), 'd');
+  final picked = <int>{};
+  final shapes = <String>{};
+  final radius = count == 0 ? 0 : sorted.length ~/ (2 * count);
+  for (var i = 0; i < count; i++) {
+    final at = ((i + 0.5) * sorted.length / count).floor();
+    final near = [
+      for (var j = 0; j < sorted.length; j++)
+        if (!picked.contains(j)) j,
+    ]..sort((a, b) => (a - at).abs().compareTo((b - at).abs()));
+    final fresh = near.where((j) => (j - at).abs() <= radius && !shapes.contains(shape(sorted[j])));
+    final j = fresh.isNotEmpty ? fresh.first : near.first;
+    picked.add(j);
+    shapes.add(shape(sorted[j]));
+  }
+  return [for (final j in picked) sorted[j]];
 }
 
 bool annihilates(Board board, Level level) {
@@ -233,53 +216,3 @@ List<CatalogEntry> trailOrder(List<CatalogEntry> list) {
   out.addAll(trivial.skip(t));
   return out;
 }
-
-int _closing(String s, int open) {
-  var depth = 0;
-  for (var i = open; i < s.length; i++) {
-    if (s[i] == '(') depth++;
-    if (s[i] == ')' && --depth == 0) return i + 1;
-  }
-  return s.length;
-}
-
-String? absVariant(String number, String solution) {
-  final evaluator = Evaluator(Level.hard);
-  final subs = [
-    for (var i = 0; i + 1 < solution.length; i++)
-      if (solution.startsWith('-(', i)) i,
-  ];
-  for (final at in subs) {
-    final end = _closing(solution, at + 1);
-    final wrapped = '${solution.substring(0, at)}a(${solution.substring(at, end)})${solution.substring(end)}';
-    final negs = [
-      for (var i = 0; i + 1 < wrapped.length; i++)
-        if (wrapped.startsWith('n(', i)) i,
-    ];
-    final candidates = [
-      wrapped,
-      for (final n in negs)
-        '${wrapped.substring(0, n)}${wrapped.substring(n + 2, _closing(wrapped, n + 1) - 1)}'
-            '${wrapped.substring(_closing(wrapped, n + 1))}',
-    ];
-    for (final text in candidates) {
-      final Board board;
-      try {
-        board = SolutionCodec.decode(number, text);
-      } on FormatException {
-        continue;
-      }
-      if (!evaluator.isSolution(board)) continue;
-      final abs = board.blocks.expand((b) => b.descendants).whereType<Unary>().firstWhere((u) => u.op == UnOp.abs);
-      final inner = evaluator.evaluate(abs.child).values[abs.child.id];
-      if (inner != null && inner.isNegative()) return text;
-    }
-  }
-  return null;
-}
-
-Set<Enum> opsIn(Board board) => {
-  for (final b in board.blocks)
-    for (final n in b.descendants)
-      if (n is Binary) n.op else if (n is Unary) n.op,
-};

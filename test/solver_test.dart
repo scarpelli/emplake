@@ -53,6 +53,24 @@ void main() {
       expect(needsUnary.difficulty, greaterThan(plain.difficulty));
     });
 
+    test('a mirrored number rates as the easiest', () {
+      final r = Solver(Level.hard).solve('5885');
+      expect(r.mirrored, isTrue);
+      expect(r.difficulty, 0);
+      expect(r.stars, 1);
+    });
+
+    test('rating follows the effort of the simplest solution', () {
+      final solver = Solver(Level.hard);
+      expect(solver.solve('8897').stars, 1, reason: '8 + 8 = 9 + 7');
+      expect(solver.solve('5938').stars, 2, reason: '5 + 9 ÷ 3 = 8');
+      expect(solver.solve('2647').stars, 3, reason: '2 = 6 ÷ (−4 + 7)');
+    });
+
+    test('keeps the simplest solution instead of the shortest', () {
+      expect(linearText(Solver(Level.easy).solve('3585').board()), '3 × 5 × 8 = 5!');
+    });
+
     test('is fast enough to run on demand and Hard leaves many numbers unsolved', () {
       final sw = Stopwatch()..start();
       final solvable = <Level, int>{};

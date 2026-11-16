@@ -8,6 +8,7 @@ import 'package:emplake/features/game/domain/format.dart';
 import 'package:emplake/features/game/domain/level.dart';
 import 'package:emplake/features/game/domain/replay.dart';
 import 'package:emplake/features/game/domain/solution_codec.dart';
+import 'package:emplake/features/game/domain/solver.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../tool/catalog_docs.dart';
@@ -27,6 +28,14 @@ void main() {
       for (final e in catalog.entriesFor(level)) {
         expect(Evaluator(level).isSolution(e.board()), isTrue, reason: '${level.name} ${e.number} ${e.solution}');
       }
+    }
+  });
+
+  test('stars match the solver rating and no plate is mirrored', () {
+    for (final e in catalog.all) {
+      final r = Solver(e.level).solve(e.number);
+      expect(e.stars, r.stars, reason: e.id);
+      expect(r.mirrored, isFalse, reason: e.id);
     }
   });
 

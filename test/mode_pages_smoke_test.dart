@@ -85,10 +85,10 @@ void main() {
         .start(
           mode: GameMode.challenges,
           level: Level.hard,
-          number: '7107',
+          number: '4498',
           run: const ChallengeRun(kind: ChallengeKind.restricted),
           restriction: const Restriction.forbid(BinOp.mul),
-          solution: _catalog.lookup(Level.hard, '7107')!.variants.first.solution,
+          solution: _catalog.lookup(Level.hard, '4498')!.variants.first.solution,
         );
     await tester.pump();
     expect(find.text('REGRA DA PLACA'), findsOneWidget);

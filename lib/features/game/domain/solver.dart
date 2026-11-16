@@ -15,6 +15,8 @@ class SolveResult {
     this.ways = 0,
     this.matches = 0,
     this.size = 0,
+    this.effort = 0,
+    this.options = 0,
   });
 
   final String number;
@@ -28,23 +30,27 @@ class SolveResult {
 
   final int size;
 
+  final double effort;
+
+  final int options;
+
   bool get solvable => solution != null;
 
-  int get difficulty => (size - 6) * 50 + math.max<int>(0, 30 - matches) - 15 * _count('0') - 5 * _count('1');
+  bool get mirrored => mirroredNumber(number);
 
-  int _count(String digit) => digit.allMatches(number).length;
+  static bool mirroredNumber(String n) =>
+      n.length == 4 && ((n[0] == n[3] && n[1] == n[2]) || (n[0] == n[2] && n[1] == n[3]));
+
+  double get difficulty {
+    if (!solvable) return double.infinity;
+    if (mirrored) return 0;
+    return effort - 0.5 * math.log(options) / math.ln2;
+  }
 
   int get stars {
     if (!solvable) return 0;
-    if (size >= 8) return 3;
-    if (size == 7) return _count('0') > 0 ? 1 : 2;
-    final many = switch (level) {
-      Level.easy => 15,
-      Level.intermediate => 12,
-      Level.advanced => 10,
-      Level.hard => 5,
-    };
-    return matches >= many || _count('0') > 0 ? 1 : 2;
+    final d = difficulty;
+    return d < 2.6 ? 1 : (d < 4.2 ? 2 : 3);
   }
 
   Board board() => SolutionCodec.decode(number, solution!);
@@ -79,7 +85,7 @@ class Solver {
     final spans = List.generate(n, (_) => List<Map<int, _Entry>?>.filled(n, null));
     for (var i = 0; i < n; i++) {
       final leaf = <int, _Entry>{};
-      _add(leaf, _Entry(_Q(digits[i], 1), Leaf(0, digits[i], i), 1, 1, false));
+      _add(leaf, _Entry(_Q(digits[i], 1), Leaf(0, digits[i], i), 1, 1, false, 0));
       _closeUnary(leaf, depth: 2);
       spans[i][i] = leaf;
     }
@@ -95,9 +101,9 @@ class Solver {
       }
     }
 
-    final candidates = <(int, Node, Node)>[];
+    final candidates = <(double, int, Node, Node)>[];
     var ways = 0;
-    final matched = <String>{};
+    final matched = <String, double>{};
     final eqAt = restriction?.kind == RestrictionKind.equalsAt ? restriction!.gap : null;
     for (var k = 0; k < n - 1; k++) {
       if (eqAt != null && k != eqAt) continue;
@@ -108,13 +114,19 @@ class Solver {
           if (r == null) continue;
           if (_required != null && !e.uses && !r.uses) continue;
           ways = math.min(_maxWays, ways + e.ways * r.ways);
-          matched.add('$k:${e.value.key}');
-          candidates.add((e.size + r.size, e.node, r.node));
+          final key = '$k:${e.value.key}';
+          matched[key] = math.min(matched[key] ?? double.infinity, e.cost + r.cost);
+          candidates.add((e.cost + r.cost, e.size + r.size, e.node, r.node));
         }
       }
     }
-    candidates.sort((a, b) => a.$1.compareTo(b.$1));
-    for (final (size, l, r) in candidates.take(40)) {
+    final effort = matched.values.fold(double.infinity, math.min);
+    final options = matched.values.where((c) => c <= effort + 1).length;
+    candidates.sort((a, b) {
+      final c = a.$1.compareTo(b.$1);
+      return c != 0 ? c : a.$2.compareTo(b.$2);
+    });
+    for (final (_, size, l, r) in candidates.take(40)) {
       final text = SolutionCodec.encode(l, r);
       final board = SolutionCodec.decode(number, text);
       if (_evaluator.isSolution(board) && (restriction?.allows(board) ?? true)) {
@@ -125,6 +137,8 @@ class Solver {
           ways: ways,
           matches: matched.length,
           size: size,
+          effort: effort,
+          options: options,
         );
       }
     }
@@ -140,10 +154,11 @@ class Solver {
       map[key] = e;
     } else {
       old.ways = math.min(_maxWays, old.ways + e.ways);
-      if (e.size < old.size) {
+      if (e.cost < old.cost || (e.cost == old.cost && e.size < old.size)) {
         old
           ..node = e.node
-          ..size = e.size;
+          ..size = e.size
+          ..cost = e.cost;
       }
     }
   }
@@ -155,7 +170,8 @@ class Solver {
           final v = _binary(op, x.value, y.value);
           if (v == null) continue;
           final uses = x.uses || y.uses || op == _required;
-          _add(out, _Entry(v, Binary(0, op, x.node, y.node), x.size + y.size + 1, x.ways * y.ways, uses));
+          final cost = x.cost + y.cost + _binaryCost(op, x.value, y.value, v);
+          _add(out, _Entry(v, Binary(0, op, x.node, y.node), x.size + y.size + 1, x.ways * y.ways, uses, cost));
         }
       }
     }
@@ -170,7 +186,14 @@ class Solver {
           final v = _unary(op, e.value);
           final uses = e.uses || op == _required;
           if (v == null || (v.key == e.value.key && uses == e.uses)) continue;
-          final added = _Entry(v, Unary(0, op, e.node), e.size + 1, e.ways, uses);
+          final added = _Entry(
+            v,
+            Unary(0, op, e.node),
+            e.size + 1,
+            e.ways,
+            uses,
+            e.cost + _unaryCost[op]! + _valueCost(v),
+          );
           final key = _key(v, uses);
           final isNew = !map.containsKey(key);
           _add(map, added);
@@ -179,6 +202,32 @@ class Solver {
       }
       frontier = next;
     }
+  }
+
+  static const _unaryCost = {
+    UnOp.neg: 1.5,
+    UnOp.abs: 2.0,
+    UnOp.sqrt: 2.0,
+    UnOp.cbrt: 2.8,
+    UnOp.fact: 2.2,
+    UnOp.floor: 2.8,
+    UnOp.ceil: 2.8,
+  };
+
+  static double _binaryCost(BinOp op, _Q a, _Q b, _Q v) {
+    final base = switch (op) {
+      BinOp.add => 1.0,
+      BinOp.sub => a.key == b.key ? 0.6 : 1.2,
+      BinOp.mul => a.n == 0 || b.n == 0 ? 0.6 : (a.isOne || b.isOne ? 0.8 : 1.3),
+      BinOp.div => a.n == 0 || a.key == b.key || b.isOne ? 0.8 : 2.0,
+      BinOp.pow => a.isOne || b.n == 0 || b.isOne ? 1.5 : 2.5,
+    };
+    return base + _valueCost(v);
+  }
+
+  static double _valueCost(_Q v) {
+    final size = v.n.abs();
+    return (v.d != 1 ? 0.8 : 0) + (v.n < 0 ? 0.4 : 0) + (size > 100 ? 0.8 : (size > 30 ? 0.4 : 0));
   }
 
   _Q? _binary(BinOp op, _Q a, _Q b) {
@@ -253,12 +302,13 @@ class Solver {
 }
 
 class _Entry {
-  _Entry(this.value, this.node, this.size, this.ways, this.uses);
+  _Entry(this.value, this.node, this.size, this.ways, this.uses, this.cost);
 
   final _Q value;
   Node node;
   int size;
   int ways;
+  double cost;
 
   final bool uses;
 }
@@ -292,6 +342,8 @@ class _Q {
     }
     return a == 0 ? 1 : a;
   }
+
+  bool get isOne => n == 1 && d == 1;
 
   int get key => (n + Solver._limit) * (Solver._limit + 1) + d;
 }

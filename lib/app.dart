@@ -1,9 +1,9 @@
-import 'package:firebase_ui_localizations/firebase_ui_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/audio/sound_service.dart';
+import 'core/firebase_ui_labels.dart';
 import 'core/router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/web/theme_chrome.dart';
@@ -30,7 +30,7 @@ class EmplakeApp extends ConsumerWidget {
       supportedLocales: supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
-        FirebaseUILocalizations.delegate,
+        AppFirebaseUILocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

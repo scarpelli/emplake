@@ -131,8 +131,10 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
     ..writeln('| `n` | número da placa (4 dígitos, usados nessa ordem, sem concatenar) |')
     ..writeln('| `l` | nível: `easy`, `intermediate`, `advanced`, `hard` |')
     ..writeln(
-      '| `s` | **dificuldade** de 1 a 3 (★). Uma placa ★1 usa operadores simples e tem muitos valores em que os dois lados se encontram; '
-      'uma ★2 tem poucos desses valores ou usa um unário; uma ★3 usa dois ou mais unários. Essas estrelas são diferentes das que o jogador ganha numa fase da Aventura. |',
+      '| `s` | **dificuldade** de 1 a 3 (★), igual em todos os níveis. O solver mede o esforço da solução mais simples: cada operação tem um peso '
+      '(+ pesa menos que ÷, e unários pesam mais), resultados negativos, frações ou grandes pesam mais, e truques como x − x, x × 0 e x ÷ x pesam menos. '
+      'Se há várias soluções quase tão simples quanto a melhor, a placa fica mais fácil. ★1 vai até 2,6 de esforço, ★2 vai até 4,2 e ★3 vem depois disso. '
+      'Placas espelhadas (abba, abab) ficam fora do catálogo. Essas estrelas são diferentes das que o jogador ganha numa fase da Aventura. |',
     )
     ..writeln(
       '| `x` | solução em notação prefixa (`=(esquerda,direita)`). Os binários são `+ - * / ^`, e os '

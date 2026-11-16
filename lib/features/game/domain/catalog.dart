@@ -44,10 +44,10 @@ class CatalogEntry {
 
   Board board() => SolutionCodec.decode(number, solution);
 
-  CatalogEntry copyWith({bool? trivial, List<RestrictedVariant>? variants}) => CatalogEntry(
+  CatalogEntry copyWith({int? stars, bool? trivial, List<RestrictedVariant>? variants}) => CatalogEntry(
     number: number,
     level: level,
-    stars: stars,
+    stars: stars ?? this.stars,
     solution: solution,
     trivial: trivial ?? this.trivial,
     variants: variants ?? this.variants,
