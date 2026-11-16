@@ -35,12 +35,13 @@ No Emplake, "fácil" quer dizer **mais ferramentas**: o Fácil tem todos os oper
 | `t` | **trivial**: a placa tem 0 e a solução anula um lado com × 0 (ou 0 ÷ x, 0ʸ). Na Aventura, a placa vira aquecimento; no Contra o relógio, fica de fora; e no Com restrição, recebe a regra "sem ×". |
 | `r` | variantes do desafio **Com restrição**: `{r: regra, x: solução}`. As regras são `-op` (sem o operador), `+op` (use o operador) e `=k` (o = fica no vão k, e o vão 0 é o que vem depois do 1º dígito). Cada variante tem uma solução verificada sob a regra, e a regra **invalida** a solução `x` original. |
 
-A ordem das entradas de cada nível no JSON é a **ordem da trilha da Aventura**, e as placas novas entram no fim do nível.
+A ordem das entradas de cada nível no JSON é a **ordem da trilha da Aventura**.
 
 ## Como regenerar
 
 ```
-flutter test tool/gen_catalog_test.dart
+EMPLAKE_REGEN=1 flutter test tool/gen_catalog_test.dart --plain-name regenerate
+flutter test tool/gen_catalog_test.dart --plain-name enrich
 ```
 
-O comando lê as entradas atuais, recalcula `t` e `r`, verifica tudo com as regras do jogo e reescreve o `assets/catalog.json` e estes arquivos. O `test/catalog_test.dart` falha se os docs ficarem desatualizados.
+O primeiro comando escolhe as placas entre todos os números de 4 dígitos, sem as espelhadas, com a mesma quantidade de ★1, ★2 e ★3 em cada nível e guardando a solução mais simples de cada uma. O segundo recalcula as estrelas, `t` e `r`, põe as placas na ordem da trilha, verifica tudo com as regras do jogo e reescreve o `assets/catalog.json` e estes arquivos. Rodado sozinho, o segundo mantém as placas e a ordem atuais. O `test/catalog_test.dart` falha se os docs ficarem desatualizados.

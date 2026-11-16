@@ -98,7 +98,10 @@ O jogo sorteia só placas de [`assets/catalog.json`](../assets/catalog.json), to
 verificada. Para regenerar o catálogo e a documentação em `docs/catalogo/`:
 
 ```sh
-flutter test tool/gen_catalog_test.dart
+EMPLAKE_REGEN=1 flutter test tool/gen_catalog_test.dart --plain-name regenerate   # escolhe as placas
+flutter test tool/gen_catalog_test.dart --plain-name enrich                        # estrelas, variantes e docs
 ```
+
+O que cada passo faz está em [docs/catalogo/](catalogo/README.md#como-regenerar).
 
 O teste `test/catalog_test.dart` falha se os documentos ficarem desatualizados.

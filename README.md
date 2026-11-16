@@ -208,7 +208,7 @@ migrarem.
 | Documento | O que tem |
 |---|---|
 | [docs/desenvolvimento.md](docs/desenvolvimento.md) | Estrutura do código, configuração do Firebase, como rodar e publicar, textos e idiomas. |
-| [docs/modos.md](docs/modos.md) | Regras e motivos da Aventura, dos Desafios, da placa do dia e da sequência de dias. |
+| [docs/modos.md](docs/modos.md) | Regras e motivos da Aventura e dos Desafios. |
 | [docs/catalogo/](docs/catalogo/README.md) | As 150 placas, cada uma com a solução, a dificuldade e as variantes do desafio Com restrição. |
 
 ## Créditos

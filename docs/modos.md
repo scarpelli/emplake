@@ -7,32 +7,30 @@ a trilha de lições (Aventura), o *Ramp Up* (Contra o relógio) e os corações
 ## Princípios
 
 - Todos os modos sorteiam do mesmo `assets/catalog.json`, com soluções verificadas pelo
-  `Evaluator` do jogo. Os modos novos não criam placas, só mudam a ordem, o filtro e as regras extras.
-- Os números das 150 placas não mudaram, então o histórico dos jogadores (uma placa resolvida é
-  identificada pelo número e pelo nível), a placa do dia e as lições continuam válidos. O catálogo
-  passou para a versão 2 ganhando só dois metadados: `t` (trivial) e `r` (variantes com restrição).
+  `Evaluator` do jogo. Os modos não criam placas, só mudam a ordem, o filtro e as regras extras.
+- Além do número, do nível, da dificuldade e da solução, cada placa traz dois metadados: `t`
+  (trivial) e `r` (variantes com restrição).
 - No Emplake, "fácil" quer dizer *mais ferramentas*: o Fácil tem todos os operadores, e o Difícil
   só tem + − × ÷, −x e |x|. Os cabeçalhos da Aventura mostram os operadores reais de cada nível
-  (`Level.operatorLabels`), e do mockup aproveitamos só o layout.
+  (`Level.operatorLabels`).
 
 ## Placas triviais (com 0)
 
 Muitas placas com 0 saem na hora anulando um lado com × 0 (ex.: 6004 → 6 × 0 = 0 × 4). O gerador marca
 como **trivial** a placa que tem 0 e cuja solução tem um ×, ÷ ou ^ que vale 0 porque um operando é 0.
-Hoje são 29 das 150. Elas continuam no catálogo, mas cada modo as trata de um jeito:
+O [índice do catálogo](catalogo/README.md) mostra quantas há em cada nível. Cada modo as trata de um jeito:
 
 | Modo | Placas triviais |
 |---|---|
 | Aleatório, Específico, placa do dia | Entram no sorteio como as outras. |
 | Aventura | Entram como **aquecimento**: as 2 primeiras fases de cada coluna, depois uma a cada 2 fases normais, para ensinar o truque do ×0. |
 | Contra o relógio | Ficam **de fora**, porque seriam pontos de graça numa corrida contra o tempo. |
-| Com restrição | Recebem primeiro a regra **"sem ×"**, que desliga o truque. Variantes que ainda saem com ×0, como 0 ÷ 1 = 0 + 0, são descartadas. Placas sem nenhuma variante decente (ex.: 0100) ficam fora do desafio. |
+| Com restrição | Recebem primeiro a regra **"sem ×"**, que desliga o truque. Variantes que ainda anulam um lado com 0 não entram. Placas sem nenhuma variante (ex.: 0501) ficam fora do desafio. |
 
 ## Aventura: a coleção inteira como trilha
 
 - **Coleção inteira:** são quatro colunas (do Fácil ao Difícil) com *todas* as placas do catálogo,
-  hoje 40 + 40 + 35 + 35 = 150. Quando o catálogo crescer, a trilha cresce junto, e as placas novas
-  entram no fim do seu nível para não deslocar o progresso de ninguém.
+  40 + 40 + 35 + 35 = 150.
 - **Ordem:** dentro de cada nível, a ordem das entradas no JSON é a ordem da trilha: dificuldade ★,
   depois a `difficulty` do solver, com as triviais intercaladas como aquecimento. As fases são
   numeradas ao longo da coleção: 001–040 Fácil, 041–080 Intermediário, 081–115 Avançado,
@@ -101,30 +99,6 @@ Regras comuns aos dois:
 - O jogador tem **3 vidas**, e estourar o tempo ou pular custa uma delas. A placa perdida mostra uma solução que segue a regra.
 - O **recorde** é o maior número de placas resolvidas antes de perder as 3 vidas.
 
-### Descartado: Caça às soluções
-
-O mockup tinha um terceiro desafio, "Caça às soluções" (uma placa, quantas igualdades diferentes
-existem). Ele saiu por dois motivos:
-
-- Com os unários, o total é infinito: −(−x), |x| e outros geram igualdades novas sem fim, então não
-  dá para mostrar algo como "14 / 23".
-- Só com os binários, quase não há o que caçar, porque a mediana das 150 placas é de **1** solução.
-
-## Placa do dia e sequência de dias
-
-- **Sem repetição:** a placa do dia sai das placas ★2 do catálogo (52 hoje), numa ordem embaralhada
-  com semente fixa. Nenhuma placa se repete até o ciclo inteiro passar, e a ordem muda a cada ciclo
-  sem repetir a placa na virada (`Daily.entryFor`).
-- **Fuso local:** o dia vira à meia-noite do jogador, não à meia-noite UTC (21h no Brasil). Todo mundo
-  joga a mesma placa na mesma data, e as estatísticas do dia (`dailyStats`) somam os jogadores pela data.
-- **Uma sequência só:** a sequência conta os dias seguidos em que o jogador resolveu pelo menos uma
-  placa, em qualquer modo (desafios e lições incluídos). Ver a solução não conta, e errar a placa do
-  dia não zera a sequência. Ela aparece no topo da tela inicial, ao lado do cumprimento, com o ícone
-  de fogo na cor de destaque do tema. Também aparece nas estatísticas do jogador e no texto
-  compartilhado da placa do dia (`FirestoreRepository.recordPlayedDay`, `Daily.streakOn`).
-- O antigo bônus de acertos seguidos, que soma até +50% nos pontos, passou a se chamar **combo**,
-  para não ser confundido com a sequência de dias.
-
 ## Onde está no código
 
 | Parte | Arquivo |
@@ -140,10 +114,5 @@ existem). Ele saiu por dois motivos:
 
 No Firestore, as estrelas da Aventura (`adventure.{nivel_numero}`) e os recordes
 (`challenges.{clock|restricted}.{best,plays}`) ficam no próprio documento `users/{uid}`, que o dono já
-pode escrever. Por isso as regras do Firestore não mudaram. Uma cópia local em SharedPreferences
+pode escrever, então não precisam de regras próprias. Uma cópia local em SharedPreferences
 faz a trilha e os recordes funcionarem offline e no build de preview.
-
-## Para depois
-
-- Criar conquistas novas, como "coluna completa" na Aventura e "10 placas" no Contra o relógio.
-- Ampliar o catálogo. As placas novas entram no fim de cada nível, e o gerador calcula `t` e `r` para elas.

@@ -151,18 +151,22 @@ Map<String, String> renderCatalogDocs(Catalog catalog) {
     )
     ..writeln()
     ..writeln(
-      'A ordem das entradas de cada nível no JSON é a **ordem da trilha da Aventura**, e as placas novas entram no fim do nível.',
+      'A ordem das entradas de cada nível no JSON é a **ordem da trilha da Aventura**.',
     )
     ..writeln()
     ..writeln('## Como regenerar')
     ..writeln()
     ..writeln('```')
-    ..writeln('flutter test tool/gen_catalog_test.dart')
+    ..writeln('EMPLAKE_REGEN=1 flutter test tool/gen_catalog_test.dart --plain-name regenerate')
+    ..writeln('flutter test tool/gen_catalog_test.dart --plain-name enrich')
     ..writeln('```')
     ..writeln()
     ..writeln(
-      'O comando lê as entradas atuais, recalcula `t` e `r`, verifica tudo com as regras do jogo e reescreve '
-      'o `assets/catalog.json` e estes arquivos. O `test/catalog_test.dart` falha se os docs ficarem desatualizados.',
+      'O primeiro comando escolhe as placas entre todos os números de 4 dígitos, sem as espelhadas, com a mesma '
+      'quantidade de ★1, ★2 e ★3 em cada nível e guardando a solução mais simples de cada uma. O segundo recalcula as '
+      'estrelas, `t` e `r`, põe as placas na ordem da trilha, verifica tudo com as regras do jogo e reescreve o '
+      '`assets/catalog.json` e estes arquivos. Rodado sozinho, o segundo mantém as placas e a ordem atuais. '
+      'O `test/catalog_test.dart` falha se os docs ficarem desatualizados.',
     );
   files['docs/catalogo/README.md'] = idx.toString();
 
