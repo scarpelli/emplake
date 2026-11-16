@@ -1641,4 +1641,50 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get linkError => 'No se pudo crear la cuenta. Inténtalo de nuevo.';
+
+  @override
+  String get save => 'Guardar';
+
+  @override
+  String get accountEditName => 'Cambiar nombre';
+
+  @override
+  String get accountNameLabel => 'Nombre';
+
+  @override
+  String get accountNameEmpty => 'Escribe un nombre.';
+
+  @override
+  String get accountNameSaved => 'Nombre actualizado.';
+
+  @override
+  String get accountChangePassword => 'Cambiar contraseña';
+
+  @override
+  String get accountCurrentPassword => 'Contraseña actual';
+
+  @override
+  String get accountNewPassword => 'Nueva contraseña';
+
+  @override
+  String get accountPasswordSaved => 'Contraseña cambiada.';
+
+  @override
+  String get accountWrongPassword => 'La contraseña actual no es correcta.';
+
+  @override
+  String get accountTooManyAttempts =>
+      'Hubo demasiados intentos seguidos. Espera un poco e inténtalo de nuevo.';
+
+  @override
+  String get accountPasswordError =>
+      'No se pudo cambiar la contraseña. Inténtalo de nuevo.';
+
+  @override
+  String get accountForgotPassword => 'Olvidé mi contraseña';
+
+  @override
+  String accountResetSent(String email) {
+    return 'Enviamos a $email un enlace para que crees una contraseña nueva.';
+  }
 }

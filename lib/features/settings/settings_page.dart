@@ -11,6 +11,7 @@ import '../avatar/avatar_page.dart';
 import '../avatar/robot_avatar.dart';
 import '../daily/daily.dart';
 import '../game/presentation/skip_dialog.dart';
+import 'account_dialogs.dart';
 import 'seed_color_dialog.dart';
 import 'settings_controller.dart';
 
@@ -348,6 +349,19 @@ class _PlayerCard extends ConsumerWidget {
       await ref.read(firebaseAuthProvider).signOut();
     }
 
+    Widget action(IconData icon, String label, VoidCallback onTap) => SelectTile(
+      selected: false,
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(width: 10),
+          Expanded(child: Text(label)),
+          const Icon(Icons.chevron_right, size: 20),
+        ],
+      ),
+    );
+
     Widget stat(String label, int? value) => Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -410,18 +424,15 @@ class _PlayerCard extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        SelectTile(
-          selected: false,
-          onTap: openCreator,
-          child: Row(
-            children: [
-              const Icon(Icons.brush_outlined, size: 20),
-              const SizedBox(width: 10),
-              Expanded(child: Text(l.avatarCreate)),
-              const Icon(Icons.chevron_right, size: 20),
-            ],
-          ),
-        ),
+        action(Icons.brush_outlined, l.avatarCreate, openCreator),
+        if (!guest) ...[
+          const SizedBox(height: 8),
+          action(Icons.badge_outlined, l.accountEditName, () => showEditNameDialog(context)),
+          if (hasPasswordLogin(user)) ...[
+            const SizedBox(height: 8),
+            action(Icons.lock_outline, l.accountChangePassword, () => showChangePasswordDialog(context)),
+          ],
+        ],
         const SizedBox(height: 8),
         IntrinsicHeight(
           child: Row(

@@ -24,17 +24,36 @@ class _FakeUser implements User {
   @override
   String get uid => 'preview';
   @override
-  List<UserInfo> get providerData => const [];
+  List<UserInfo> get providerData => [if (!isAnonymous) _PasswordInfo()];
   @override
   Future<void> reload() async {}
   @override
-  Future<void> updateDisplayName(String? name) async => displayName = name;
+  Future<void> updateDisplayName(String? name) async {
+    displayName = name;
+    _auth._changes.add(this);
+  }
+
+  @override
+  Future<UserCredential> reauthenticateWithCredential(AuthCredential credential) async {
+    if (credential is EmailAuthCredential && credential.password == _auth._password) return _FakeCredential(this);
+    throw FirebaseAuthException(code: 'invalid-credential');
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async => _auth._password = newPassword;
   @override
   Future<UserCredential> linkWithCredential(AuthCredential credential) async {
     final email = credential is EmailAuthCredential ? credential.email : null;
     return _auth._set(_FakeUser(_auth, isAnonymous: false, email: email));
   }
 
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+class _PasswordInfo implements UserInfo {
+  @override
+  String get providerId => 'password';
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
 }
@@ -57,6 +76,7 @@ class _FakeAuth implements FirebaseAuth {
 
   final _changes = StreamController<User?>.broadcast();
   User? _user;
+  String _password = 'senha123';
 
   UserCredential _set(User? user) {
     _user = user;
@@ -79,6 +99,8 @@ class _FakeAuth implements FirebaseAuth {
   Future<UserCredential> signInAnonymously() async => _set(_FakeUser(this, isAnonymous: true));
   @override
   Future<void> signOut() async => _set(null);
+  @override
+  Future<void> sendPasswordResetEmail({required String email, ActionCodeSettings? actionCodeSettings}) async {}
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
 }

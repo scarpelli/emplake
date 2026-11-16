@@ -426,5 +426,19 @@
   "linkWeakPassword": "The password needs at least 6 characters.",
   "linkInvalidEmail": "Invalid email.",
   "linkWrongPassword": "Wrong password for this account.",
-  "linkError": "Could not create the account. Please try again."
+  "linkError": "Could not create the account. Please try again.",
+  "save": "Save",
+  "accountEditName": "Change name",
+  "accountNameLabel": "Name",
+  "accountNameEmpty": "Type a name.",
+  "accountNameSaved": "Name updated.",
+  "accountChangePassword": "Change password",
+  "accountCurrentPassword": "Current password",
+  "accountNewPassword": "New password",
+  "accountPasswordSaved": "Password changed.",
+  "accountWrongPassword": "Your current password is incorrect.",
+  "accountTooManyAttempts": "There were too many attempts in a row. Wait a little and try again.",
+  "accountPasswordError": "Could not change the password. Please try again.",
+  "accountForgotPassword": "I forgot my password",
+  "accountResetSent": "We sent {email} a link so you can set a new password."
 }

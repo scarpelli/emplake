@@ -1000,5 +1000,20 @@
   "linkWeakPassword": "A senha precisa ter pelo menos 6 caracteres.",
   "linkInvalidEmail": "E-mail inválido.",
   "linkWrongPassword": "Senha incorreta para essa conta.",
-  "linkError": "Não foi possível criar a conta. Tente de novo."
+  "linkError": "Não foi possível criar a conta. Tente de novo.",
+  "save": "Salvar",
+  "accountEditName": "Mudar nome",
+  "accountNameLabel": "Nome",
+  "accountNameEmpty": "Escreva um nome.",
+  "accountNameSaved": "Nome atualizado.",
+  "accountChangePassword": "Mudar senha",
+  "accountCurrentPassword": "Senha atual",
+  "accountNewPassword": "Nova senha",
+  "accountPasswordSaved": "Senha alterada.",
+  "accountWrongPassword": "A senha atual não está certa.",
+  "accountTooManyAttempts": "Foram muitas tentativas seguidas. Espere um pouco e tente de novo.",
+  "accountPasswordError": "Não foi possível mudar a senha. Tente de novo.",
+  "accountForgotPassword": "Esqueci a senha",
+  "accountResetSent": "Mandamos para {email} um link para você criar uma senha nova.",
+  "@accountResetSent": {"placeholders": {"email": {"type": "String"}}}
 }

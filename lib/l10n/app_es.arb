@@ -426,5 +426,19 @@
   "linkWeakPassword": "La contraseña necesita al menos 6 caracteres.",
   "linkInvalidEmail": "Correo no válido.",
   "linkWrongPassword": "Contraseña incorrecta para esta cuenta.",
-  "linkError": "No se pudo crear la cuenta. Inténtalo de nuevo."
+  "linkError": "No se pudo crear la cuenta. Inténtalo de nuevo.",
+  "save": "Guardar",
+  "accountEditName": "Cambiar nombre",
+  "accountNameLabel": "Nombre",
+  "accountNameEmpty": "Escribe un nombre.",
+  "accountNameSaved": "Nombre actualizado.",
+  "accountChangePassword": "Cambiar contraseña",
+  "accountCurrentPassword": "Contraseña actual",
+  "accountNewPassword": "Nueva contraseña",
+  "accountPasswordSaved": "Contraseña cambiada.",
+  "accountWrongPassword": "La contraseña actual no es correcta.",
+  "accountTooManyAttempts": "Hubo demasiados intentos seguidos. Espera un poco e inténtalo de nuevo.",
+  "accountPasswordError": "No se pudo cambiar la contraseña. Inténtalo de nuevo.",
+  "accountForgotPassword": "Olvidé mi contraseña",
+  "accountResetSent": "Enviamos a {email} un enlace para que crees una contraseña nueva."
 }

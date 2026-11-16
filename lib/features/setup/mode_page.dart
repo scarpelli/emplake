@@ -24,13 +24,6 @@ class ModePage extends ConsumerStatefulWidget {
 
 class _ModePageState extends ConsumerState<ModePage> {
   GameMode _mode = GameMode.adventure;
-  Future<UserProfile>? _profile;
-
-  @override
-  void initState() {
-    super.initState();
-    _profile = ref.read(repositoryProvider)?.loadProfile();
-  }
 
   static const _icons = {
     GameMode.educational: Icons.school_outlined,
@@ -111,13 +104,13 @@ class _ModePageState extends ConsumerState<ModePage> {
                                 ),
                                 const SizedBox(width: 10),
                                 Flexible(
-                                  child: FutureBuilder<UserProfile>(
-                                    future: _profile,
+                                  child: FutureBuilder<UserProfile?>(
+                                    future: ref.watch(profileProvider.future),
                                     builder: (context, snap) {
                                       final name = (snap.data?.displayName.isNotEmpty ?? false)
                                           ? snap.data!.displayName.split(' ').first.toUpperCase()
                                           : fallbackName;
-                                      if (snap.connectionState == ConnectionState.waiting) {
+                                      if (snap.connectionState == ConnectionState.waiting && !snap.hasData) {
                                         return Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [

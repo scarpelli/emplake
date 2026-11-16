@@ -2661,6 +2661,90 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Não foi possível criar a conta. Tente de novo.'**
   String get linkError;
+
+  /// No description provided for @save.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get save;
+
+  /// No description provided for @accountEditName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mudar nome'**
+  String get accountEditName;
+
+  /// No description provided for @accountNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome'**
+  String get accountNameLabel;
+
+  /// No description provided for @accountNameEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escreva um nome.'**
+  String get accountNameEmpty;
+
+  /// No description provided for @accountNameSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome atualizado.'**
+  String get accountNameSaved;
+
+  /// No description provided for @accountChangePassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mudar senha'**
+  String get accountChangePassword;
+
+  /// No description provided for @accountCurrentPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha atual'**
+  String get accountCurrentPassword;
+
+  /// No description provided for @accountNewPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova senha'**
+  String get accountNewPassword;
+
+  /// No description provided for @accountPasswordSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha alterada.'**
+  String get accountPasswordSaved;
+
+  /// No description provided for @accountWrongPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'A senha atual não está certa.'**
+  String get accountWrongPassword;
+
+  /// No description provided for @accountTooManyAttempts.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foram muitas tentativas seguidas. Espere um pouco e tente de novo.'**
+  String get accountTooManyAttempts;
+
+  /// No description provided for @accountPasswordError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível mudar a senha. Tente de novo.'**
+  String get accountPasswordError;
+
+  /// No description provided for @accountForgotPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esqueci a senha'**
+  String get accountForgotPassword;
+
+  /// No description provided for @accountResetSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mandamos para {email} um link para você criar uma senha nova.'**
+  String accountResetSent(String email);
 }
 
 class _AppLocalizationsDelegate
