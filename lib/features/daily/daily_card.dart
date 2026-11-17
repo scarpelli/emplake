@@ -77,7 +77,7 @@ class DailyCard extends ConsumerWidget {
     final digits = (today?.number ?? '····').split('');
 
     void share(BuildContext button) {
-      final streak = ref.read(profileProvider).value?.streakOn(today!.key) ?? 0;
+      final streak = ref.read(profileProvider).value?.streakAfter(today!.key, solved: result!.solved) ?? 0;
       shareDailyText(
         button,
         Daily.shareText(

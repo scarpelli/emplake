@@ -255,10 +255,11 @@ class _GamePageState extends ConsumerState<GamePage> {
     if (s == null) return null;
     final profile = await ref.read(profileProvider.future);
     if (!mounted) return null;
-    final streak = profile?.streakOn(Daily.keyFor(DateTime.now())) ?? 0;
+    final solved = s.phase == GamePhase.solved;
+    final streak = profile?.streakAfter(Daily.keyFor(DateTime.now()), solved: solved) ?? 0;
     return Daily.shareText(
       key: Daily.keyFor(DateTime.now()),
-      solved: s.phase == GamePhase.solved,
+      solved: solved,
       seconds: s.elapsed,
       referenceSeconds: s.level.seconds,
       hints: s.hintsUsed,

@@ -70,6 +70,9 @@ class UserProfile {
 
   int streakOn(String day) => Daily.streakOn(day, lastDay: lastDaily, current: dailyStreak);
 
+  int streakAfter(String day, {required bool solved}) =>
+      solved ? Daily.nextStreak(key: day, lastDay: lastDaily, current: dailyStreak) : streakOn(day);
+
   final int blindSolves;
   final int inTimeSolves;
 

@@ -150,6 +150,25 @@ void main() {
       expect(Daily.streakOn('2026-11-13', current: 5), 0);
     });
 
+    test('the shared streak counts today even before the profile catches up', () {
+      UserProfile profile({String? lastDaily, int dailyStreak = 0}) => UserProfile(
+        displayName: '',
+        email: '',
+        totalPoints: 0,
+        solvedCount: 0,
+        skippedCount: 0,
+        lastDaily: lastDaily,
+        dailyStreak: dailyStreak,
+      );
+      const today = '2026-11-13';
+      expect(profile(lastDaily: '2026-11-12', dailyStreak: 1).streakAfter(today, solved: true), 2);
+      expect(profile(lastDaily: today, dailyStreak: 2).streakAfter(today, solved: true), 2);
+      expect(profile(lastDaily: '2026-11-10', dailyStreak: 4).streakAfter(today, solved: true), 1);
+      expect(profile().streakAfter(today, solved: true), 1);
+      expect(profile(lastDaily: '2026-11-12', dailyStreak: 1).streakAfter(today, solved: false), 1);
+      expect(profile(lastDaily: '2026-11-10', dailyStreak: 4).streakAfter(today, solved: false), 0);
+    });
+
     test('share text', () {
       const labels = DailyShareLabels(
         title: 'placa do dia',

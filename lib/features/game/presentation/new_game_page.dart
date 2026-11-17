@@ -224,7 +224,7 @@ class _DailyDone extends ConsumerWidget {
     final bp = context.bp;
     final t = Theme.of(context).textTheme;
     final key = Daily.keyFor(DateTime.now());
-    final streak = ref.watch(profileProvider).value?.streakOn(key) ?? 0;
+    final streak = ref.watch(profileProvider).value?.streakAfter(key, solved: result.solved) ?? 0;
     final share = Daily.shareText(
       key: key,
       solved: result.solved,
