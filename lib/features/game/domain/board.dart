@@ -10,7 +10,11 @@ class Board {
   }
 
   factory Board.fromSides(List<int> digits, Node left, Node right, {required int nextId}) =>
-      Board._(List.unmodifiable(digits), List.unmodifiable([left, right]), 0, nextId);
+      Board._(List.unmodifiable(digits), List.unmodifiable([_grouped(left), _grouped(right)]), 0, nextId);
+
+  static Node _grouped(Node n) => byPrecedence(withExplicitGrouping(n));
+
+  static List<Node> _ordered(List<Node> blocks) => List.unmodifiable([for (final b in blocks) byPrecedence(b)]);
 
   static const totalLinks = 3;
 
@@ -41,7 +45,7 @@ class Board {
     final merged = Binary(nextId, op, blocks[gap], blocks[gap + 1]);
     final newBlocks = [...blocks]..replaceRange(gap, gap + 2, [merged]);
     final newEq = eqGap != null && eqGap! > gap ? eqGap! - 1 : eqGap;
-    return Board._(digits, List.unmodifiable(newBlocks), newEq, nextId + 1);
+    return Board._(digits, _ordered(newBlocks), newEq, nextId + 1);
   }
 
   Board placeEquals(int gap) {
@@ -78,7 +82,7 @@ class Board {
     final (a, b) = blocks[i].splitAt(node.digitGap);
     final newBlocks = [...blocks]..replaceRange(i, i + 1, [a, b]);
     final newEq = eqGap != null && eqGap! >= i ? eqGap! + 1 : eqGap;
-    return Board._(digits, List.unmodifiable(newBlocks), newEq, nextId);
+    return Board._(digits, _ordered(newBlocks), newEq, nextId);
   }
 
   Board clearGap(int gap) {
@@ -144,7 +148,7 @@ class Board {
     if (i < 0) throw StateError('node $nodeId not found');
     final newBlocks = [...blocks];
     newBlocks[i] = blocks[i].replace(nodeId, fn);
-    return Board._(digits, List.unmodifiable(newBlocks), eqGap, nextId + idDelta);
+    return Board._(digits, _ordered(newBlocks), eqGap, nextId + idDelta);
   }
 
   Board applyUnary(int nodeId, UnOp op) => _replace(nodeId, (n) => Unary(nextId, op, n), idDelta: 1);
@@ -152,7 +156,11 @@ class Board {
   Board unwrap(int nodeId) {
     final node = find(nodeId);
     if (node is! Unary) throw StateError('node $nodeId is not unary');
-    return _replace(nodeId, (n) => (n as Unary).child);
+    final keepGroup = node.child is Binary && blocks.every((b) => b.id != nodeId);
+    return _replace(nodeId, (n) {
+      final child = (n as Unary).child;
+      return keepGroup && !child.parens ? child.withParens(true) : child;
+    });
   }
 
   Board changeBinary(int nodeId, BinOp op) => _replace(nodeId, (n) => (n as Binary).withOp(op));
@@ -168,7 +176,9 @@ class Board {
 
   factory Board.fromJson(Map<String, dynamic> json) => Board._(
     (json['digits'] as List).cast<int>(),
-    List.unmodifiable([for (final b in json['blocks'] as List) Node.fromJson((b as Map).cast<String, dynamic>())]),
+    List.unmodifiable([
+      for (final b in json['blocks'] as List) _grouped(Node.fromJson((b as Map).cast<String, dynamic>())),
+    ]),
     json['eq'] as int?,
     json['next'] as int,
   );

@@ -115,6 +115,11 @@ class _CoverPageState extends ConsumerState<CoverPage> {
                                 ],
                               ),
                       ),
+                      Text(
+                        l.teamNames(teamMembers[0], teamMembers[1]),
+                        textAlign: TextAlign.center,
+                        style: t.bodySmall?.copyWith(color: context.bp.muted),
+                      ),
                     ],
                   ),
                 ),

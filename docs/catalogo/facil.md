@@ -21,13 +21,13 @@ Os operadores são + − × ÷ xʸ e −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉. A divis
 | [012](#fase-012--8136) | 8136 | ★☆☆ | `8 + 1 = 3 + 6` |  | sem + · = depois do 1º dígito · use × |
 | [013](#fase-013--2356) | 2356 | ★☆☆ | `2 = 3 + 5 − 6` |  | sem − · = depois do 2º dígito · use × |
 | [014](#fase-014--7414) | 7414 | ★☆☆ | `7 − 4 + 1 = 4` |  | sem + · = depois do 1º dígito · use × |
-| [015](#fase-015--9663) | 9663 | ★☆☆ | `9 = 6 + 6 − 3` |  | sem + · = depois do 3º dígito · use xʸ |
+| [015](#fase-015--9663) | 9663 | ★☆☆ | `9 = 6 + 6 − 3` |  | sem − · = depois do 2º dígito · use xʸ |
 | [016](#fase-016--8443) | 8443 | ★☆☆ | `8 + 4 = 4 × 3` |  | sem + · = depois do 1º dígito · use ÷ |
 | [017](#fase-017--2179) | 2179 | ★☆☆ | `2 + 1 × 7 = 9` |  | sem + · = depois do 1º dígito · use ÷ |
 | [018](#fase-018--5712) | 5712 | ★☆☆ | `5 = 7 − 1 × 2` |  | sem − · = depois do 2º dígito · use ÷ |
 | [019](#fase-019--8977) | 8977 | ★☆☆ | `8 = 9 − 7 ÷ 7` |  | sem − · = depois do 2º dígito · use × |
 | [020](#fase-020--8839) | 8839 | ★☆☆ | `8 − 8 = 3 − √9` |  | sem − · = depois do 3º dígito · use xʸ |
-| [021](#fase-021--5395) | 5395 | ★☆☆ | `5 × 3 ÷ √9 = 5` |  | sem × · = depois do 1º dígito · use xʸ |
+| [021](#fase-021--5395) | 5395 | ★☆☆ | `5 × 3 ÷ √9 = 5` |  | sem ÷ · = depois do 1º dígito · use xʸ |
 | [022](#fase-022--1645) | 1645 | ★☆☆ | `1^6 + 4 = 5` |  | sem + · = depois do 1º dígito · use × |
 | [023](#fase-023--8917) | 8917 | ★★☆ | `8 = 9 − 1^7` |  | sem − · = depois do 2º dígito · use × |
 | [024](#fase-024--9087) | 9087 | ★★☆ | `9^0 = 8 − 7` |  | sem − · = depois do 1º dígito · use ÷ |
@@ -233,8 +233,8 @@ Os operadores são + − × ÷ xʸ e −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉. A divis
 - **Operadores:** + − · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
-  - *sem +* (`-+`): `9 − 6 = 6 − 3` → cada lado vale **3** — código `=(-(9,6),-(6,3))`
-  - *= depois do 3º dígito* (`=2`): `√9 × 6 ÷ 6 = 3` → cada lado vale **3** — código `=(*(s(9),/(6,6)),3)`
+  - *sem −* (`--`): `√9 × 6 ÷ 6 = 3` → cada lado vale **3** — código `=(*(s(9),/(6,6)),3)`
+  - *= depois do 2º dígito* (`=1`): `9 − 6 = 6 − 3` → cada lado vale **3** — código `=(-(9,6),-(6,3))`
   - *use xʸ* (`+^`): `(√9)^(6 ÷ 6) = 3` → cada lado vale **3** — código `=(^(s(9),/(6,6)),3)`
 
 ## Fase 016 — 8443
@@ -306,12 +306,12 @@ Os operadores são + − × ÷ xʸ e −x √ ∛ ! |x| ⌊x⌋ ⌈x⌉. A divis
 
 - **Dificuldade:** ★☆☆ (1)
 - **Solução:** `5 × 3 ÷ √9 = 5` → cada lado vale **5**
-- **LaTeX:** `5 \times \frac{3}{\sqrt{9}} = 5`
+- **LaTeX:** `\frac{5 \times 3}{\sqrt{9}} = 5`
 - **Código:** `=(*(5,/(3,s(9))),5)`
 - **Operadores:** × ÷ √ · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 3º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
-  - *sem ×* (`-*`): `5 ÷ (3 ÷ √9) = 5` → cada lado vale **5** — código `=(/(5,/(3,s(9))),5)`
+  - *sem ÷* (`-/`): `5 + 3 − √9 = 5` → cada lado vale **5** — código `=(+(5,-(3,s(9))),5)`
   - *= depois do 1º dígito* (`=0`): `5 = 3 ÷ √9 × 5` → cada lado vale **5** — código `=(5,*(/(3,s(9)),5))`
   - *use xʸ* (`+^`): `5^(3 ÷ √9) = 5` → cada lado vale **5** — código `=(^(5,/(3,s(9))),5)`
 

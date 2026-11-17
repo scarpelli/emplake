@@ -192,3 +192,69 @@ class Unary extends Node {
   @override
   Map<String, dynamic> toJson() => {'t': 'u', 'id': id, 'op': op.name, 'c': child.toJson(), if (parens) 'p': true};
 }
+
+int precedenceOf(BinOp op) => switch (op) {
+  BinOp.add || BinOp.sub => 1,
+  BinOp.mul || BinOp.div => 2,
+  BinOp.pow => 3,
+};
+
+bool needsGrouping(BinOp parent, BinOp child, {required bool isRight}) {
+  final p = precedenceOf(parent), c = precedenceOf(child);
+  if (c != p) return c < p;
+  if (parent == BinOp.pow) return !isRight;
+  return isRight && (parent == BinOp.sub || parent == BinOp.div);
+}
+
+Node byPrecedence(Node n) {
+  switch (n) {
+    case Leaf():
+      return n;
+    case Unary(:final op, :final child):
+      final c = byPrecedence(child);
+      return identical(c, child) ? n : Unary(n.id, op, c, parens: n.parens);
+    case Binary():
+      final operands = <Node>[];
+      final ops = <Binary>[];
+      void flatten(Node x, bool root) {
+        if (x is Binary && (root || !x.parens)) {
+          flatten(x.left, false);
+          ops.add(x);
+          flatten(x.right, false);
+        } else {
+          operands.add(byPrecedence(x));
+        }
+      }
+
+      flatten(n, true);
+      var nextOperand = 0;
+      var nextOp = 0;
+      Node climb(int minPrec) {
+        var lhs = operands[nextOperand++];
+        while (nextOp < ops.length && precedenceOf(ops[nextOp].op) >= minPrec) {
+          final b = ops[nextOp++];
+          final p = precedenceOf(b.op);
+          final rhs = climb(b.op == BinOp.pow ? p : p + 1);
+          lhs = Binary(b.id, b.op, lhs, rhs);
+        }
+        return lhs;
+      }
+
+      return (climb(0) as Binary).withParens(n.parens);
+  }
+}
+
+Node withExplicitGrouping(Node n) {
+  switch (n) {
+    case Leaf():
+      return n;
+    case Unary(:final op, :final child):
+      return Unary(n.id, op, withExplicitGrouping(child), parens: n.parens);
+    case Binary(:final op, :final left, :final right):
+      Node side(Node c, bool isRight) {
+        final g = withExplicitGrouping(c);
+        return g is Binary && !g.parens && needsGrouping(op, g.op, isRight: isRight) ? g.withParens(true) : g;
+      }
+      return Binary(n.id, op, side(left, false), side(right, true), parens: n.parens);
+  }
+}

@@ -317,6 +317,8 @@ class _OperatorsTab extends StatelessWidget {
 
     return _scroll([
       Text(l.helpOperatorsIntro, style: t.bodyMedium?.copyWith(height: 1.45)),
+      const SizedBox(height: 8),
+      Text(l.helpPrecedence, style: t.bodyMedium?.copyWith(height: 1.45)),
       const SizedBox(height: 12),
       for (final (symbol, name, example, where) in rows)
         Container(

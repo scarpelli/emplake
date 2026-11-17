@@ -56,7 +56,7 @@ void main() {
       var b = Board.start('3000');
       b = b.applyUnary(0, UnOp.fact);
       b = b.applyUnary(b.blocks[0].id, UnOp.fact);
-      expect(linearText(b), '(3!)!   0   0   0');
+      expect(linearText(b), '3!!   0   0   0');
       expect(Evaluator(Level.easy).evaluateBoard(b).values[b.blocks[0].id]!.display(), '720');
       b = b.unwrap(b.blocks[0].id);
       expect(linearText(b), '3!   0   0   0');
@@ -146,7 +146,8 @@ void main() {
 
   group('format precedence', () {
     test('subtraction on the right gets parentheses', () {
-      var b = Board.start('1234').link(1, BinOp.sub).link(0, BinOp.sub);
+      var b = Board.start('1234').link(1, BinOp.sub);
+      b = b.toggleParens(b.blocks[1].id).link(0, BinOp.sub);
       expect(linearText(b), '1 − (2 − 3)   4');
     });
 

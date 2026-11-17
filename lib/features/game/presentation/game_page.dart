@@ -122,7 +122,7 @@ class _GamePageState extends ConsumerState<GamePage> {
         unawaited(_countPlayedDay().then((_) => ref.invalidate(profileProvider)));
         setState(() => _sheetVisible = true);
         _autoNext?.cancel();
-        _autoNext = Timer(const Duration(milliseconds: 1100), () {
+        _autoNext = Timer(const Duration(milliseconds: 2500), () {
           final now = ref.read(gameControllerProvider);
           if (mounted && now?.run != null && now!.phase == GamePhase.solved) _goNext(now);
         });
@@ -1243,7 +1243,8 @@ class _Feedback extends StatelessWidget {
       final d = state.board.digits;
       final lines = [
         l.hintEquals(d[h.equalsGap], d[h.equalsGap + 1]),
-        if (state.hintsUsed >= 2) l.hintLink(d[h.linkGap], d[h.linkGap + 1], h.linkOp.label),
+        if (state.hintsUsed >= 2)
+          (h.linkGrouped ? l.hintLinkGrouped : l.hintLink)(d[h.linkGap], d[h.linkGap + 1], h.linkOp.label),
       ];
       return banner(Icons.lightbulb_outline, l.hintTitle(state.hintsUsed), lines.join('\n'), bp.accent);
     }

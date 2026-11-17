@@ -73,6 +73,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginCredit => 'Game conceived by Prof. Walter A. Carnielli';
 
   @override
+  String teamNames(String first, String second) {
+    return '$first and $second';
+  }
+
+  @override
   String get language => 'Language';
 
   @override
@@ -407,6 +412,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String hintLink(int a, int b, String op) {
     return 'Start by linking $a and $b with $op.';
+  }
+
+  @override
+  String hintLinkGrouped(int a, int b, String op) {
+    return 'Start by linking $a and $b with $op, and put ( ) on that branch.';
   }
 
   @override
@@ -884,6 +894,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGame => 'GAME';
 
   @override
+  String get settingsAbout => 'ABOUT';
+
+  @override
   String get settingsLiveValues => 'Live values';
 
   @override
@@ -1134,6 +1147,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get helpOperatorsIntro =>
       'Binary operators (+ − × ÷ xʸ) link two blocks at a gap. The others act on a segment: tap a number or branch and pick one.';
+
+  @override
+  String get helpPrecedence =>
+      'The math follows the usual order: xʸ first, then × and ÷, and + and − last. A sign like √, ! or −x applies only to the number or branch it was placed on. To work out a part first, tap its branch and use ( ) before linking it to the rest.';
 
   @override
   String get opAdd => 'Addition';

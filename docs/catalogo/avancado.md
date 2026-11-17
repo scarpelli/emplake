@@ -12,7 +12,7 @@ Os operadores são + − × ÷ e −x √ ! |x|. A divisão não inteira dá err
 | [083](#fase-083--3121) | 3121 | ★☆☆ | `3 = 1 × (2 + 1)` |  | sem × · = depois do 2º dígito · use − |
 | [084](#fase-084--0972) | 0972 | ★☆☆ | `0 = 9 − (7 + 2)` |  | sem − · = depois do 3º dígito · use × |
 | [085](#fase-085--1305) | 1305 | ★★☆ | `1 = (3 × 0 × 5)!` | sim | sem × · = depois do 2º dígito · use − |
-| [086](#fase-086--5342) | 5342 | ★☆☆ | `5 = 3 + 4 − 2` |  | sem + · = depois do 2º dígito · use ÷ |
+| [086](#fase-086--5342) | 5342 | ★☆☆ | `5 = 3 + 4 − 2` |  | sem − · = depois do 3º dígito · use ÷ |
 | [087](#fase-087--1156) | 1156 | ★☆☆ | `1 = (1 + 5) ÷ 6` |  | sem ÷ · = depois do 2º dígito · use − |
 | [088](#fase-088--4839) | 4839 | ★☆☆ | `4 + 8 = 3 + 9` |  | sem + · = depois do 1º dígito · use × |
 | [089](#fase-089--6711) | 6711 | ★☆☆ | `6 = 7 − 1 × 1` |  | sem − · = depois do 2º dígito · use ÷ |
@@ -20,7 +20,7 @@ Os operadores são + − × ÷ e −x √ ! |x|. A divisão não inteira dá err
 | [091](#fase-091--3478) | 3478 | ★☆☆ | `3 = 4 + 7 − 8` |  | sem − · = depois do 2º dígito · use × |
 | [092](#fase-092--4136) | 4136 | ★☆☆ | `4 − 1 + 3 = 6` |  | sem + · = depois do 1º dígito · use × |
 | [093](#fase-093--5863) | 5863 | ★☆☆ | `5 = 8 − 6 + 3` |  | sem + · = depois do 2º dígito · use ÷ |
-| [094](#fase-094--7092) | 7092 | ★☆☆ | `7 = 0 + 9 − 2` |  | sem + · = depois do 2º dígito · use × |
+| [094](#fase-094--7092) | 7092 | ★☆☆ | `7 = 0 + 9 − 2` |  | sem − · = depois do 2º dígito · use × |
 | [095](#fase-095--2663) | 2663 | ★☆☆ | `2 + 6 ÷ 6 = 3` |  | sem + · = depois do 2º dígito · use √ |
 | [096](#fase-096--8966) | 8966 | ★☆☆ | `8 = 9 − 6 ÷ 6` |  | sem − · = depois do 2º dígito · use × |
 | [097](#fase-097--2741) | 2741 | ★☆☆ | `2 = 7 − (4 + 1)` |  | sem − · = depois do 2º dígito · use √ |
@@ -112,8 +112,8 @@ Os operadores são + − × ÷ e −x √ ! |x|. A divisão não inteira dá err
 - **Operadores:** + − · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
-  - *sem +* (`-+`): `5 − 3 = 4 − 2` → cada lado vale **2** — código `=(-(5,3),-(4,2))`
-  - *= depois do 2º dígito* (`=1`): `5 + 3 = 4 × 2` → cada lado vale **8** — código `=(+(5,3),*(4,2))`
+  - *sem −* (`--`): `5 + 3 = 4 × 2` → cada lado vale **8** — código `=(+(5,3),*(4,2))`
+  - *= depois do 3º dígito* (`=2`): `(5 + 3) ÷ 4 = 2` → cada lado vale **2** — código `=(/(+(5,3),4),2)`
   - *use ÷* (`+/`): `5 = 3 + 4 ÷ 2` → cada lado vale **5** — código `=(5,+(3,/(4,2)))`
 
 ## Fase 087 — 1156
@@ -216,7 +216,7 @@ Os operadores são + − × ÷ e −x √ ! |x|. A divisão não inteira dá err
 - **Operadores:** + − · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
-  - *sem +* (`-+`): `7 − 0 = 9 − 2` → cada lado vale **7** — código `=(-(7,0),-(9,2))`
+  - *sem −* (`--`): `7 = 0 + 9 + (−2)` → cada lado vale **7** — código `=(7,+(0,+(9,n(2))))`
   - *= depois do 2º dígito* (`=1`): `7 + 0 = 9 − 2` → cada lado vale **7** — código `=(+(7,0),-(9,2))`
   - *use ×* (`+*`): `7 = 0! × (9 − 2)` → cada lado vale **7** — código `=(7,*(!(0),-(9,2)))`
 
@@ -449,7 +449,7 @@ Os operadores são + − × ÷ e −x √ ! |x|. A divisão não inteira dá err
 - **Operadores:** − ! · 7 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
-  - *sem −* (`--`): `6 = (7 + −8 + 4)!` → cada lado vale **6** — código `=(6,!(+(7,+(n(8),4))))`
+  - *sem −* (`--`): `6 = (7 + (−8) + 4)!` → cada lado vale **6** — código `=(6,!(+(7,+(n(8),4))))`
   - *use ×* (`+*`): `6 = (7 − √(8 × √4))!` → cada lado vale **6** — código `=(6,!(-(7,s(*(8,s(4))))))`
 
 ## Fase 113 — 9291

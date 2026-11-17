@@ -27,6 +27,7 @@ List<ReplayStep> replaySolution(String number, String solution) {
         build(left);
         build(right);
         board = board.link(board.blockGapAt(n.digitGap)!, op);
+        if (n.parens) board = board.toggleParens(board.binaryAt(n.digitGap)!.id);
         steps.add(ReplayStep(board, op: op, gap: n.digitGap));
       case Unary(:final op, :final child):
         build(child);

@@ -29,8 +29,9 @@ São Carlos, com o Prof. José Guimarães. É uma engenharia reversa do
 
 A expressão é montada como uma **árvore que cresce para cima**, a partir dos quatro dígitos:
 
-- toque num **vão** entre dois blocos e escolha `+ − × ÷ xʸ` para ligá-los. A ordem das ligações define
-  o agrupamento, então os parênteses saem da própria árvore;
+- toque num **vão** entre dois blocos e escolha `+ − × ÷ xʸ` para ligá-los. A conta segue a precedência
+  usual (`xʸ`, depois `× ÷`, depois `+ −`), e a árvore se reorganiza a cada ligação para mostrar o que é
+  feito primeiro. Para fazer uma parte antes, ponha `( )` no ramo;
 - o `=` entra num vão, uma única vez, e separa os dois lados. Ele pode ser o primeiro sinal colocado;
 - toque num **nó** (um número ou um ramo) para aplicar `−x √ ∛ ! |x| ⌊x⌋ ⌈x⌉`, trocar o operador, pôr
   `( )` ou removê-lo. Os sinais também podem ser arrastados de um vão para outro;
@@ -60,6 +61,7 @@ clicar, com o tema claro à esquerda e o escuro à direita.
 | Divisão com resultado não inteiro só no Fácil, com erro nos outros níveis | O avaliador trabalha com frações exatas. Fora do Fácil, uma divisão não inteira gera o erro `nonIntegerDivision`, que aparece no próprio nó, com a explicação. | [evaluator.dart](lib/features/game/domain/evaluator.dart) | |
 | Renderizador de LaTeX logo abaixo da fórmula montada | A caixa da fórmula mostra a expressão em texto e, logo abaixo, a mesma expressão renderizada pelo `flutter_math_fork`, com o código LaTeX para copiar. O LaTeX abre no botão **LATEX** da caixa, e o app lembra a escolha. Veja [por que fica assim](#latex-no-botão-da-caixa-da-fórmula). | [formula_panel.dart](lib/features/game/presentation/formula_panel.dart), [format.dart](lib/features/game/domain/format.dart) | <details><summary>ver tela</summary><img src="docs/img/jogo.png" width="480" alt="Jogo com a árvore montada e o LaTeX aberto"></details> |
 | Interface da tela principal única | A expressão é uma árvore que cresce para cima a partir dos dígitos, com o valor de cada ramo ao lado. Veja [por que uma árvore](#a-expressão-como-árvore). | [tree_view.dart](lib/features/game/presentation/tree_view.dart), [board.dart](lib/features/game/domain/board.dart) | <details><summary>ver tela</summary><img src="docs/img/jogo.png" width="480" alt="Árvore da expressão"></details> |
+| Precedência do original e expressões compostas | A cada sinal colocado, os blocos são reorganizados pela precedência, e `( )` num ramo faz essa parte antes. Os unários podem ser empilhados (`−−2`, `3!!`) e postos entre outros sinais, tocando no nó de dentro. | [expr.dart](lib/features/game/domain/expr.dart), [board.dart](lib/features/game/domain/board.dart), [precedence_test.dart](test/precedence_test.dart) | |
 | O `=` pode ser colocado logo no início | O `=` entra em qualquer vão livre antes das ligações, e as ligações não podem atravessá-lo. | [board.dart](lib/features/game/domain/board.dart) | |
 
 ### Características do aplicativo
@@ -140,9 +142,10 @@ clicar, com o tema claro à esquerda e o escuro à direita.
 ### A expressão como árvore
 
 No original, os operadores são arrastados para uma linha. Aqui, cada ligação entre dois blocos cria um
-nó acima deles, então a ordem das ligações já define o agrupamento, e o jogador vê o valor de cada ramo
-enquanto monta. Isso torna a tela principal diferente das outras e evita o erro mais comum, que é
-esquecer um parêntese. Seguindo a dica do enunciado, o `=` pode ser o primeiro sinal colocado.
+nó acima deles, e a árvore segue a mesma precedência do original: `xʸ` primeiro, depois `×` e `÷`, e por
+último `+` e `−`. Os unários valem só para o número ou ramo em que foram postos. A cada sinal colocado, a
+árvore se reorganiza e mostra o que é calculado primeiro, e o jogador vê o valor de cada ramo enquanto
+monta. Seguindo a dica do enunciado, o `=` pode ser o primeiro sinal colocado.
 
 ### O login não é a primeira tela
 

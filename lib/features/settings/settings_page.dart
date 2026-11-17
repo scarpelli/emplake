@@ -7,6 +7,7 @@ import '../../core/theme/blueprint.dart';
 import '../../core/widgets/bp_widgets.dart';
 import '../../data/firestore_repository.dart';
 import '../auth/guest.dart';
+import '../auth/login_page.dart';
 import '../avatar/avatar_page.dart';
 import '../avatar/robot_avatar.dart';
 import '../daily/daily.dart';
@@ -250,6 +251,7 @@ class SettingsPage extends ConsumerWidget {
                       _SwitchRow(label: l.music, value: s.music, onChanged: ctrl.setMusic),
                       _SwitchRow(label: l.settingsHaptics, value: s.haptics, onChanged: ctrl.setHaptics),
                     ]),
+                    section(l.settingsAbout, [const TeamCard()]),
                   ]),
                 ],
               ),

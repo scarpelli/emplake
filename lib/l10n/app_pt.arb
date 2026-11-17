@@ -27,6 +27,17 @@
     }
   },
   "loginCredit": "Jogo concebido por Prof. Walter A. Carnielli",
+  "teamNames": "{first} e {second}",
+  "@teamNames": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
   "language": "Idioma",
   "loginOr": "OU",
   "loginGoogle": "Entrar com Google",
@@ -283,6 +294,20 @@
     }
   },
   "hintLink": "Comece ligando o {a} e o {b} com {op}.",
+  "hintLinkGrouped": "Comece ligando o {a} e o {b} com {op}, e ponha ( ) nesse ramo.",
+  "@hintLinkGrouped": {
+    "placeholders": {
+      "a": {
+        "type": "int"
+      },
+      "b": {
+        "type": "int"
+      },
+      "op": {
+        "type": "String"
+      }
+    }
+  },
   "@hintLink": {
     "placeholders": {
       "a": {
@@ -565,6 +590,7 @@
   "themeDark": "Escuro",
   "themeHint": "Segue o tema do aparelho até você escolher outro.",
   "settingsGame": "JOGO",
+  "settingsAbout": "SOBRE",
   "settingsLiveValues": "Valores em tempo real",
   "settingsLiveValuesHint": "Mostra quanto vale cada ramo e cada lado do = enquanto você monta.",
   "settingsHaptics": "Vibração",
@@ -630,6 +656,7 @@
   "helpKeys": "TECLADO",
   "helpKeysList": "Enter verificar · Esc pular · Tab seleção · Ctrl+Z desfazer · ⌫ remover · H dica\n+ − * / ^ = ( ) operadores · ! fatorial · r √ · c ∛ · a |x| · n −x · f ⌊x⌋ · F ⌈x⌉",
   "helpOperatorsIntro": "Os binários (+ − × ÷ xʸ) ligam dois blocos num vão. Os outros agem sobre um trecho: toque num número ou ramo e escolha.",
+  "helpPrecedence": "A conta segue a ordem usual: primeiro xʸ, depois × e ÷, e por último + e −. Um sinal como √, ! ou −x vale só para o número ou ramo em que foi colocado. Para fazer uma parte antes, toque no ramo e use ( ) antes de ligá-lo ao resto.",
   "opAdd": "Soma",
   "opSub": "Subtração",
   "opMul": "Multiplicação",

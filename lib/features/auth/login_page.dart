@@ -81,7 +81,7 @@ class LoginPage extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(l.loginSubtitle, style: t.titleMedium?.copyWith(color: context.bp.muted)),
                     const SizedBox(height: 40),
-                    const _TeamCard(),
+                    const TeamCard(),
                   ],
                 ),
               ),
@@ -97,7 +97,7 @@ class LoginPage extends StatelessWidget {
                   const Center(child: _GoogleButton()),
                   const SizedBox(height: 12),
                   const Center(child: _GuestLink()),
-                  if (!wide) const Padding(padding: EdgeInsets.only(top: 24), child: _TeamCard()),
+                  if (!wide) const Padding(padding: EdgeInsets.only(top: 24), child: TeamCard()),
                 ],
               );
             },
@@ -178,8 +178,8 @@ ThemeData _linkTheme(ThemeData base) {
   );
 }
 
-class _TeamCard extends StatelessWidget {
-  const _TeamCard();
+class TeamCard extends StatelessWidget {
+  const TeamCard({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -73,6 +73,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginCredit => 'Jogo concebido por Prof. Walter A. Carnielli';
 
   @override
+  String teamNames(String first, String second) {
+    return '$first e $second';
+  }
+
+  @override
   String get language => 'Idioma';
 
   @override
@@ -409,6 +414,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String hintLink(int a, int b, String op) {
     return 'Comece ligando o $a e o $b com $op.';
+  }
+
+  @override
+  String hintLinkGrouped(int a, int b, String op) {
+    return 'Comece ligando o $a e o $b com $op, e ponha ( ) nesse ramo.';
   }
 
   @override
@@ -888,6 +898,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsGame => 'JOGO';
 
   @override
+  String get settingsAbout => 'SOBRE';
+
+  @override
   String get settingsLiveValues => 'Valores em tempo real';
 
   @override
@@ -1138,6 +1151,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get helpOperatorsIntro =>
       'Os binários (+ − × ÷ xʸ) ligam dois blocos num vão. Os outros agem sobre um trecho: toque num número ou ramo e escolha.';
+
+  @override
+  String get helpPrecedence =>
+      'A conta segue a ordem usual: primeiro xʸ, depois × e ÷, e por último + e −. Um sinal como √, ! ou −x vale só para o número ou ramo em que foi colocado. Para fazer uma parte antes, toque no ramo e use ( ) antes de ligá-lo ao resto.';
 
   @override
   String get opAdd => 'Soma';

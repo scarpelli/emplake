@@ -293,6 +293,19 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
         for (final c in p.children) c: p,
     };
     final valueStyle = Theme.of(context).textTheme.labelSmall;
+    final values = <int, String>{
+      if (widget.showValues)
+        for (final n in _layout.nodes.values)
+          if (n.kind == TreeNodeKind.op && eval.result.values[n.id] != null)
+            n.id: eval.result.values[n.id]!.display(decimalSeparator: sep),
+    };
+    final valueSizes = {for (final e in values.entries) e.key: _measure(context, '→ ${e.value}', valueStyle)};
+    final halves = {for (final n in _layout.nodes.values) n.id: _NodeChip.halfSize(context, n)};
+    final verdict = widget.showValues ? _verdict(context, eval, sep) : null;
+    final verdictText = verdict == null ? null : _measure(context, verdict.text, verdict.style);
+    final verdictSize = verdictText == null
+        ? null
+        : Size(verdictText.width + (verdict!.done ? verdictText.height + 4 : 0), verdictText.height);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -311,6 +324,18 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
             _geometry
               .._local = pos
               .._nodes = _layout.nodes;
+            final eqAt = pos[equalsNodeId];
+            final verdictRect = verdictSize == null || eqAt == null
+                ? null
+                : Offset(eqAt.dx + 18 * _scale + 6, eqAt.dy - 9) & verdictSize;
+            final spots = _placeValueLabels(
+              pos: pos,
+              sizes: valueSizes,
+              halves: halves,
+              parentOf: parentOf,
+              width: width,
+              verdict: verdictRect,
+            );
 
             return Stack(
               key: _geometry._key,
@@ -345,18 +370,30 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
                       ),
                     ),
                   ),
-                for (final n in _layout.nodes.values)
-                  if (widget.showValues && n.kind == TreeNodeKind.op && eval.result.values[n.id] != null)
-                    _valueLabel(
-                      at: pos[n.id]!,
-                      gap: _NodeChip.halfWidth(context, n) * _scale + 6,
-                      onLeft: (parentOf[n.id]?.x ?? n.x) > n.x,
-                      width: width,
-                      value: eval.result.values[n.id]!.display(decimalSeparator: sep),
-                      style: valueStyle?.copyWith(color: selection == NodeSelection(n.id) ? bp.accent : bp.muted),
+                for (final MapEntry(key: id, value: spot) in spots.entries)
+                  _valueLabel(
+                    spot: spot,
+                    width: width,
+                    value: values[id]!,
+                    style: valueStyle?.copyWith(color: selection == NodeSelection(id) ? bp.accent : bp.muted),
+                  ),
+                if (verdict != null && verdictRect != null)
+                  Positioned(
+                    left: verdictRect.left,
+                    top: verdictRect.top,
+                    child: IgnorePointer(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(verdict.text, style: verdict.style),
+                          if (verdict.done) ...[
+                            const SizedBox(width: 4),
+                            Icon(Icons.check, size: verdictRect.height, color: verdict.style?.color),
+                          ],
+                        ],
+                      ),
                     ),
-                if (widget.showValues && pos[equalsNodeId] != null)
-                  _equalsVerdict(context, pos[equalsNodeId]!, eval, sep),
+                  ),
               ],
             );
           },
@@ -472,48 +509,133 @@ class _TreeViewState extends State<TreeView> with SingleTickerProviderStateMixin
     child: Center(child: child),
   );
 
+  static Size _measure(BuildContext context, String text, TextStyle? style) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: DefaultTextStyle.of(context).style.merge(style)),
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    final size = painter.size;
+    painter.dispose();
+    return size;
+  }
+
+  static const _columns = 4;
+
+  Map<int, _LabelSpot> _placeValueLabels({
+    required Map<int, Offset> pos,
+    required Map<int, Size> sizes,
+    required Map<int, Size> halves,
+    required Map<int, PlacedNode> parentOf,
+    required double width,
+    required Rect? verdict,
+  }) {
+    final obstacles = <Rect>[
+      for (final MapEntry(key: id, value: half) in halves.entries)
+        if (pos[id] case final p?)
+          Rect.fromCenter(center: p, width: half.width * 2 * _scale, height: half.height * 2 * _scale),
+      ?verdict,
+    ];
+    final edges = <(Offset, Offset)>[
+      for (final n in _layout.nodes.values)
+        for (final c in n.children)
+          if ((pos[n.id], pos[c]) case (final a?, final b?)) (a, b),
+    ];
+
+    bool towardParent(PlacedNode n) {
+      final p = parentOf[n.id];
+      return p != null && p.x != n.x;
+    }
+
+    bool prefersLeft(PlacedNode n) => towardParent(n) ? parentOf[n.id]!.x > n.x : n.x < _columns / 2;
+
+    double cost(Rect r, List<Rect> placed) {
+      var c = 0.0;
+      if (r.left < 0) c += -r.left * r.height;
+      if (r.right > width) c += (r.right - width) * r.height;
+      for (final o in [...obstacles, ...placed]) {
+        final i = r.intersect(o);
+        if (i.width > 0 && i.height > 0) c += i.width * i.height;
+      }
+      for (final (a, b) in edges) {
+        for (var k = 1; k < 12; k++) {
+          if (r.contains(Offset.lerp(a, b, k / 12)!)) c += 8;
+        }
+      }
+      return c;
+    }
+
+    final order = [for (final id in sizes.keys) _layout.nodes[id]!]
+      ..sort((a, b) {
+        final byParent = (towardParent(a) ? 0 : 1).compareTo(towardParent(b) ? 0 : 1);
+        return byParent != 0 ? byParent : a.x.compareTo(b.x);
+      });
+
+    final spots = <int, _LabelSpot>{};
+    for (final n in order) {
+      final at = pos[n.id];
+      if (at == null) continue;
+      final size = sizes[n.id]!;
+      final gap = halves[n.id]!.width * _scale + 6;
+      final top = at.dy - 26 * _scale;
+      final step = size.height + 2;
+      final left = prefersLeft(n);
+      _LabelSpot? best;
+      var bestCost = double.infinity;
+      for (final dy in [0.0, -step, step]) {
+        for (final onLeft in [left, !left]) {
+          final x = onLeft ? at.dx - gap - size.width : at.dx + gap;
+          final rect = Offset(x, top + dy) & size;
+          final c = cost(rect, [for (final s in spots.values) s.rect]);
+          if (c < bestCost) {
+            bestCost = c;
+            best = (rect: rect, onLeft: onLeft);
+          }
+          if (c == 0) break;
+        }
+        if (bestCost == 0) break;
+      }
+      spots[n.id] = best!;
+    }
+    return spots;
+  }
+
   Widget _valueLabel({
-    required Offset at,
-    required double gap,
-    required bool onLeft,
+    required _LabelSpot spot,
     required double width,
     required String value,
     required TextStyle? style,
   }) {
     final label = IgnorePointer(
-      child: Text(onLeft ? '$value ←' : '→ $value', maxLines: 1, softWrap: false, style: style),
+      child: Text(spot.onLeft ? '$value ←' : '→ $value', maxLines: 1, softWrap: false, style: style),
     );
-    return onLeft
-        ? Positioned(right: width - at.dx + gap, top: at.dy - 26 * _scale, child: label)
-        : Positioned(left: at.dx + gap, top: at.dy - 26 * _scale, child: label);
+    return spot.onLeft
+        ? Positioned(right: width - spot.rect.right, top: spot.rect.top, child: label)
+        : Positioned(left: spot.rect.left, top: spot.rect.top, child: label);
   }
 
-  Widget _equalsVerdict(BuildContext context, Offset at, Verdict v, String sep) {
+  ({String text, TextStyle? style, bool done})? _verdict(BuildContext context, Verdict v, String sep) {
     final bp = context.bp;
     final board = widget.state.board;
-    final eq = board.eqGap!;
+    final eq = board.eqGap;
+    if (eq == null) return null;
     final values = v.result.values;
     final NumValue? l = values[board.blocks[eq].id];
     final NumValue? r = values[board.blocks[eq + 1].id];
-    if (l == null || r == null) return const SizedBox.shrink();
+    if (l == null || r == null) return null;
     final complete = board.isComplete;
     final equal = l.equals(r);
-    final text =
-        '${l.display(decimalSeparator: sep)} ${equal ? '=' : '≠'} ${r.display(decimalSeparator: sep)}'
-        '${complete && equal ? ' ✓' : ''}';
-    return Positioned(
-      left: at.dx + 18 * _scale + 6,
-      top: at.dy - 9,
-      child: IgnorePointer(
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelMedium
-              ?.copyWith(color: !complete ? bp.muted : (equal ? bp.ok : bp.danger), fontWeight: FontWeight.w600),
-        ),
-      ),
+    return (
+      text: '${l.display(decimalSeparator: sep)} ${equal ? '=' : '≠'} ${r.display(decimalSeparator: sep)}',
+      done: complete && equal,
+      style: Theme.of(context).textTheme.labelMedium
+          ?.copyWith(color: !complete ? bp.muted : (equal ? bp.ok : bp.danger), fontWeight: FontWeight.w600),
     );
   }
 }
+
+typedef _LabelSpot = ({Rect rect, bool onLeft});
 
 class _EdgePainter extends CustomPainter {
   _EdgePainter(this.layout, this.pos, this.color);
@@ -568,21 +690,34 @@ class _NodeChip extends StatelessWidget {
 
   static bool _isLong(PlacedNode n) => n.label.length > 2;
 
-  static double halfWidth(BuildContext context, PlacedNode n) {
-    if (!_isLong(n)) return 18;
+  static double _textWidth(BuildContext context, String text, TextStyle? style) {
     final painter = TextPainter(
-      text: TextSpan(
-        text: n.label,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
-      ),
+      text: TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.w600)),
       textDirection: TextDirection.ltr,
       textScaler: MediaQuery.textScalerOf(context),
       maxLines: 1,
     )..layout();
-    final w = painter.width + 16 + 2.8;
+    final w = painter.width;
     painter.dispose();
+    return w;
+  }
+
+  static double halfWidth(BuildContext context, PlacedNode n) {
+    if (!_isLong(n)) return 18;
+    final w = _textWidth(context, n.label, Theme.of(context).textTheme.labelMedium) + 16 + 2.8;
     return math.max(36, w) / 2;
   }
+
+  static Size halfSize(BuildContext context, PlacedNode n) => switch (n.kind) {
+    TreeNodeKind.gap => const Size(11, 11),
+    TreeNodeKind.leaf => Size(
+      n.label.length > 1
+          ? math.max(38, _textWidth(context, n.label, Theme.of(context).textTheme.titleMedium) + 12 + 2.8) / 2
+          : 19,
+      19,
+    ),
+    TreeNodeKind.op || TreeNodeKind.equals => Size(halfWidth(context, n), 18),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -640,14 +775,13 @@ class _NodeChip extends StatelessWidget {
       case TreeNodeKind.gap:
         shape = CustomPaint(
           painter: _DashedBoxPainter(
-            lit || destination ? bp.accent : bp.line,
+            lit || destination ? bp.accent : bp.muted,
             filled: lit ? bp.accent : (destination ? bp.accent.withValues(alpha: 0.18) : null),
           ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 120),
             width: hover ? 30 : 22,
             height: hover ? 30 : 22,
-            child: Icon(Icons.add, size: 14, color: lit ? bp.onAccent : (destination ? bp.accent : bp.muted)),
           ),
         );
     }

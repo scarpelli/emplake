@@ -19,7 +19,7 @@ Os operadores são + − × ÷ e −x |x|. A divisão não inteira dá erro, e c
 | [125](#fase-125--8163) | 8163 | ★☆☆ | `8 + 1 = 6 + 3` |  | sem + · = depois do 1º dígito · use − |
 | [126](#fase-126--5489) | 5489 | ★☆☆ | `5 − 4 + 8 = 9` |  | sem + · = depois do 1º dígito |
 | [127](#fase-127--9427) | 9427 | ★☆☆ | `9 = 4 − 2 + 7` |  | sem + · = depois do 2º dígito · use ÷ |
-| [128](#fase-128--9641) | 9641 | ★☆☆ | `9 = 6 + 4 − 1` |  | sem + · = depois do 3º dígito |
+| [128](#fase-128--9641) | 9641 | ★☆☆ | `9 = 6 + 4 − 1` |  | sem − · = depois do 2º dígito |
 | [129](#fase-129--5378) | 5378 | ★☆☆ | `5 × 3 = 7 + 8` |  | sem + |
 | [130](#fase-130--5567) | 5567 | ★☆☆ | `5 ÷ 5 + 6 = 7` |  | sem + · = depois do 1º dígito |
 | [131](#fase-131--4428) | 4428 | ★☆☆ | `4 × (4 − 2) = 8` |  | sem − · use ÷ |
@@ -197,8 +197,8 @@ Os operadores são + − × ÷ e −x |x|. A divisão não inteira dá erro, e c
 - **Operadores:** + − · 6 nós (6 nós indicam só dois binários além do =) · "=" depois do 1º dígito
 - **Trivial (×0):** não · **Placa do dia:** não
 - **Com restrição:**
-  - *sem +* (`-+`): `9 − 6 = 4 − 1` → cada lado vale **3** — código `=(-(9,6),-(4,1))`
-  - *= depois do 3º dígito* (`=2`): `−9 + 6 + 4 = 1` → cada lado vale **1** — código `=(+(n(9),+(6,4)),1)`
+  - *sem −* (`--`): `9 = 6 + 4 + (−1)` → cada lado vale **9** — código `=(9,+(6,+(4,n(1))))`
+  - *= depois do 2º dígito* (`=1`): `9 − 6 = 4 − 1` → cada lado vale **3** — código `=(-(9,6),-(4,1))`
 
 ## Fase 129 — 5378
 

@@ -220,6 +220,12 @@ abstract class AppLocalizations {
   /// **'Jogo concebido por Prof. Walter A. Carnielli'**
   String get loginCredit;
 
+  /// No description provided for @teamNames.
+  ///
+  /// In pt, this message translates to:
+  /// **'{first} e {second}'**
+  String teamNames(String first, String second);
+
   /// No description provided for @language.
   ///
   /// In pt, this message translates to:
@@ -717,6 +723,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Comece ligando o {a} e o {b} com {op}.'**
   String hintLink(int a, int b, String op);
+
+  /// No description provided for @hintLinkGrouped.
+  ///
+  /// In pt, this message translates to:
+  /// **'Comece ligando o {a} e o {b} com {op}, e ponha ( ) nesse ramo.'**
+  String hintLinkGrouped(int a, int b, String op);
 
   /// No description provided for @hintTooltip.
   ///
@@ -1534,6 +1546,12 @@ abstract class AppLocalizations {
   /// **'JOGO'**
   String get settingsGame;
 
+  /// No description provided for @settingsAbout.
+  ///
+  /// In pt, this message translates to:
+  /// **'SOBRE'**
+  String get settingsAbout;
+
   /// No description provided for @settingsLiveValues.
   ///
   /// In pt, this message translates to:
@@ -1887,6 +1905,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Os binários (+ − × ÷ xʸ) ligam dois blocos num vão. Os outros agem sobre um trecho: toque num número ou ramo e escolha.'**
   String get helpOperatorsIntro;
+
+  /// No description provided for @helpPrecedence.
+  ///
+  /// In pt, this message translates to:
+  /// **'A conta segue a ordem usual: primeiro xʸ, depois × e ÷, e por último + e −. Um sinal como √, ! ou −x vale só para o número ou ramo em que foi colocado. Para fazer uma parte antes, toque no ramo e use ( ) antes de ligá-lo ao resto.'**
+  String get helpPrecedence;
 
   /// No description provided for @opAdd.
   ///

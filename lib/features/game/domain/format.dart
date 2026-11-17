@@ -41,6 +41,8 @@ int _latexPrec(Node n) {
 
 bool _isNeg(Node n) => !n.parens && n is Unary && n.op == UnOp.neg;
 
+bool _isFact(Node n) => !n.parens && n is Unary && n.op == UnOp.fact;
+
 bool _binaryChildNeedsParens(BinOp op, Node child, bool isRight, int Function(Node) prec) {
   final p = prec(child);
   if (isRight && _isNeg(child)) return true;
@@ -90,12 +92,12 @@ void _linear(Node n, List<FormulaToken> out) {
       switch (op) {
         case UnOp.neg:
           out.add(FormulaToken('−', n.id));
-          _wrapIf(_linearPrec(child) <= 7, child, out);
+          _wrapIf(_linearPrec(child) <= 7 && !_isNeg(child), child, out);
         case UnOp.sqrt || UnOp.cbrt:
           out.add(FormulaToken(op.symbol, n.id));
           _wrapIf(_linearPrec(child) < _atom, child, out);
         case UnOp.fact:
-          _wrapIf(_linearPrec(child) < _atom, child, out);
+          _wrapIf(_linearPrec(child) < _atom && !_isFact(child), child, out);
           out.add(FormulaToken('!', n.id));
         case UnOp.abs:
           out.add(FormulaToken('|', n.id));
@@ -134,10 +136,10 @@ String latexNode(Node n) {
     Leaf(:final digit) => '$digit',
     Binary(:final op, :final left, :final right) => _latexBinary(op, left, right),
     Unary(:final op, :final child) => switch (op) {
-      UnOp.neg => '-${_lwrap(_latexPrec(child) <= 7, child)}',
+      UnOp.neg => '-${_lwrap(_latexPrec(child) <= 7 && !_isNeg(child), child)}',
       UnOp.sqrt => '\\sqrt{${latexNode(child)}}',
       UnOp.cbrt => '\\sqrt[3]{${latexNode(child)}}',
-      UnOp.fact => '${_lwrap(_latexPrec(child) < _atom, child)}!',
+      UnOp.fact => '${_lwrap(_latexPrec(child) < _atom && !_isFact(child), child)}!',
       UnOp.abs => '\\left|${latexNode(child)}\\right|',
       UnOp.floor => '\\left\\lfloor ${latexNode(child)} \\right\\rfloor',
       UnOp.ceil => '\\left\\lceil ${latexNode(child)} \\right\\rceil',
@@ -147,9 +149,9 @@ String latexNode(Node n) {
 }
 
 String _latexBinary(BinOp op, Node left, Node right) {
-  if (op == BinOp.div) return '\\frac{${latexNode(left)}}{${latexNode(right)}}';
+  if (op == BinOp.div) return '\\frac{${latexNode(left.withParens(false))}}{${latexNode(right.withParens(false))}}';
   if (op == BinOp.pow) {
-    return '{${_lwrap(_latexPrec(left) < _atom, left)}}^{${latexNode(right)}}';
+    return '{${_lwrap(_latexPrec(left) < _atom, left)}}^{${latexNode(right.withParens(false))}}';
   }
   final l = _lwrap(_binaryChildNeedsParens(op, left, false, _latexPrec), left);
   final r = _lwrap(_binaryChildNeedsParens(op, right, true, _latexPrec), right);

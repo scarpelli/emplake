@@ -2,12 +2,13 @@ import 'expr.dart';
 import 'solution_codec.dart';
 
 class HintInfo {
-  const HintInfo({required this.equalsGap, required this.linkGap, required this.linkOp});
+  const HintInfo({required this.equalsGap, required this.linkGap, required this.linkOp, this.linkGrouped = false});
 
   final int equalsGap;
 
   final int linkGap;
   final BinOp linkOp;
+  final bool linkGrouped;
 
   static HintInfo from(String number, String solution) {
     final board = SolutionCodec.decode(number, solution);
@@ -24,6 +25,11 @@ class HintInfo {
       }
     }
     final eq = board.eqDigitGap!;
-    return HintInfo(equalsGap: eq, linkGap: best?.digitGap ?? eq, linkOp: best?.op ?? BinOp.add);
+    return HintInfo(
+      equalsGap: eq,
+      linkGap: best?.digitGap ?? eq,
+      linkOp: best?.op ?? BinOp.add,
+      linkGrouped: best?.parens ?? false,
+    );
   }
 }

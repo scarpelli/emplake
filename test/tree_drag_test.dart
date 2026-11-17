@@ -80,7 +80,7 @@ void main() {
 
   testWidgets('dragging an operator onto an open gap drops it there', (tester) async {
     final calls = await _pump(tester);
-    final gaps = find.byIcon(Icons.add);
+    final gaps = find.bySemanticsLabel(RegExp(r'^vão \d$'));
     expect(gaps, findsNWidgets(2));
     await _drag(tester, find.text('+'), tester.getCenter(gaps.last));
     expect(calls.drops, hasLength(1));
@@ -115,7 +115,7 @@ void main() {
 
   testWidgets('a sign that goes on a segment is refused between two numbers', (tester) async {
     final calls = await _pump(tester, showValues: false, sources: [(const PaletteUnaryDrag(UnOp.fact), '!')]);
-    await _drag(tester, find.text('src !'), tester.getCenter(find.byIcon(Icons.add).last));
+    await _drag(tester, find.text('src !'), tester.getCenter(find.bySemanticsLabel(RegExp(r'^vão \d$')).last));
     expect(calls.wrong.single, isA<PaletteUnaryDrag>());
     expect(calls.drops, isEmpty);
     expect(calls.onNode, isEmpty);
@@ -131,8 +131,49 @@ void main() {
   testWidgets('live values can be hidden', (tester) async {
     await _pump(tester);
     expect(find.textContaining('3'), findsWidgets);
-    expect(find.text('→ 3'), findsOneWidget);
+    expect(find.textContaining(_three), findsOneWidget);
     await _pump(tester, showValues: false);
-    expect(find.text('→ 3'), findsNothing);
+    expect(find.textContaining(_three), findsNothing);
+  }, variant: desktop);
+
+  testWidgets('live values of neighbouring branches do not overlap', (tester) async {
+    final board = Board.start('9486').applyUnary(0, UnOp.sqrt).applyUnary(1, UnOp.fact).placeEquals(1);
+    for (final width in [340.0, 392.0, 480.0]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [Blueprint.fromSeed(const Color(0xFF2460B7), Brightness.light)]),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: width,
+                height: 300,
+                child: TreeView(
+                  state: GameState(mode: GameMode.random, level: Level.easy, board: board, secondsLeft: 45),
+                  onTapNode: (_) {},
+                  onTapGap: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final labels = [
+        tester.getRect(find.textContaining(RegExp(r'^(→ 3|3 ←)$'))),
+        tester.getRect(find.textContaining(RegExp(r'^(→ 24|24 ←)$'))),
+        tester.getRect(find.text('24 ≠ 8')),
+      ];
+      final nodes = [for (final s in ['9', '4', '8', '6', '√', '!', '=']) tester.getRect(find.text(s))];
+      for (var i = 0; i < labels.length; i++) {
+        for (final other in [...labels.skip(i + 1), ...nodes]) {
+          expect(labels[i].overlaps(other), isFalse, reason: 'width $width: ${labels[i]} overlaps $other');
+        }
+      }
+    }
   }, variant: desktop);
 }
+
+final _three = RegExp(r'^(→ 3|3 ←)$');
